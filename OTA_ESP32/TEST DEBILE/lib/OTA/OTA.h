@@ -1,8 +1,10 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <ESPmDNS.h>
+
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
+#include <TelnetStream.h>
 
 
 #ifndef _OTA_H

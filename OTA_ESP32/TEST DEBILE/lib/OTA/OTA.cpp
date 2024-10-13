@@ -1,19 +1,23 @@
 #include "OTA.h"
 
 const char *name_card_elec = "BaseEsp32";
-const char *ssid = "Freebox-587F87";
-const char *password = "subcrescat-degend@-parciore@2-adducturos";
+const char *ssid = "Me voici";
+const char *password = "youssef13";
 
 // IPAddress local_IP(192, 168, 1, 177); // IP fixe que vous voulez assigner
-
+void ota_handle(void *parameter)
+{
+  for (;;)
+  {
+    ArduinoOTA.handle();
+    delay(3500);
+  }
+}
 void setupOTA()
 {
+  WiFi.setHostname(name_card_elec);
+
   WiFi.mode(WIFI_STA);
-  // Fixer l'IP statique
-  // if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS))
-  // {
-  //   Serial.println("Erreur de configuration de l'IP statique");
-  // }
 
   WiFi.begin(ssid, password);
   Serial.println("Connexion au WiFi en cours...");
@@ -63,13 +67,24 @@ void setupOTA()
       else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
       else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
       else if (error == OTA_END_ERROR) Serial.println("End Failed"); });
-      
-  WiFi.setHostname(name_card_elec);
+
+ 
   ArduinoOTA.begin();
+  SerialWIFI.begin();
 
   Serial.println("Ready");
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
-  Serial.print("Hostname: ");
+  Serial.print("Wifi Hostname: ");
   Serial.println(WiFi.getHostname());
+  Serial.print("Arduino Hostname: ");
+  Serial.print(ArduinoOTA.getHostname());Serial.println(".local");
+
+  xTaskCreate(
+      ota_handle,   /* Task function. */
+      "OTA_HANDLE", /* String with name of task. */
+      10000,        /* Stack size in bytes. */
+      NULL,         /* Parameter passed as input of the task */
+      1,            /* Priority of the task. */
+      NULL);        /* Task handle. */
 }

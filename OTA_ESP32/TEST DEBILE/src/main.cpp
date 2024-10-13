@@ -1,18 +1,27 @@
-#include <Arduino.h>
-#include "OTA.h"
 
-int i = 0;
+
+#include "OTA.h"
 
 void setup()
 {
-    setupOTA();
     Serial.begin(115200);
-    Serial.println("Bonjour Mon chers OTA");
+    Serial.println("Booting with Telnet");
+
+    setupOTA();
+    while (!SerialWIFI.available())
+    {
+        delay(500);
+        Serial.println("Aucun client connecté, en attente...");
+    }
+    SerialWIFI.println("Coucou");
+
+    // Your setup code
 }
 
 void loop()
 {
-    ArduinoOTA.handle();
-    Serial.println(i++);
-    delay(100);
+    static int i = 0;
+
+    SerialWIFI.println(i++);
+    delay(500);
 }
