@@ -1,10 +1,9 @@
 #include "OTA.h" // Inclusion de la bibliothèque pour gérer l'OTA (Over-The-Air)
-// Je laisse le routeur choisir l'adresse IP et
-// je fixe le nom de mon réseau Wi-Fi, ce qui simplifie les démarches, notamment lors des débogages
-//  Informations de connexion WiFi
+
+// Informations de connexion WiFi
 const char *name_card_elec = "BaseEsp32"; // Nom d'hôte de la carte ESP32
-const char *ssid = "Freebox-587F87";            // SSID du réseau WiFi
-const char *password = "subcrescat-degend@-parciore@2-adducturos";       // Mot de passe du réseau WiFi
+const char *ssid = "Me voici";            // SSID du réseau WiFi
+const char *password = "youssef13";       // Mot de passe du réseau WiFi
 
 // Fonction pour gérer les opérations OTA dans une tâche séparée
 void ota_handle(void *parameter)
@@ -193,7 +192,7 @@ void setupOTA()
       else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
       else if (error == OTA_END_ERROR) Serial.println("End Failed"); });
 
-
+ 
   ArduinoOTA.begin();
   SerialWIFI.begin();
 
