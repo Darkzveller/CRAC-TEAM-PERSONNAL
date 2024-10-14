@@ -10,11 +10,11 @@ void setup()
     setupOTA();
 
     // Boucle jusqu'à ce qu'un client soit connecté via le port série WiFi
-    while (!SerialWIFI.available())
-    {
-        delay(500); // Attente de 500 ms avant de vérifier à nouveau
-        Serial.println("Aucun client connecté, en attente..."); // Message indiquant qu'il n'y a pas de client connecté
-    }
+    // while (!SerialWIFI.available())
+    // {
+    //     delay(500); // Attente de 500 ms avant de vérifier à nouveau
+    //     Serial.println("Aucun client connecté, en attente..."); // Message indiquant qu'il n'y a pas de client connecté
+    // }
 
     // Une fois qu'un client est connecté, envoie "Coucou" via la connexion série WiFi
     SerialWIFI.println("Coucou");
