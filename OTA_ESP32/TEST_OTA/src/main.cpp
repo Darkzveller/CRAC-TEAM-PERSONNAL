@@ -10,11 +10,11 @@ void setup()
     setupOTA();
 
     // Boucle jusqu'à ce qu'un client soit connecté via le port série WiFi
-    // while (!SerialWIFI.available())
-    // {
-    //     delay(500); // Attente de 500 ms avant de vérifier à nouveau
-    //     Serial.println("Aucun client connecté, en attente..."); // Message indiquant qu'il n'y a pas de client connecté
-    // }
+    while (!SerialWIFI.available())
+    {
+        delay(500);                                             // Attente de 500 ms avant de vérifier à nouveau
+        Serial.println("Aucun client connecté, en attente..."); // Message indiquant qu'il n'y a pas de client connecté
+    }
 
     // Une fois qu'un client est connecté, envoie "Coucou" via la connexion série WiFi
     SerialWIFI.println("Coucou");
@@ -26,11 +26,27 @@ void setup()
 // Boucle principale, exécutée en continu après le setup
 void loop()
 {
-    static int i = 0; // Déclaration d'une variable statique qui conserve sa valeur entre les appels
+    static long i = 0; // Déclaration d'une variable statique qui conserve sa valeur entre les appels
 
-    // Envoie la valeur de 'i' via la connexion série WiFi, puis incrémente 'i'
-    SerialWIFI.println(i++);
+    if (SerialWIFI.available())
+    {
+        String input = SerialWIFI.readString(); // Lire la chaîne complète
+        Serial.print("Reçu: ");
+        Serial.println(input); // Afficher ce qui a été reçu
 
-    // Pause de 500 ms avant la prochaine exécution de la boucle
-    delay(500);
+        // Supprimer les espaces ou caractères indésirables (comme le retour à la ligne)
+        input.trim(); // Enlève les espaces superflus et les retours à la ligne
+
+        if (input.equals("stop")) // Vérifier si l'entrée est "stop"
+        {
+            i = 0; // Remise à zéro de la variable
+            SerialWIFI.println(i);
+            Serial.println("Valeur mise à zéro");
+        }
+        else if (input.equals("start")) // Vérifier si l'entrée est "start"
+        {
+            SerialWIFI.println(i++); // Incrémenter i et envoyer
+            Serial.println("Incrémenté : " + String(i));
+        }
+    }
 }

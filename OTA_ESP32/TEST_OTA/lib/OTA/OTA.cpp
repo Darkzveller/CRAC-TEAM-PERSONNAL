@@ -2,18 +2,20 @@
 // Je laisse le routeur choisir l'adresse IP et
 // je fixe le nom de mon réseau Wi-Fi, ce qui simplifie les démarches, notamment lors des débogages
 //  Informations de connexion WiFi
-const char *name_card_elec = "BaseEsp32"; // Nom d'hôte de la carte ESP32
-const char *ssid = "Freebox-587F87";            // SSID du réseau WiFi
-const char *password = "subcrescat-degend@-parciore@2-adducturos";       // Mot de passe du réseau WiFi
+const char *name_card_elec = "BaseEsp32";                          // Nom d'hôte de la carte ESP32
+const char *ssid = "Freebox-587F87";                               // SSID du réseau WiFi
+const char *password = "subcrescat-degend@-parciore@2-adducturos"; // Mot de passe du réseau WiFi
 
 // Fonction pour gérer les opérations OTA dans une tâche séparée
 void ota_handle(void *parameter)
 {
+  TickType_t xLastWakeTime;
+  xLastWakeTime = xTaskGetTickCount();
   for (;;)
   {
     // Gestion des opérations OTA (vérifie si une mise à jour est en cours)
     ArduinoOTA.handle();
-    delay(3500); // Délai entre deux vérifications de l'OTA
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(3500));
   }
 }
 
@@ -28,6 +30,10 @@ void setupOTA()
 
   // Démarre la connexion WiFi avec les identifiants donnés
   WiFi.begin(ssid, password);
+  Serial.println();
+  Serial.print("SSID : ");
+  Serial.println(ssid);
+
   Serial.println("Connexion au WiFi en cours...");
 
   // Boucle jusqu'à ce que la connexion au WiFi soit réussie
@@ -50,7 +56,7 @@ void setupOTA()
   ArduinoOTA.setHostname(name_card_elec);
 
   // Pas de mot de passe par défaut pour l'OTA
-  // ArduinoOTA.setPassword("admin");
+  // ArduinoOTA.setPassword("amdin");
 
   // Possibilité de définir un mot de passe via son hachage MD5
   // ArduinoOTA.setPasswordHash("admin");
@@ -112,6 +118,10 @@ void setupOTA()
   Serial.print("Arduino Hostname: ");
   Serial.print(ArduinoOTA.getHostname()); // Affiche le nom d'hôte pour OTA
   Serial.println(".local");
+  Serial.println("Commande a tapé dans le terminal");
+  Serial.print("telnet ");
+  Serial.print(ArduinoOTA.getHostname());
+  Serial.println(".local 23");
 
   // Création d'une tâche FreeRTOS pour gérer l'OTA dans un thread séparé
   xTaskCreate(
