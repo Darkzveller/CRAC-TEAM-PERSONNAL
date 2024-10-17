@@ -6,7 +6,6 @@
 #include <ArduinoOTA.h>
 #include <TelnetStream.h>
 
-
 #ifndef _OTA_H
 #define _OTA_H
 
