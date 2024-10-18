@@ -28,9 +28,7 @@ void ota_handle(void *parameter)
   xLastWakeTime = xTaskGetTickCount();
   for (;;)
   {
-
-    receptionWIFI();
-    // Gestion des opérations OTA (vérifie si une mise à jour est en cours)
+    SerialWIFIActivites(); // Gestion des opérations OTA (vérifie si une mise à jour est en cours)
     ArduinoOTA.handle();
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(3500));
   }
@@ -149,7 +147,7 @@ void setupOTA()
       1,            /* Priorité de la tâche */
       NULL);        /* Handle de la tâche (aucun ici) */
 }
-
+/*
 void receptionWIFI()
 {
   if (SerialWIFI.available())
@@ -157,7 +155,7 @@ void receptionWIFI()
     String input = SerialWIFI.readString(); // Lire la chaîne complète
     Serial.print("Reçu: ");
     Serial.println(input); // Afficher ce qui a été reçu
-
+    int f = 0;
     // Supprimer les espaces ou caractères indésirables (comme le retour à la ligne)
     input.trim(); // Enlève les espaces superflus et les retours à la ligne
 
@@ -170,5 +168,70 @@ void receptionWIFI()
     {
       SerialWIFI.println("START TEST");
     }
+  }
+}
+*/
+void affichage_commande_wifi()
+{
+
+  SerialWIFI.println("S pour tout stopper");
+  SerialWIFI.println("M pour tout mettre en marche");
+}
+
+void receptionWIFI(char ch)
+{
+
+  static int i = 0;
+  static String chaine = "";
+  String commande;
+  String valeur;
+  int index, length;
+
+  if ((ch == 13) or (ch == 10))
+  {
+    index = chaine.indexOf(' ');
+    length = chaine.length();
+    if (index == -1)
+    {
+      commande = chaine;
+      valeur = "";
+    }
+    else
+    {
+      commande = chaine.substring(0, index);
+      valeur = chaine.substring(index + 1, length);
+    }
+    if (commande == "START")
+    {
+      SerialWIFI.println("Start");
+    }
+    if (commande == "s")
+    {
+      SerialWIFI.println("stop all");
+    }
+    // Exemple de commande possible
+    /*
+        if (commande == "Te")
+        {
+            Te = valeur.toInt();
+        }
+        if (commande == "Kp_moteur")
+        {
+            // Serial.printf("Kp_moteur");
+            Kp_moteur = valeur.toDouble();
+        }*/
+
+    chaine = "";
+  }
+  else
+  {
+    chaine += ch;
+  }
+}
+void SerialWIFIActivites()
+{
+  while (SerialWIFI.available() > 0) // tant qu'il y a des caractères à lire
+  {
+    receptionWIFI(SerialWIFI.read());
   }
 }

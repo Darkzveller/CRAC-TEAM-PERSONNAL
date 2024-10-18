@@ -15,8 +15,7 @@ void setup()
         delay(500);                                             // Attente de 500 ms avant de vérifier à nouveau
         Serial.println("Aucun client connecté, en attente..."); // Message indiquant qu'il n'y a pas de client connecté
     }
-    SerialWIFI.println(""); // Pour qu'on puisse nous, de notré coté voir ce qu'on tape dans l'invite de commandes
-
+    affichage_commande_wifi();
     // Une fois qu'un client est connecté, envoie "Coucou" via la connexion série WiFi
     // SerialWIFI.println("Coucou");
 
@@ -27,5 +26,4 @@ void setup()
 // Boucle principale, exécutée en continu après le setup
 void loop()
 {
-
 }
