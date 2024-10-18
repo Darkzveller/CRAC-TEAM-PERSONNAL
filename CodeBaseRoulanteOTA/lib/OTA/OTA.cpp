@@ -30,7 +30,7 @@ void ota_handle(void *parameter)
   {
     SerialWIFIActivites(); // Gestion des opérations OTA (vérifie si une mise à jour est en cours)
     ArduinoOTA.handle();
-    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(3500));
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(500));
   }
 }
 

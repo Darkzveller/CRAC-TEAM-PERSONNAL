@@ -72,7 +72,7 @@ void setupOTA()
   ArduinoOTA.setHostname(name_card_elec);
 
   // Pas de mot de passe par défaut pour l'OTA
-  // ArduinoOTA.setPassword("onverra");
+  ArduinoOTA.setPassword("onverra");
 
   // Possibilité de définir un mot de passe via son hachage MD5
   // ArduinoOTA.setPasswordHash("admin");

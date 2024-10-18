@@ -3,22 +3,19 @@
 
 #ifndef Variable_H
 #define Variable_H
-const int8_t resolution = 8;
-#define COEFF_ROUE_GAUCHE 1
-#define COEFF_ROUE_DROITE 1.03
-double compDroit;
-double compGauche;
+// Initialisation Moteur
+// Initialisation des paramètre de la pwm
+int frequence = 19500;
+int resolution = 12;
 
-// double Kp_moteur = 6.14;
-// double Kd_moteur = 29.6;
-double Kp_moteur = 0;
-double Kd_moteur = 0;
+int PWM_1 = 17;
+int M1_INA = 26;
+int M1_INB = 25;
+int channel_1 = 0;
 
-double Ki_moteur = 0;
-double limit_integral=0;
-double consigne_angulaire = -0.0328;
-double theta;
-float raccourci_dt;
-// coefficient du filtre
-float A, B;
+int PWM_2 = 18;
+int M2_INA = 16;
+int M2_INB = 15;
+int channel_2 = 1;
+
 #endif
