@@ -5,7 +5,7 @@ long i = 0;      // Déclaration d'une variable statique qui conserve sa valeur 
 // Je laisse le routeur choisir l'adresse IP et
 // je fixe le nom de mon réseau Wi-Fi, ce qui simplifie les démarches, notamment lors des débogages
 //  Informations de connexion WiFi
-const char *name_card_elec = "BaseEsp32";
+const char *name_card_elec = "testota";
 // BESOIN DE ME SIMPLIFIER MA VIE
 #ifdef MON_TELEPHONE                // Nom d'hôte de la carte ESP32
 const char *ssid = "Me voici";      // SSID du réseau WiFi
