@@ -1,6 +1,6 @@
 // #define MON_TELEPHONE
 #define MA_FREEBOX
-
+long i = 0;      // Déclaration d'une variable statique qui conserve sa valeur entre les appels
 #include "OTA.h" // Inclusion de la bibliothèque pour gérer l'OTA (Over-The-Air)
 // Je laisse le routeur choisir l'adresse IP et
 // je fixe le nom de mon réseau Wi-Fi, ce qui simplifie les démarches, notamment lors des débogages
@@ -15,7 +15,7 @@ const char *password = "youssef13"; // Mot de passe du réseau WiFi
 const char *ssid = "Freebox-587F87";                               // SSID du réseau WiFi
 const char *password = "subcrescat-degend@-parciore@2-adducturos"; // Mot de passe du réseau WiFi
 #endif
-#ifdef Mon_PC                                                  // Nom d'hôte de la carte ESP32
+#ifdef Mon_PC                                                      // Nom d'hôte de la carte ESP32
 const char *ssid = "Freebox-587F87";                               // SSID du réseau WiFi
 const char *password = "subcrescat-degend@-parciore@2-adducturos"; // Mot de passe du réseau WiFi
 #endif
@@ -27,6 +27,8 @@ void ota_handle(void *parameter)
   xLastWakeTime = xTaskGetTickCount();
   for (;;)
   {
+
+    receptionWIFI();
     // Gestion des opérations OTA (vérifie si une mise à jour est en cours)
     ArduinoOTA.handle();
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(3500));
@@ -146,7 +148,35 @@ void setupOTA()
       1,            /* Priorité de la tâche */
       NULL);        /* Handle de la tâche (aucun ici) */
 }
+void receptionWIFI()
+{
+  if (SerialWIFI.available())
+  {
+    String input = SerialWIFI.readString(); // Lire la chaîne complète
+    Serial.print("Reçu: ");
+    Serial.println(input); // Afficher ce qui a été reçu
 
+    // Supprimer les espaces ou caractères indésirables (comme le retour à la ligne)
+    input.trim(); // Enlève les espaces superflus et les retours à la ligne
+
+    // if (input.equals("stop")) // Vérifier si l'entrée est "stop"
+    // {
+    //     i = 0; // Remise à zéro de la variable
+    //     SerialWIFI.println(i);
+    //     Serial.println("Valeur mise à zéro");
+    // }
+    if (input.equals("STOP")) // Vérifier si l'entrée est "stop"
+    {
+      // i = 0; // Remise à zéro de la variable
+      SerialWIFI.println("STOP BASE ROULANTE");
+    }
+    if (input.equals("start")) // Vérifier si l'entrée est "start"
+    {
+      SerialWIFI.println(i++); // Incrémenter i et envoyer
+      Serial.println("Incrémenté : " + String(i));
+    }
+  }
+}
 // AU cas ou j'ai mal effectué mes commentaires
 /*#include "OTA.h"
 

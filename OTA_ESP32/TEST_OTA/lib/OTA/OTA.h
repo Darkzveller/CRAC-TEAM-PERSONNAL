@@ -10,5 +10,5 @@
 #define _OTA_H
 
 void setupOTA();
-
+void receptionWIFI();
 #endif

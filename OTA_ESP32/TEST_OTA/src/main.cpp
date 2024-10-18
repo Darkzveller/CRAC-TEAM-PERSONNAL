@@ -27,34 +27,5 @@ void setup()
 // Boucle principale, exécutée en continu après le setup
 void loop()
 {
-    static long i = 0; // Déclaration d'une variable statique qui conserve sa valeur entre les appels
-
-    if (SerialWIFI.available())
-    {
-        String input = SerialWIFI.readString(); // Lire la chaîne complète
-        Serial.print("Reçu: ");
-        Serial.println(input); // Afficher ce qui a été reçu
-
-        // Supprimer les espaces ou caractères indésirables (comme le retour à la ligne)
-        input.trim(); // Enlève les espaces superflus et les retours à la ligne
-
-        // if (input.equals("stop")) // Vérifier si l'entrée est "stop"
-        // {
-        //     i = 0; // Remise à zéro de la variable
-        //     SerialWIFI.println(i);
-        //     Serial.println("Valeur mise à zéro");
-        // }
-        if (input.equals("STOP")) // Vérifier si l'entrée est "stop"
-        {
-            // i = 0; // Remise à zéro de la variable
-            SerialWIFI.println("STOP BASE ROULANTE");
-        }
-        if (input.equals("start")) // Vérifier si l'entrée est "start"
-        {
-            SerialWIFI.println(i++); // Incrémenter i et envoyer
-            Serial.println("Incrémenté : " + String(i));
-        }
-    }
-                SerialWIFI.println(i++); // Incrémenter i et envoyer
 
 }
