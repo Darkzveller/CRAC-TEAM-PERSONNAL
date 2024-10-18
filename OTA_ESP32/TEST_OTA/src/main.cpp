@@ -55,4 +55,6 @@ void loop()
             Serial.println("Incrémenté : " + String(i));
         }
     }
+                SerialWIFI.println(i++); // Incrémenter i et envoyer
+
 }

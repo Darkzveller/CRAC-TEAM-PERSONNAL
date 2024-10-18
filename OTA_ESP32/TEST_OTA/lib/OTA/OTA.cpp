@@ -1,5 +1,5 @@
-#define MON_TELEPHONE
-// #define MA_FREEBOX
+// #define MON_TELEPHONE
+#define MA_FREEBOX
 
 #include "OTA.h" // Inclusion de la bibliothèque pour gérer l'OTA (Over-The-Air)
 // Je laisse le routeur choisir l'adresse IP et
@@ -12,6 +12,10 @@ const char *ssid = "Me voici";      // SSID du réseau WiFi
 const char *password = "youssef13"; // Mot de passe du réseau WiFi
 #endif
 #ifdef MA_FREEBOX                                                  // Nom d'hôte de la carte ESP32
+const char *ssid = "Freebox-587F87";                               // SSID du réseau WiFi
+const char *password = "subcrescat-degend@-parciore@2-adducturos"; // Mot de passe du réseau WiFi
+#endif
+#ifdef Mon_PC                                                  // Nom d'hôte de la carte ESP32
 const char *ssid = "Freebox-587F87";                               // SSID du réseau WiFi
 const char *password = "subcrescat-degend@-parciore@2-adducturos"; // Mot de passe du réseau WiFi
 #endif
@@ -66,7 +70,7 @@ void setupOTA()
   ArduinoOTA.setHostname(name_card_elec);
 
   // Pas de mot de passe par défaut pour l'OTA
-  // ArduinoOTA.setPassword("amdin");
+  // ArduinoOTA.setPassword("onverra");
 
   // Possibilité de définir un mot de passe via son hachage MD5
   // ArduinoOTA.setPasswordHash("admin");
