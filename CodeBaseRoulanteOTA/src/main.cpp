@@ -1,13 +1,32 @@
 #include "OTA.h" // Inclusion de la bibliothèque OTA (Over-The-Air) pour les mises à jour sans fil
+#include "Variable.h"
 #include "MOTEUR.h"
+#include "EncoderManager.h"
+void controle(void *parameters)
+{
+    TickType_t xLastWakeTime;
+    xLastWakeTime = xTaskGetTickCount();
+    while (1)
+    {
+        float x = read_encodeurdroit(SHOW_ANGLE_RADIANS);
+        float z = read_encodeurgauche(SHOW_ANGLE_RADIANS);
+
+        // Serial.println(x);
+        // FlagCalcul = 1;
+        vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
+    }
+}
 void setup()
 {
-    setup_motors();
     // Initialisation de la communication série à 115200 bauds
     Serial.begin(115200);
     Serial.println("Booting with OTA"); // Message indiquant le démarrage avec OTA
-    // Appel à la fonction de configuration OTA (non définie dans ce code, mais probablement ailleurs)
+                                        // Appel à la fonction de configuration OTA (non définie dans ce code, mais probablement ailleurs)
     // setupOTA();
+    // Initialisation des moteurs
+    setup_motors();
+    // Initialisation des encodeurs
+    setup_encodeur();
 
     // Boucle jusqu'à ce qu'un client soit connecté via le port série WiFi
     // while (!SerialWIFI.available())
@@ -17,47 +36,26 @@ void setup()
     // }
     // affichage_commande_wifi();
     Serial.println("on commence");
+    // delay(10000);
+
+    xTaskCreate(
+        controle,   // nom de la fonction
+        "controle", // nom de la tache que nous venons de vréer
+        10000,      // taille de la pile en octet
+        NULL,       // parametre
+        10,         // tres haut niveau de priorite
+        NULL        // descripteur
+    );
 }
 
 // Boucle principale, exécutée en continu après le setup
 void loop()
 {
-    Serial.println("Un tour de boucle effectuer");
-    int temps = 2500;
-    int pwm = 1024;
-    Serial.println("Premier test");
-
-    for (int jsp = 0; jsp < 4096; jsp++)
-    {
-        Serial.printf("pwm = %d\n", jsp);
-        moteur_droit(jsp, true);
-        moteur_gauche(jsp, true);
-        delay(10);
-    }
-
-    for (int jsp = 4096; jsp > 1; jsp--)
-    {
-        Serial.printf("pwm = %d\n", jsp);
-        moteur_droit(jsp, true);
-        moteur_gauche(jsp, true);
-        delay(10);
-    }
-
+    int temps = 1000;
+    moteur_droit(1024, 0);
+    moteur_gauche(1024, 0);
     delay(temps);
-
-    for (int jsp = 0; jsp < 4096; jsp++)
-    {
-        Serial.printf("pwm = %d\n", jsp);
-        moteur_droit(jsp, false);
-        moteur_gauche(jsp, false);
-        delay(10);
-    }
-
-    for (int jsp = 4096; jsp > 1; jsp--)
-    {
-        Serial.printf("pwm = %d\n", jsp);
-        moteur_droit(jsp, false);
-        moteur_gauche(jsp, false);
-        delay(10);
-    }
+    moteur_droit(1024, 1);
+    moteur_gauche(1024, 1);
+    delay(temps);
 }
