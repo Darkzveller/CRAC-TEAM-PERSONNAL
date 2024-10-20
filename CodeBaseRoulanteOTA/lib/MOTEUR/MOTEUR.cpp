@@ -16,7 +16,8 @@ void setup_motors()
 }
 
 void moteur_droit(int pwm, bool sens)
-{
+{    Serial.printf("Pwm Motors %4d\n",pwm);
+
     if (sens == true)
     {
         digitalWrite(M1_INA, 1);

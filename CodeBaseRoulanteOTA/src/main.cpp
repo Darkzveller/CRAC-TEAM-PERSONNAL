@@ -2,6 +2,7 @@
 #include "Variable.h"
 #include "MOTEUR.h"
 #include "EncoderManager.h"
+#include "ASSERVISSEMENT.h"
 #include <mat.h>
 
 // #include "ASSERVISSEMENT.h"
@@ -13,9 +14,8 @@ void controle(void *parameters)
     while (1)
     {
         read_x_y_theta();
-
-        // probl();
-
+        asservissement_roue_folle_droite_tick(0, odo_tick_droit);
+        asservissement_roue_folle_gauche_tick(0, odo_tick_gauche);
         // FlagCalcul = 1;
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
     }
@@ -27,7 +27,7 @@ void setup()
     Serial.begin(115200);
     Serial.println("Booting with OTA"); // Message indiquant le démarrage avec OTA
                                         // Appel à la fonction de configuration OTA (non définie dans ce code, mais probablement ailleurs)
-    // setupOTA();
+    setupOTA();
     // Initialisation des moteurs
     setup_motors();
     // Initialisation des encodeurs
@@ -57,40 +57,4 @@ void setup()
 // Boucle principale, exécutée en continu après le setup
 void loop()
 {
-    int temps = 1000;
-    static int i = 0;
-    int pwm = 2000;
-    /*
-        if (i == 0)
-        {
-            moteur_droit(pwm, 0);
-            moteur_gauche(pwm, 0);
-            delay(temps);
-            moteur_droit(0, 0);
-            moteur_gauche(0, 0);
-            delay(5000);
-
-            moteur_droit(2048, 1);
-            moteur_gauche(2048, 0);
-            delay(340);
-            moteur_droit(pwm, 0);
-            moteur_gauche(pwm, 0);
-            delay(temps);
-            // moteur_droit(pwm, 0);
-            // moteur_gauche(pwm, 0);
-
-            //     // moteur_droit(pwm, 1);
-            //     // moteur_gauche(pwm, 0);
-            //     // delay(1000);
-            //     // moteur_droit(pwm, 0);
-            //     // moteur_gauche(pwm, 0);
-            //     // delay(temps);
-        }
-        else
-        {
-            stop_motors();
-        }
-        i++;*/
-    moteur_droit(pwm, 1);
-    moteur_gauche(pwm, 0);
 }

@@ -27,20 +27,41 @@
 #define COEFF_ROUE_GAUCHE 1
 #define SIZE_WHEEL_DIAMETER_mm 50.0
 
-extern float theta_robot_prec;
-extern float theta_robot ;
-extern float odo_x, odo_y;
-extern float odo_last_d ;
-extern float odo_last_g ;
+extern double theta_robot_prec;
+extern double theta_robot ;
+
+extern double odo_x, odo_y;
+extern double odo_last_d ;
+extern double odo_last_g ;
  
-extern float delta_droit;
-extern float delta_gauche;
+extern double odo_tick_droit;
+extern double odo_tick_gauche;
 
-extern uint8_t tab_encodeur_droit[2];
-extern uint8_t tab_encodeur_gauche[2];
+extern double delta_droit;
+extern double delta_gauche;
 
-extern float odo_dist_gauche;
-extern float odo_dist_droit;
+#define PIN_ENCODEUR_1 23
+#define PIN_ENCODEUR_2 22
+
+#define PIN_ENCODEUR_3 36
+#define PIN_ENCODEUR_4 39
+// uint8_t  tab_encodeur_droit[2] = {23, 22};
+// uint8_t  tab_encodeur_gauche[2] = {36, 39};
+
+extern double odo_dist_gauche;
+extern double odo_dist_droit;
+//************Asservissement ROUE FOLLE EN TICK */
+
+extern float coeff_P_roue_folle_tick ;
+extern float coeff_D_roue_folle_tick ;
+extern float coeff_I_roue_folle_tick ;
+
+extern float erreur_prec_roue_folle_droite_tick;
+extern float erreur_prec_roue_folle_gauche_tick ;
+extern float integral_limit_roue_folle_tick ; 
+
+extern float somme_integral_roue_folle_droite_tick; 
+extern float somme_integral_roue_folle_gauche_tick; 
 
 
 #endif

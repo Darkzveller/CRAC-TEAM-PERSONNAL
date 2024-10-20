@@ -7,8 +7,8 @@ ESP32Encoder encoderdroite;
 void setup_encodeur()
 {
     ESP32Encoder::useInternalWeakPullResistors = UP; // Utilise les résistances internes
-    encoderdroite.attachHalfQuad(tab_encodeur_droit[0], tab_encodeur_droit[1]);
-    encodergauche.attachHalfQuad(tab_encodeur_gauche[0], tab_encodeur_gauche[1]);
+    encoderdroite.attachHalfQuad(PIN_ENCODEUR_1, PIN_ENCODEUR_2);
+    encodergauche.attachHalfQuad(PIN_ENCODEUR_3, PIN_ENCODEUR_4);
 
     encoderdroite.clearCount();
     encodergauche.clearCount();
@@ -17,7 +17,8 @@ void setup_encodeur()
 void read_encodeurdroit()
 {
     long double val_tick = encoderdroite.getCount() * COEFF_ROUE_DROITE;
-    float dist = (2.0 * M_PI * (SIZE_WHEEL_DIAMETER_mm / 2.0) / TIC_PER_TOUR) * val_tick;
+    odo_tick_droit =val_tick;
+    double dist = (2.0 * M_PI * (SIZE_WHEEL_DIAMETER_mm / 2.0) / TIC_PER_TOUR) * val_tick;
     odo_dist_droit = dist;
     // Serial.printf("dista = %4.2f\n", dist);
 
@@ -60,7 +61,8 @@ void read_encodeurdroit()
 void read_encodeurgauche()
 {
     long double val_tick = encodergauche.getCount() * COEFF_ROUE_GAUCHE;
-    float dist = (2.0 * M_PI * (SIZE_WHEEL_DIAMETER_mm / 2.0) / TIC_PER_TOUR) * val_tick;
+    odo_tick_gauche = val_tick;
+    double dist = (2.0 * M_PI * (SIZE_WHEEL_DIAMETER_mm / 2.0) / TIC_PER_TOUR) * val_tick;
     odo_dist_gauche = dist;
     // Serial.printf("dista droite= %4.2f\n", dist);
 
@@ -111,7 +113,7 @@ void read_x_y_theta()
     odo_last_d = odo_dist_droit;
     odo_last_g = odo_dist_gauche;
 
-    float distance_parcourue = 0.5 * (delta_droit + delta_gauche);
+    double distance_parcourue = 0.5 * (delta_droit + delta_gauche);
     /*
         theta_robot = ((delta_droit - delta_gauche) * 0.5) / ENTRAXE;
 
