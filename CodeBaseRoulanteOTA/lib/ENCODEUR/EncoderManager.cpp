@@ -145,15 +145,15 @@ pareil pour ordo_y
     // Mise à jour des coordonnées x et y
     odo_x += cos(theta_robot) * distance_parcourue;
     odo_y += sin(theta_robot) * distance_parcourue;
-
-    if (theta_robot > (2 * PI))
-    {
-        theta_robot = theta_robot * 0.0;
-    }
-    if (theta_robot < -(2 * PI))
-    {
-        theta_robot = theta_robot * 0.0;
-    }
+    /*
+        if (theta_robot > (2 * PI))
+        {
+            theta_robot = theta_robot * 0.0;
+        }
+        if (theta_robot < -(2 * PI))
+        {
+            theta_robot = theta_robot * 0.0;
+        }*/
     // Serial.printf("dparcourue %4.2f distdroit %4.2f  dist gauche %4.2f ", distance_parcourue, odo_dist_droit, odo_dist_gauche);
     // Serial.printf(" x %4.2f mm y %4.2f mm theta %4.2f deg\n", odo_x, odo_y, theta_robot * 180 / 3.14);
 
