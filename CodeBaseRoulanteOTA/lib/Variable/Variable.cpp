@@ -20,14 +20,23 @@ uint8_t  tab_encodeur_gauche[2] = {36, 39};
 float angle_precedent_droit;
 float angle_precedent_gauche;
 
-float odo_gauche;
-float odo_droit;
+float odo_tick_gauche;
+float odo_tick_droit;
 
 float odo_dist_gauche;
 float odo_dist_droit;
 
 float theta_droit;
 float theta_gauche;
+
+float theta_robot_prec = 0;
+float theta_robot = 0;
+float odo_x, odo_y;
+float odo_last_d = 0;
+float odo_last_g = 0;
+
+float delta_droit;
+float delta_gauche;
 
 
 // Variable asservissement

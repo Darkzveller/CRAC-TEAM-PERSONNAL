@@ -8,5 +8,5 @@
 void setup_encodeur();
 void read_encodeurdroit();
 void read_encodeurgauche();
-
+void read_x_y_theta();
 #endif

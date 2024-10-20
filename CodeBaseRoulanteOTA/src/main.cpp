@@ -2,29 +2,19 @@
 #include "Variable.h"
 #include "MOTEUR.h"
 #include "EncoderManager.h"
+#include <mat.h>
+
 // #include "ASSERVISSEMENT.h"
 
-float theta_robot_prec = 0;
-float theta_robot = 0;
 void controle(void *parameters)
 {
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        read_encodeurdroit();
-        read_encodeurgauche();
-        float distance_parcourue = 0.5 * (odo_droit + odo_gauche);
+        read_x_y_theta();
 
-        theta_robot = (((odo_dist_droit - odo_dist_gauche)) / ENTRAXE);
-        theta_robot_prec = 1 / (1 + Tau_odo / Te) * theta_robot + Tau_odo / Te * 1 / (1 + Tau_odo / Te) * theta_robot_prec;
-
-        float odo_x = cos(theta_robot) * distance_parcourue;
-        float odo_y = sin(theta_robot) * distance_parcourue;
-
-
-        Serial.printf("distdroit %4.2f  dist gauche %4.2f ", odo_dist_droit, odo_dist_gauche);
-        Serial.printf(" x %4.2f mm y %4.2f mm theta %4.2f rad theta %4.2f deg\n", odo_x, odo_y, theta_robot, theta_robot * 180 / 3.14);
+        // probl();
 
         // FlagCalcul = 1;
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
@@ -61,7 +51,7 @@ void setup()
         10,         // tres haut niveau de priorite
         NULL        // descripteur
     );
-    delay(10000);
+    delay(7500);
 }
 
 // Boucle principale, exécutée en continu après le setup
@@ -69,32 +59,38 @@ void loop()
 {
     int temps = 1000;
     static int i = 0;
-    int pwm = 1024;
+    int pwm = 2000;
+    /*
+        if (i == 0)
+        {
+            moteur_droit(pwm, 0);
+            moteur_gauche(pwm, 0);
+            delay(temps);
+            moteur_droit(0, 0);
+            moteur_gauche(0, 0);
+            delay(5000);
 
-    if (i == 0)
-    {
-        moteur_droit(pwm, 1);
-        moteur_gauche(pwm, 0);
-        delay(temps);
-        moteur_droit(pwm, 0);
-        moteur_gauche(pwm, 0);
-        delay(temps);
-        // moteur_droit(pwm, 1);
-        // moteur_gauche(pwm, 1);
-        // delay(temps);
-        // moteur_droit(pwm, 0);
-        // moteur_gauche(pwm, 0);
+            moteur_droit(2048, 1);
+            moteur_gauche(2048, 0);
+            delay(340);
+            moteur_droit(pwm, 0);
+            moteur_gauche(pwm, 0);
+            delay(temps);
+            // moteur_droit(pwm, 0);
+            // moteur_gauche(pwm, 0);
 
-        // moteur_droit(pwm, 1);
-        // moteur_gauche(pwm, 0);
-        // delay(1000);
-        // moteur_droit(pwm, 0);
-        // moteur_gauche(pwm, 0);
-        // delay(temps);
-    }
-    else
-    {
-        stop_motors();
-    }
-    i++;
+            //     // moteur_droit(pwm, 1);
+            //     // moteur_gauche(pwm, 0);
+            //     // delay(1000);
+            //     // moteur_droit(pwm, 0);
+            //     // moteur_gauche(pwm, 0);
+            //     // delay(temps);
+        }
+        else
+        {
+            stop_motors();
+        }
+        i++;*/
+    moteur_droit(pwm, 1);
+    moteur_gauche(pwm, 0);
 }
