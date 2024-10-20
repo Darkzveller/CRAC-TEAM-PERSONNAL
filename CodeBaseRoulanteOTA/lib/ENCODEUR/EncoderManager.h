@@ -6,7 +6,7 @@
 #define ENCODERMANAGER_H
 
 void setup_encodeur();
-float read_encodeurdroit(uint8_t grandeur_A_Mesure);
-float read_encodeurgauche(uint8_t grandeur_A_Mesure);
+void read_encodeurdroit();
+void read_encodeurgauche();
 
 #endif

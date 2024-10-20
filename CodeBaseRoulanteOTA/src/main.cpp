@@ -2,22 +2,43 @@
 #include "Variable.h"
 #include "MOTEUR.h"
 #include "EncoderManager.h"
+// #include "ASSERVISSEMENT.h"
+
+float theta_prec = 0;
+float theta = 0;
+float A, B, Tau = 10;
 void controle(void *parameters)
 {
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        float x = read_encodeurdroit(SHOW_ANGLE_RADIANS);
-        float z = read_encodeurgauche(SHOW_ANGLE_RADIANS);
+        read_encodeurdroit();
+        read_encodeurgauche();
+        float distance_parcourue = 0.5 * (odo_droit + odo_gauche);
 
-        // Serial.println(x);
+        // float theta = (odo_droit - odo_gauche)/LARGEUR_ROBOT_mm;
+        // float theta = rouedroite - ((perimetreroue*correcteur/resolution)* roue gauche) /Entraxe  + theta prece    ;
+        // theta = (((odo_droit - odo_gauche) * (SIZE_WHEEL_mm / TIC_PER_TOUR)) / ENTRAXE) + theta_prec;
+
+        theta = (((odo_dist_droit - odo_dist_gauche)) / ENTRAXE) * 2;
+
+        theta_prec = 1 / (1 + Tau / Te) * theta + Tau / Te * 1 / (1 + Tau / Te) * theta_prec;
+
+        float odo_x = cos(theta) * distance_parcourue;
+        float odo_y = sin(theta) * distance_parcourue;
+
+
+        Serial.printf("distdroit %4.2f  dist gauche %4.2f ", odo_dist_droit, odo_dist_gauche);
+        Serial.printf(" x %4.2f mm y %4.2f mm theta %4.2f rad theta %4.2f deg\n", odo_x, odo_y, theta, theta * 180 / 3.14);
+
         // FlagCalcul = 1;
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
     }
 }
 void setup()
-{
+{ // calcul coeff filtre
+
     // Initialisation de la communication série à 115200 bauds
     Serial.begin(115200);
     Serial.println("Booting with OTA"); // Message indiquant le démarrage avec OTA
@@ -46,16 +67,40 @@ void setup()
         10,         // tres haut niveau de priorite
         NULL        // descripteur
     );
+    delay(10000);
 }
 
 // Boucle principale, exécutée en continu après le setup
 void loop()
 {
     int temps = 1000;
-    moteur_droit(1024, 0);
-    moteur_gauche(1024, 0);
-    delay(temps);
-    moteur_droit(1024, 1);
-    moteur_gauche(1024, 1);
-    delay(temps);
+    static int i = 0;
+    int pwm = 1024;
+
+    if (i == 0)
+    {
+        moteur_droit(pwm, 1);
+        moteur_gauche(pwm, 0);
+        delay(temps);
+        moteur_droit(pwm, 0);
+        moteur_gauche(pwm, 0);
+        delay(temps);
+        // moteur_droit(pwm, 1);
+        // moteur_gauche(pwm, 1);
+        // delay(temps);
+        // moteur_droit(pwm, 0);
+        // moteur_gauche(pwm, 0);
+
+        // moteur_droit(pwm, 1);
+        // moteur_gauche(pwm, 0);
+        // delay(1000);
+        // moteur_droit(pwm, 0);
+        // moteur_gauche(pwm, 0);
+        // delay(temps);
+    }
+    else
+    {
+        stop_motors();
+    }
+    i++;
 }

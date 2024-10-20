@@ -47,8 +47,9 @@ void moteur_gauche(int pwm, bool sens)
 
 void stop_motors()
 {
-    digitalWrite(M2_INA, 0);
-    digitalWrite(M2_INB, 0);
-    digitalWrite(M1_INA, 0);
-    digitalWrite(M1_INB, 0);
+    bool stop = true;
+    digitalWrite(M2_INA, stop);
+    digitalWrite(M2_INB, stop);
+    digitalWrite(M1_INA, stop);
+    digitalWrite(M1_INB, stop);
 }
