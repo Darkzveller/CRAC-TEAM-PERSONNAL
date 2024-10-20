@@ -19,7 +19,7 @@ extern int M2_INA;
 extern int M2_INB;
 extern int channel_2;
 // Encodeur + Parametre physique du robot
-#define ENTRAXE 140
+#define ENTRAXE 75
 #define LARGEUR_ROBOT_mm 250
 #define TIC_PER_TOUR 2048
 #define RESOLUTION_ROUE_CODEUSE 10
@@ -34,6 +34,8 @@ extern int channel_2;
 
 extern uint8_t tab_encodeur_droit[2];
 extern uint8_t tab_encodeur_gauche[2];
+
+extern float Tau_odo;
 
 extern float angle_precedent_droit;
 extern float angle_precedent_gauche;

@@ -4,9 +4,8 @@
 #include "EncoderManager.h"
 // #include "ASSERVISSEMENT.h"
 
-float theta_prec = 0;
-float theta = 0;
-float A, B, Tau = 10;
+float theta_robot_prec = 0;
+float theta_robot = 0;
 void controle(void *parameters)
 {
     TickType_t xLastWakeTime;
@@ -17,20 +16,15 @@ void controle(void *parameters)
         read_encodeurgauche();
         float distance_parcourue = 0.5 * (odo_droit + odo_gauche);
 
-        // float theta = (odo_droit - odo_gauche)/LARGEUR_ROBOT_mm;
-        // float theta = rouedroite - ((perimetreroue*correcteur/resolution)* roue gauche) /Entraxe  + theta prece    ;
-        // theta = (((odo_droit - odo_gauche) * (SIZE_WHEEL_mm / TIC_PER_TOUR)) / ENTRAXE) + theta_prec;
+        theta_robot = (((odo_dist_droit - odo_dist_gauche)) / ENTRAXE);
+        theta_robot_prec = 1 / (1 + Tau_odo / Te) * theta_robot + Tau_odo / Te * 1 / (1 + Tau_odo / Te) * theta_robot_prec;
 
-        theta = (((odo_dist_droit - odo_dist_gauche)) / ENTRAXE) * 2;
-
-        theta_prec = 1 / (1 + Tau / Te) * theta + Tau / Te * 1 / (1 + Tau / Te) * theta_prec;
-
-        float odo_x = cos(theta) * distance_parcourue;
-        float odo_y = sin(theta) * distance_parcourue;
+        float odo_x = cos(theta_robot) * distance_parcourue;
+        float odo_y = sin(theta_robot) * distance_parcourue;
 
 
         Serial.printf("distdroit %4.2f  dist gauche %4.2f ", odo_dist_droit, odo_dist_gauche);
-        Serial.printf(" x %4.2f mm y %4.2f mm theta %4.2f rad theta %4.2f deg\n", odo_x, odo_y, theta, theta * 180 / 3.14);
+        Serial.printf(" x %4.2f mm y %4.2f mm theta %4.2f rad theta %4.2f deg\n", odo_x, odo_y, theta_robot, theta_robot * 180 / 3.14);
 
         // FlagCalcul = 1;
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));

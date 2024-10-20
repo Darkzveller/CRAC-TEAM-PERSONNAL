@@ -12,6 +12,8 @@ int M2_INA = 16;
 int M2_INB = 15;
 int channel_2 = 1;
 // Encodeur
+float Tau_odo = 100;
+
 uint8_t  tab_encodeur_droit[2] = {23, 22};
 uint8_t  tab_encodeur_gauche[2] = {36, 39};
 
@@ -26,5 +28,7 @@ float odo_dist_droit;
 
 float theta_droit;
 float theta_gauche;
+
+
 // Variable asservissement
 

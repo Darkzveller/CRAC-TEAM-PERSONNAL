@@ -22,7 +22,7 @@ void read_encodeurdroit()
     
     float number_tour = val_tick * 1.0 / TIC_PER_TOUR;
     float angle_actuelle_radians = 2.0 * M_PI * number_tour / 1.0;
-    // theta_droit = angle_actuelle_radians;
+    theta_droit = angle_actuelle_radians;
     float distance_parcourue_translation = angle_actuelle_radians * SIZE_WHEEL_mm / (2.0 * M_PI);
     odo_dist_droit = distance_parcourue_translation;
     float vitesse_angulaire = (angle_actuelle_radians - angle_precedent_droit) / Te;
@@ -60,7 +60,7 @@ void read_encodeurgauche()
 
     float number_tour = val_tick * 1.0 / TIC_PER_TOUR;
     float angle_actuelle_radians = 2.0 * M_PI * number_tour / 1.0;
-    // theta_gauche = angle_actuelle_radians;
+    theta_gauche = angle_actuelle_radians;
     float distance_parcourue_translation = angle_actuelle_radians * SIZE_WHEEL_mm / (2.0 * M_PI);
     odo_dist_gauche = distance_parcourue_translation;
 
