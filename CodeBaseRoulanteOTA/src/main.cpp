@@ -4,7 +4,7 @@
 #include "EncoderManager.h"
 #include "ASSERVISSEMENT.h"
 #include <mat.h>
-// #include "ASSERVISSEMENT.h"
+
 int f = 0;
 void controle(void *parameters)
 {
@@ -14,8 +14,6 @@ void controle(void *parameters)
     {
         if (flag_controle)
         {
-            read_x_y_theta();
-            // Serial.printf("f %4d ", f);
 
             asservissement_roue_folle_droite_tick(f, odo_tick_droit);
             asservissement_roue_folle_gauche_tick(f, odo_tick_gauche);
@@ -37,13 +35,27 @@ void controle(void *parameters)
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
     }
 }
+void odo(void *parameters)
+{
+    TickType_t xLastWakeTime;
+    xLastWakeTime = xTaskGetTickCount();
+    while (1)
+    {
+
+        read_x_y_theta();
+
+        // FlagCalcul = 1;
+        vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
+    }
+}
+
 void setup()
 { // calcul coeff filtre
 
     // Initialisation de la communication série à 115200 bauds
     Serial.begin(115200);
     // Serial.println("Booting with OTA"); // Message indiquant le démarrage avec OTA
-                                        // Appel à la fonction de configuration OTA (non définie dans ce code, mais probablement ailleurs)
+    // Appel à la fonction de configuration OTA (non définie dans ce code, mais probablement ailleurs)
     setupOTA();
     // Initialisation des moteurs
     setup_motors();
@@ -67,6 +79,14 @@ void setup()
         NULL,       // parametre
         10,         // tres haut niveau de priorite
         NULL        // descripteur
+    );
+    xTaskCreate(
+        odo,   // nom de la fonction
+        "odo", // nom de la tache que nous venons de vréer
+        10000, // taille de la pile en octet
+        NULL,  // parametre
+        11,    // tres haut niveau de priorite
+        NULL   // descripteur
     );
 }
 
