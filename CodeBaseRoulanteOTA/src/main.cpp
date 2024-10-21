@@ -19,7 +19,7 @@ void controle(void *parameters)
 
             asservissement_roue_folle_droite_tick(f, odo_tick_droit);
             asservissement_roue_folle_gauche_tick(f, odo_tick_gauche);
-            Serial.println();
+            // Serial.println();
             // f = f + 12 * 2;
             // delay(10);
 
@@ -42,7 +42,7 @@ void setup()
 
     // Initialisation de la communication série à 115200 bauds
     Serial.begin(115200);
-    Serial.println("Booting with OTA"); // Message indiquant le démarrage avec OTA
+    // Serial.println("Booting with OTA"); // Message indiquant le démarrage avec OTA
                                         // Appel à la fonction de configuration OTA (non définie dans ce code, mais probablement ailleurs)
     setupOTA();
     // Initialisation des moteurs

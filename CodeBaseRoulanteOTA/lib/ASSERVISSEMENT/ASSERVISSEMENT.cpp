@@ -1,14 +1,14 @@
 #include "Variable.h" // Remonte d'un niveau pour atteindre lib
 #include "MOTEUR.h"
 #include "ASSERVISSEMENT.h"
-
+#include "OTA.h"
 
 void asservissement_roue_folle_droite_tick(double consigne, double observation)
 {
   bool sens = 0;
   double sortie_roue_folle;
 
-  double resolution_calculer = (pow(2, resolution_pwm) - 1)*POURCENT_MAX_PWM;
+  double resolution_calculer = (pow(2, resolution_pwm) - 1) * POURCENT_MAX_PWM;
   double erreur = consigne - observation;
 
   double proportionnel = erreur * coeff_P_roue_folle_tick;
@@ -62,7 +62,9 @@ void asservissement_roue_folle_droite_tick(double consigne, double observation)
       sortie_roue_folle = -commande;
     }
   }
-  Serial.printf("cmd %5.2f P %5.2f D %5.2f I %5.2f Sinte %5.2f err %5.2f obs %5.2f  cons %5.2f resol %4.0f ", commande, proportionnel, deriver, integral, somme_integral_roue_folle_droite_tick, erreur, observation, consigne,resolution_calculer);
+  // Serial.printf("cmd %5.2f P %5.2f D %5.2f I %5.2f Sinte %5.2f err %5.2f obs %5.2f  cons %5.2f resol %4.0f", commande, proportionnel, deriver, integral, somme_integral_roue_folle_droite_tick, erreur, observation, consigne, resolution_calculer);
+  // SerialWIFI.printf("cmd %5.2f P %5.2f D %5.2f I %5.2f Sinte %5.2f err %5.2f obs %5.2f  cons %5.2f resol %4.0f", commande, proportionnel, deriver, integral, somme_integral_roue_folle_droite_tick, erreur, observation, consigne, resolution_calculer);
+  // SerialWIFI.println();
   moteur_droit(sortie_roue_folle, sens);
 }
 
