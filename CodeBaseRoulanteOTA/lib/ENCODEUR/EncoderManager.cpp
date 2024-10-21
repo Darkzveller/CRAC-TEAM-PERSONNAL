@@ -17,7 +17,7 @@ void setup_encodeur()
 void read_encodeurdroit()
 {
     long double val_tick = encoderdroite.getCount() * COEFF_ROUE_DROITE;
-    odo_tick_droit =val_tick;
+    odo_tick_droit = val_tick;
     double dist = (2.0 * M_PI * (SIZE_WHEEL_DIAMETER_mm / 2.0) / TIC_PER_TOUR) * val_tick;
     odo_dist_droit = dist;
     // Serial.printf("dista = %4.2f\n", dist);
@@ -103,6 +103,11 @@ void read_encodeurgauche()
     // }
 }
 
+void reset_encodeur()
+{
+    encoderdroite.clearCount();
+    encodergauche.clearCount();
+}
 void read_x_y_theta()
 {
 

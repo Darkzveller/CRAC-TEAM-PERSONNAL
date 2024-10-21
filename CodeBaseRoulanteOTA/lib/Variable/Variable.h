@@ -7,7 +7,8 @@
 
 // Déclaration des variables externes
 #define frequence 19500
-#define resolution_pwm 12 
+#define resolution_pwm 12
+#define POURCENT_MAX_PWM 0.75 
 // Moteur droit
 #define PWM_1 17 
 #define M1_INA 26
@@ -62,6 +63,12 @@ extern float integral_limit_roue_folle_tick ;
 
 extern float somme_integral_roue_folle_droite_tick; 
 extern float somme_integral_roue_folle_gauche_tick; 
+
+
+
+//***********OTA******************* */
+
+extern bool flag_controle ;
 
 
 #endif

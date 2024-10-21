@@ -1,11 +1,15 @@
-// #define MON_TELEPHONE
-// #define MA_FREEBOX
-#define MON_PC
-long i = 0;      // Déclaration d'une variable statique qui conserve sa valeur entre les appels
 #include "OTA.h" // Inclusion de la bibliothèque pour gérer l'OTA (Over-The-Air)
+#include "Variable.h"
+#include "MOTEUR.h"
+#include "EncoderManager.h"
 // Je laisse le routeur choisir l'adresse IP et
 // je fixe le nom de mon réseau Wi-Fi, ce qui simplifie les démarches, notamment lors des débogages
 //  Informations de connexion WiFi
+
+// #define MON_TELEPHONE
+// #define MA_FREEBOX
+#define MON_PC
+
 const char *name_card_elec = "baseroulante";
 // BESOIN DE ME SIMPLIFIER MA VIE
 #ifdef MON_TELEPHONE                // Nom d'hôte de la carte ESP32
@@ -20,7 +24,7 @@ const char *password = "subcrescat-degend@-parciore@2-adducturos"; // Mot de pas
 const char *ssid = "Detective-Conan"; // SSID du réseau WiFi
 const char *password = "99xS,304";    // Mot de passe du réseau WiFi
 #endif
-
+bool justepouraffichage = 0;
 // Fonction pour gérer les opérations OTA dans une tâche séparée
 void ota_handle(void *parameter)
 {
@@ -171,6 +175,7 @@ void receptionWIFI()
   }
 }
 */
+
 void affichage_commande_wifi()
 {
 
@@ -201,14 +206,56 @@ void receptionWIFI(char ch)
       commande = chaine.substring(0, index);
       valeur = chaine.substring(index + 1, length);
     }
-    if (commande == "START")
+    if (commande == "start")
     {
+      flag_controle = 1;
       SerialWIFI.println("Start");
     }
     if (commande == "s")
     {
+      flag_controle = 0;
       SerialWIFI.println("stop all");
     }
+    if (commande == "resetO")
+    {
+      reset_encodeur();
+      SerialWIFI.println("Reset encodeur");
+    }
+
+    if (commande == "P")
+    {
+      coeff_P_roue_folle_tick = valeur.toFloat();
+      SerialWIFI.printf("P = %4.6f", coeff_P_roue_folle_tick);
+      SerialWIFI.println();
+    }
+
+    if (commande == "D")
+    {
+      coeff_D_roue_folle_tick = valeur.toFloat();
+      SerialWIFI.printf("D = %4.6f", coeff_D_roue_folle_tick);
+      SerialWIFI.println();
+    }
+    if (commande == "I")
+    {
+      coeff_I_roue_folle_tick = valeur.toFloat();
+      SerialWIFI.printf("I = %4.6f", coeff_I_roue_folle_tick);
+      SerialWIFI.println();
+    }
+    if (commande == "SI")
+    {
+      integral_limit_roue_folle_tick = valeur.toInt();
+      SerialWIFI.printf("SI = %4.6f", integral_limit_roue_folle_tick);
+      SerialWIFI.println();
+    }
+    if (commande == "all_coeff_tick")
+    {
+      SerialWIFI.printf("P = %4.3f", coeff_P_roue_folle_tick);
+      SerialWIFI.printf(" D = %4.3f ", coeff_D_roue_folle_tick);
+      SerialWIFI.printf(" I = %4.3f", coeff_I_roue_folle_tick);
+      SerialWIFI.printf(" SI = %4.1f ", integral_limit_roue_folle_tick);
+      SerialWIFI.println();
+    }
+
     // Exemple de commande possible
     /*
         if (commande == "Te")
@@ -232,6 +279,12 @@ void SerialWIFIActivites()
 {
   while (SerialWIFI.available() > 0) // tant qu'il y a des caractères à lire
   {
+    if (justepouraffichage == 0)
+    {
+      SerialWIFI.println("Bien veneu dans le terminal WIFI");
+    }
+    justepouraffichage = 1;
+
     receptionWIFI(SerialWIFI.read());
   }
 }

@@ -4,18 +4,35 @@
 #include "EncoderManager.h"
 #include "ASSERVISSEMENT.h"
 #include <mat.h>
-
 // #include "ASSERVISSEMENT.h"
-
+int f = 0;
 void controle(void *parameters)
 {
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        read_x_y_theta();
-        asservissement_roue_folle_droite_tick(0, odo_tick_droit);
-        asservissement_roue_folle_gauche_tick(0, odo_tick_gauche);
+        if (flag_controle)
+        {
+            read_x_y_theta();
+            // Serial.printf("f %4d ", f);
+
+            asservissement_roue_folle_droite_tick(f, odo_tick_droit);
+            asservissement_roue_folle_gauche_tick(f, odo_tick_gauche);
+            Serial.println();
+            // f = f + 12 * 2;
+            // delay(10);
+
+            // if (f > (4095 * 2))
+            // {
+            //     f = (4096 * 2);
+            // }
+        }
+        else
+        {
+            stop_motors();
+        }
+
         // FlagCalcul = 1;
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
     }
@@ -39,9 +56,9 @@ void setup()
     //     delay(500);                                             // Attente de 500 ms avant de vérifier à nouveau
     //     Serial.println("Aucun client connecté, en attente..."); // Message indiquant qu'il n'y a pas de client connecté
     // }
+    // delay(10000);
     // affichage_commande_wifi();
     Serial.println("on commence");
-    // delay(10000);
 
     xTaskCreate(
         controle,   // nom de la fonction
@@ -51,7 +68,6 @@ void setup()
         10,         // tres haut niveau de priorite
         NULL        // descripteur
     );
-    delay(7500);
 }
 
 // Boucle principale, exécutée en continu après le setup
