@@ -2,7 +2,7 @@
 
 // Définition des variables
 // Encodeur
-
+double erreur_test;
 
 double odo_dist_gauche;
 double odo_dist_droit;
@@ -19,7 +19,7 @@ double odo_tick_gauche;
 double delta_droit;
 double delta_gauche;
 
-
+double distance_parcourue;
 // Variable asservissement
 //************Asservissement ROUE FOLLE EN TICK */
 

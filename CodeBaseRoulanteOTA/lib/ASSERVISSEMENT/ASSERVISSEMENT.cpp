@@ -10,7 +10,7 @@ void asservissement_roue_folle_droite_tick(double consigne, double observation)
 
   double resolution_calculer = (pow(2, resolution_pwm) - 1) * POURCENT_MAX_PWM;
   double erreur = consigne - observation;
-
+erreur_test=erreur;
   double proportionnel = erreur * coeff_P_roue_folle_tick;
 
   double deriver = coeff_D_roue_folle_tick * (erreur - erreur_prec_roue_folle_droite_tick) / Te;
@@ -62,11 +62,14 @@ void asservissement_roue_folle_droite_tick(double consigne, double observation)
       sortie_roue_folle = -commande;
     }
   }
+    // Serial.printf("cmd %5.2f err %5.2f obs %5.2f  cons %5.2f ", commande,erreur, observation, consigne);
+
   // Serial.printf("cmd %5.2f P %5.2f D %5.2f I %5.2f Sinte %5.2f err %5.2f obs %5.2f  cons %5.2f resol %4.0f", commande, proportionnel, deriver, integral, somme_integral_roue_folle_droite_tick, erreur, observation, consigne, resolution_calculer);
   // SerialWIFI.printf("cmd %5.2f P %5.2f D %5.2f I %5.2f Sinte %5.2f err %5.2f obs %5.2f  cons %5.2f resol %4.0f", commande, proportionnel, deriver, integral, somme_integral_roue_folle_droite_tick, erreur, observation, consigne, resolution_calculer);
   // SerialWIFI.println();
   moteur_droit(sortie_roue_folle, sens);
 }
+
 
 void asservissement_roue_folle_gauche_tick(double consigne, double observation)
 {
@@ -131,3 +134,10 @@ void asservissement_roue_folle_gauche_tick(double consigne, double observation)
   // Serial.printf("cmd %5.2f P %5.2f D %5.2f I %5.2f Sinte %5.2f err %5.2f obs %5.2f  cons %5.2f ", commande, proportionnel, deriver, integral, somme_integral_roue_folle_tick, erreur, observation, consigne);
   moteur_gauche(sortie_roue_folle, sens);
 }
+
+
+// void asservissement_vitesse_roue_gauche(double consigne, double observation){
+
+
+
+// }

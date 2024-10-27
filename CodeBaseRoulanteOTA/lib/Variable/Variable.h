@@ -4,6 +4,7 @@
 #define Variable_H
 // Parametre FreeRTOS
 #define Te 5
+extern double erreur_test;
 
 // Déclaration des variables externes
 #define frequence 19500
@@ -40,6 +41,8 @@ extern double odo_tick_gauche;
 
 extern double delta_droit;
 extern double delta_gauche;
+
+extern double distance_parcourue;
 
 #define PIN_ENCODEUR_1 23
 #define PIN_ENCODEUR_2 22

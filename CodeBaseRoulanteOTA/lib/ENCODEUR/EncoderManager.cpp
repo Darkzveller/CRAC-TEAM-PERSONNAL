@@ -118,7 +118,7 @@ void read_x_y_theta()
     odo_last_d = odo_dist_droit;
     odo_last_g = odo_dist_gauche;
 
-    double distance_parcourue = 0.5 * (delta_droit + delta_gauche);
+     distance_parcourue = 0.5 * (delta_droit + delta_gauche);
     /*
         theta_robot = ((delta_droit - delta_gauche) * 0.5) / ENTRAXE;
 
