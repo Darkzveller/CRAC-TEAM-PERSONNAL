@@ -7,28 +7,11 @@
 
 float f = 0;
 
-float vitesse_roue_droite_actuelle = 0;
-
-// float Vmax = 0.1;
-// float Amax = 0.2;
-// float Afrein = 1000;
-// float acc, vcc;
-
-// float dist = 100;
-
-// float Vmax = 30.0 * 0.10; // Vitesse maximale en m/s
-// float coeff_amax = 0.01;
-// float Amax = 30* coeff_amax; // Accélération maximale en m/s² (rampe douce)
-float Vmax = 250; // Vitesse maximale en m/s
-float coeff_amax = 0.01;
 float Amax = 50; // Accélération maximale en m/s² (rampe douce)
 float Dmax = 7.5;
-float pouravoir = 0.1 / coeff_amax;
-float Afrein = 100;    // Accélération de freinage en m/s² (freinage rapide)
-float dist = 4096 * 1; // Distance en ticks (ajuster selon tes besoins)
+float dist = 2048 * 1; // Distance en ticks (ajuster selon tes besoins)
 
 float acc_actuel;
-float distanceActu;
 double consigne_vit;
 double consigne_dist;
 double Ta = 0;
@@ -41,85 +24,29 @@ float distance_decl = 0;
 float distance_v_cons = 0;
 float Tc = 0;
 float Tc_counter = 0;
-/*
-double regulation_vitesse(float cons)
-{
-    float coeff = 1;
-    float vit = Vmax * coeff;
-    float accel = Amax * coeff;
-    float decc = Dmax * coeff;
+float Vmax_consigne = 145; // Limite de vitesse maximale souhaitée
 
-    double Vrob = (delta_droit) / Te; // Calcul de la vitesse actuelle en
-    if (stop == 0)
-    {
-
-        Ta = (vit / accel);
-        // Ta = 200;
-        Td = (vit / decc);
-        // Td = Vmax / Amax;
-        Tc = (2.0 * cons - accel * (Ta * Ta + Td * Td)) / (2 * vit);
-        distance_accel = 0.5 * Ta * Ta * accel;
-        distance_decl = 0.5 * Td * Td * decc;
-        // distance_decl = cons -distance_accel;
-        if (Ta_counter <= Ta)
-        {
-            Serial.printf("acccccccc ");
-            Ta_counter++;
-            acc_actuel++;
-            if (acc_actuel >= accel)
-            {
-                acc_actuel = accel;
-            }
-
-            consigne_vit += (Vrob + acc_actuel * Te);
-            consigne_dist = odo_tick_droit + consigne_vit * Te;
-        }
-        else if ((cons - odo_tick_droit) < (distance_decl))
-        {
-            Serial.printf("decce ");
-            acc_actuel--;
-            if (acc_actuel <= 1)
-            {
-                acc_actuel = 0;
-                stop = 1;
-            }
-            consigne_vit = Vrob - acc_actuel * Te;
-            consigne_dist = odo_tick_droit + consigne_vit * Te;
-        }
-        else
-        {
-            Serial.printf("Vit ");
-            consigne_dist = odo_tick_droit + consigne_vit * Te;
-            Tc_counter++;
-        }
-    }
-    // Serial.printf("accactu %.2f acccalc %.2f ConsVit %4.0f ConsDit %4.0f err %.0f distdeccel%.2f odo %f Ta%.2f Tacount %f Tc%.2f pouravoir %2.0f ", accel, acc_actuel, consigne_vit, consigne_dist, erreur_test, distance_decl, odo_tick_droit, Ta, Ta_counter, Tc, pouravoir);
-    Serial.printf("accactu %.2f acccalc %.2f ConsVit %4.0f ConsDit %4.0f err %.0f distdeccel%.2f Decl %f odo %f ", accel, acc_actuel, consigne_vit, consigne_dist, erreur_test, distance_decl, decc, odo_tick_droit);
-
-    // Serial.println();
-
-    // delay(500);
-    return consigne_dist;
-}
-*/
 // Définition des constantes et des variables d'état
-enum Etat
+enum Etat_vitesse_roue_folle_droite
 {
-    ETAT_ACCELERATION,
-    ETAT_CROISIERE,
-    ETAT_DECELERATION,
-    ETAT_ARRET
+    ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE,
+    ETAT_CROISIERE_Vitesse_ROUE_FOLLE_DROITE,
+    ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE,
+    ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE
 };
-Etat etat_actuel = ETAT_ACCELERATION;
+Etat_vitesse_roue_folle_droite etat_actuel = ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE;
 
 float kp_vit = 2.5, ki_vit = 0.1, kd_vit = 0.05;
-float erreur_vit, erreur_vit_precedente = 0;
-float somme_erreur_vit = 0, derivee_erreur_vit, integral_limit = 500;
+float erreur_vit_precedente_roue_folle_droite = 0;
+float somme_erreur_vit_roue_folle_droite = 0, derivee_erreur_vit, integral_limit = 500;
 
-double regulation_vitesse(float cons)
+double regulation_vitesse_roue_folle_droite(float cons)
 {
-    float Vmax_consigne = 150; // Limite de vitesse maximale souhaitée
-
+    float erreur_vit;
+    if (cons < 4096.0)
+    {
+        Vmax_consigne = 115;
+    }
     float coeff = 1;
     float vit = Vmax_consigne * coeff;
     float accel = Amax * coeff;
@@ -134,79 +61,90 @@ double regulation_vitesse(float cons)
     distance_decl = 0.5 * Td * Td * decc;
 
     // Calcul PID de la vitesse
-    erreur_vit = vit - (Vrob*vit);
-    somme_erreur_vit += erreur_vit * Te;
+    erreur_vit = vit - (Vrob * vit);
+    somme_erreur_vit_roue_folle_droite += erreur_vit * Te;
 
     // Limite pour somme_erreur_vit
-    if (somme_erreur_vit > integral_limit) {
-        somme_erreur_vit = integral_limit;
-    } else if (somme_erreur_vit < -integral_limit) {
-        somme_erreur_vit = -integral_limit;
+    if (somme_erreur_vit_roue_folle_droite > integral_limit)
+    {
+        somme_erreur_vit_roue_folle_droite = integral_limit;
+    }
+    else if (somme_erreur_vit_roue_folle_droite < -integral_limit)
+    {
+        somme_erreur_vit_roue_folle_droite = -integral_limit;
     }
 
-    derivee_erreur_vit = (erreur_vit - erreur_vit_precedente) / Te;
-    erreur_vit_precedente = erreur_vit;
-    float commande_vit = kp_vit * erreur_vit + ki_vit * somme_erreur_vit + kd_vit * derivee_erreur_vit;
+    derivee_erreur_vit = (erreur_vit - erreur_vit_precedente_roue_folle_droite) / Te;
+    erreur_vit_precedente_roue_folle_droite = erreur_vit;
+    float commande_vit = kp_vit * erreur_vit + ki_vit * somme_erreur_vit_roue_folle_droite + kd_vit * derivee_erreur_vit;
 
     // Machine à états
     switch (etat_actuel)
     {
-    case ETAT_ACCELERATION:
+    case ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE:
         acc_actuel = acc_actuel + commande_vit * Te;
         // Limite pour acc_actuel
-        if (acc_actuel > accel) {
+        if (acc_actuel > accel)
+        {
             acc_actuel = accel;
         }
 
         consigne_vit = Vrob + acc_actuel * Te;
         // Limite pour consigne_vit
-        if (consigne_vit > Vmax_consigne) {
+        if (consigne_vit > Vmax_consigne)
+        {
             consigne_vit = Vmax_consigne;
         }
 
         consigne_dist = odo_tick_droit + consigne_vit * Te;
         Ta_counter++;
-        if (Ta_counter >= Ta) {
-            etat_actuel = ETAT_CROISIERE;
+        if (Ta_counter >= Ta)
+        {
+            etat_actuel = ETAT_CROISIERE_Vitesse_ROUE_FOLLE_DROITE;
         }
         Serial.printf("ACCELERATION|");
         break;
 
-    case ETAT_CROISIERE:
+    case ETAT_CROISIERE_Vitesse_ROUE_FOLLE_DROITE:
         consigne_vit = vit;
         // Limite pour consigne_vit
-        if (consigne_vit > Vmax_consigne) {
+        if (consigne_vit > Vmax_consigne)
+        {
             consigne_vit = Vmax_consigne;
         }
 
         consigne_dist = odo_tick_droit + consigne_vit * Te;
-        if ((cons - odo_tick_droit) < (distance_decl)) {
-            etat_actuel = ETAT_DECELERATION;
+        if ((cons - odo_tick_droit) < (distance_decl))
+        {
+            etat_actuel = ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE;
         }
         Serial.printf("CROISIERE|");
         break;
 
-    case ETAT_DECELERATION:
+    case ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE:
         acc_actuel = acc_actuel - commande_vit * Te;
         // Limite pour acc_actuel
-        if (acc_actuel < 0) {
+        if (acc_actuel < 0)
+        {
             acc_actuel = 0;
         }
 
         consigne_vit = Vrob - acc_actuel * Te;
         // Limite pour consigne_vit
-        if (consigne_vit > Vmax_consigne) {
+        if (consigne_vit > Vmax_consigne)
+        {
             consigne_vit = Vmax_consigne;
         }
 
         consigne_dist = odo_tick_droit + consigne_vit * Te;
-        if ((cons - odo_tick_droit) < 10.0) {
-            etat_actuel = ETAT_ARRET;
+        if ((cons - odo_tick_droit) < 1.0)
+        {
+            etat_actuel = ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE;
         }
         Serial.printf("DECELERATION|");
         break;
 
-    case ETAT_ARRET:
+    case ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE:
         consigne_dist = cons; // Fixe la consigne de distance finale
         // stop_motors();        // Fonction d'arrêt des moteurs
         Serial.printf("ARRÊT atteint|");
@@ -220,33 +158,15 @@ double regulation_vitesse(float cons)
     return consigne_dist;
 }
 
-
-
-
 void controle(void *parameters)
 {
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        // f = Vmax * Te + 0;
-        // Serial.printf("D = %4.6f mm ", f);
 
-        // f = (f * TIC_PER_TOUR) / (2.0 * M_PI * (SIZE_WHEEL_DIAMETER_mm / 2.0));
+        f = regulation_vitesse_roue_folle_droite((dist));
 
-        // vitesse_roue_droite_actuelle = delta_droit / Te;
-        // Serial.printf("f = %4.6f tick ", f);
-        // Serial.printf("Vitesse droit = %4.6f mm/ms", vitesse_roue_droite_actuelle);
-        // Serial.println();
-        // asservissement_roue_folle_droite_tick(f, odo_tick_droit);
-        if (stop == 0)
-        {
-            f = regulation_vitesse((dist));
-        }
-        else
-        {
-            // f = dist;
-        }
         if ((flag_controle = 1) == 1)
         {
             asservissement_roue_folle_droite_tick(f, odo_tick_droit);
