@@ -22,10 +22,10 @@ float vitesse_roue_droite_actuelle = 0;
 float Vmax = 250; // Vitesse maximale en m/s
 float coeff_amax = 0.01;
 float Amax = 50; // Accélération maximale en m/s² (rampe douce)
-float Dmax = 50;
+float Dmax = 600;
 float pouravoir = 0.1 / coeff_amax;
-float Afrein = 100; // Accélération de freinage en m/s² (freinage rapide)
-float dist = 4096;  // Distance en ticks (ajuster selon tes besoins)
+float Afrein = 100;    // Accélération de freinage en m/s² (freinage rapide)
+float dist = 4096 * 2; // Distance en ticks (ajuster selon tes besoins)
 
 float acc_actuel;
 float distanceActu;
@@ -41,6 +41,7 @@ float distance_decl = 0;
 float distance_v_cons = 0;
 float Tc = 0;
 float Tc_counter = 0;
+/*
 double regulation_vitesse(float cons)
 {
     float coeff = 1;
@@ -100,40 +101,81 @@ double regulation_vitesse(float cons)
     // delay(500);
     return consigne_dist;
 }
+*/
+float kp_vit = 2.5, ki_vit = 0.1, kd_vit = 0.05; // Ajustez ces valeurs pour obtenir la précision souhaitée
+float erreur_vit, erreur_vit_precedente = 0;
+float somme_erreur_vit = 0, derivee_erreur_vit, integral_limit = 500;
 
-/**
-double regulation_vitesse(int choice_mode)
+// Fonction de régulation de vitesse
+
+double regulation_vitesse(float cons)
 {
-    double Vdist;                                          // Consigne de vitesse en ticks/s
-    double Vrob = (delta_droit + delta_gauche) / 2.0 / Te; // Calcul de la vitesse actuelle en ticks/s
-    double Dfrein = Vrob * Vrob / (2 * Afrein);            // Distance de freinage en ticks
+    float coeff = 1;
+    float vit = Vmax * coeff;
+    float accel = Amax * coeff;
+    float decc = Dmax * coeff;
+    double Vrob = (delta_droit) / Te; // Calcul de la vitesse actuelle
 
-    // Condition de freinage
-    if (choice_mode == 0)
+    if (stop == 0)
     {
-        if (dist < Dfrein) // Phase de freinage
+        Ta = vit / accel;
+        Td = vit / decc;
+        Tc = (2.0 * cons - accel * (Ta * Ta + Td * Td)) / (2 * vit);
+        distance_accel = 0.5 * Ta * Ta * accel;
+        distance_decl = 0.5 * Td * Td * decc;
+
+        // Calcul de l'erreur de vitesse
+        erreur_vit = vit - Vrob;
+        somme_erreur_vit += erreur_vit * Te;
+        if (somme_erreur_vit > integral_limit)
         {
-            Serial.printf("Frein ");
-            Vdist = Vrob - (Afrein * Te); // Ralentir progressivement avec Afrein
+            somme_erreur_vit = integral_limit;
         }
-        else if (Vrob < Vmax) // Phase d'accélération
+        else if (somme_erreur_vit < -integral_limit)
         {
-            Serial.printf("Acc ");
-            Vdist = Vrob + (Amax * Te); // Augmenter la vitesse progressivement avec Amax
+            somme_erreur_vit = -integral_limit;
         }
-        else // Maintien de la vitesse maximale
+        derivee_erreur_vit = (erreur_vit - erreur_vit_precedente) / Te;
+        erreur_vit_precedente = erreur_vit;
+
+        // PID pour la commande de vitesse
+        float commande_vit = kp_vit * erreur_vit + ki_vit * somme_erreur_vit + kd_vit * derivee_erreur_vit;
+
+        // Calcul de l'accélération/décélération en fonction de la commande PID
+        if (Ta_counter <= Ta)
         {
-            Serial.printf("Vit ");
-            Vdist = Vmax; // Maintien de la vitesse maximale
+            Ta_counter++;
+            acc_actuel = fmin(accel, acc_actuel + commande_vit * Te);
+            consigne_vit += (Vrob + acc_actuel * Te);
+            consigne_dist = odo_tick_droit + consigne_vit * Te;
+        }
+        else if ((cons - odo_tick_droit) <= distance_decl) // Commence la décélération plus tôt
+        {
+            acc_actuel = fmax(0, acc_actuel - commande_vit * Te);
+            if (acc_actuel == 0)
+                stop = 1;
+            consigne_vit = Vrob - acc_actuel * Te;
+            consigne_dist = odo_tick_droit + consigne_vit * Te;
+        }
+        else
+        {
+            consigne_dist = odo_tick_droit + consigne_vit * Te;
+            Tc_counter++;
+        }
+
+        // Ajustement pour précision finale
+        if ((cons - odo_tick_droit) < 1.0) // Tolérance pour la précision
+        {
+            stop = 1;             // Arrêt lorsque la distance finale est atteinte avec précision
+            consigne_dist = cons; // Verrouille la consigne sur la valeur cible
         }
     }
 
-    // Calcul de la consigne en ticks sur la période d'échantillonnage
-    double consigne_ticks = Vdist * Te; // Convertir la vitesse en ticks/s en nombre de ticks sur la période Te
-    Serial.printf("Consigne en ticks: %5.2f ", consigne_ticks);
-    return consigne_ticks; // Retourner la consigne en ticks
+    Serial.printf("accactu %.2f acccalc %.2f ConsVit %3.0f ConsDit %4.0f err %.0f distdeccel%.2f Decl %f odo %f st%d dist%f ",
+                  accel, acc_actuel, consigne_vit, consigne_dist, erreur_test, distance_decl, decc, odo_tick_droit, stop, cons);
+
+    return consigne_dist;
 }
-*/
 
 void controle(void *parameters)
 {
@@ -205,7 +247,8 @@ void setup()
     // delay(10000);
     // affichage_commande_wifi();
     Serial.println("on commence");
-
+    Serial.printf("cons enter : %f\n", dist);
+    delay(5000);
     xTaskCreate(
         controle,   // nom de la fonction
         "controle", // nom de la tache que nous venons de vréer
