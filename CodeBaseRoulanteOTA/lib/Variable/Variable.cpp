@@ -25,7 +25,7 @@ double distance_parcourue;
 
 float coeff_P_roue_folle_tick = 7/2.0;
 float coeff_D_roue_folle_tick = 0.25/2.0;
-float coeff_I_roue_folle_tick = 0.3;
+float coeff_I_roue_folle_tick = 0.3*1.5;
 
 float erreur_prec_roue_folle_droite_tick = 0;
 float erreur_prec_roue_folle_gauche_tick = 0;
