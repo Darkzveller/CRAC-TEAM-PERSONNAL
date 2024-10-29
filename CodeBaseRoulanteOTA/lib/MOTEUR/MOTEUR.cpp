@@ -50,7 +50,7 @@ void moteur_gauche(int pwm, bool sens)
 
 void stop_motors()
 {
-    bool stop = true;
+    bool stop = false;
     digitalWrite(M2_INA, stop);
     digitalWrite(M2_INB, stop);
     digitalWrite(M1_INA, stop);

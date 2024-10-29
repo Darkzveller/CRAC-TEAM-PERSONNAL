@@ -22,7 +22,7 @@ float vitesse_roue_droite_actuelle = 0;
 float Vmax = 250; // Vitesse maximale en m/s
 float coeff_amax = 0.01;
 float Amax = 50; // Accélération maximale en m/s² (rampe douce)
-float Dmax = 5;
+float Dmax = 7.5;
 float pouravoir = 0.1 / coeff_amax;
 float Afrein = 100;    // Accélération de freinage en m/s² (freinage rapide)
 float dist = 4096 * 1; // Distance en ticks (ajuster selon tes besoins)
@@ -134,9 +134,16 @@ double regulation_vitesse(float cons)
     distance_decl = 0.5 * Td * Td * decc;
 
     // Calcul PID de la vitesse
-    erreur_vit = vit - Vrob;
+    erreur_vit = vit - (Vrob*vit);
     somme_erreur_vit += erreur_vit * Te;
-    somme_erreur_vit = fmin(fmax(somme_erreur_vit, -integral_limit), integral_limit);
+
+    // Limite pour somme_erreur_vit
+    if (somme_erreur_vit > integral_limit) {
+        somme_erreur_vit = integral_limit;
+    } else if (somme_erreur_vit < -integral_limit) {
+        somme_erreur_vit = -integral_limit;
+    }
+
     derivee_erreur_vit = (erreur_vit - erreur_vit_precedente) / Te;
     erreur_vit_precedente = erreur_vit;
     float commande_vit = kp_vit * erreur_vit + ki_vit * somme_erreur_vit + kd_vit * derivee_erreur_vit;
@@ -145,34 +152,58 @@ double regulation_vitesse(float cons)
     switch (etat_actuel)
     {
     case ETAT_ACCELERATION:
-        acc_actuel = fmin(accel, acc_actuel + commande_vit * Te);
-        consigne_vit = fmin(Vrob + acc_actuel * Te, Vmax_consigne);
+        acc_actuel = acc_actuel + commande_vit * Te;
+        // Limite pour acc_actuel
+        if (acc_actuel > accel) {
+            acc_actuel = accel;
+        }
+
+        consigne_vit = Vrob + acc_actuel * Te;
+        // Limite pour consigne_vit
+        if (consigne_vit > Vmax_consigne) {
+            consigne_vit = Vmax_consigne;
+        }
+
         consigne_dist = odo_tick_droit + consigne_vit * Te;
         Ta_counter++;
-        if (Ta_counter >= Ta)
-        {
+        if (Ta_counter >= Ta) {
             etat_actuel = ETAT_CROISIERE;
-        }Serial.printf("ACCELERATION|");
+        }
+        Serial.printf("ACCELERATION|");
         break;
 
     case ETAT_CROISIERE:
-        consigne_vit = fmin(vit, Vmax_consigne);
+        consigne_vit = vit;
+        // Limite pour consigne_vit
+        if (consigne_vit > Vmax_consigne) {
+            consigne_vit = Vmax_consigne;
+        }
+
         consigne_dist = odo_tick_droit + consigne_vit * Te;
-        if ((cons - odo_tick_droit) < (distance_decl))
-        {
+        if ((cons - odo_tick_droit) < (distance_decl)) {
             etat_actuel = ETAT_DECELERATION;
-        }  Serial.printf("CROISIERE|");
+        }
+        Serial.printf("CROISIERE|");
         break;
 
     case ETAT_DECELERATION:
-        acc_actuel = fmax(0, acc_actuel - commande_vit * Te);
-        consigne_vit = fmin(Vrob - acc_actuel * Te, Vmax_consigne);
-        consigne_dist = odo_tick_droit + consigne_vit * Te;
-        if ((cons - odo_tick_droit) < 10.0)
-        {
-            etat_actuel = ETAT_ARRET;
-        }        Serial.printf("DECELERATION|");
+        acc_actuel = acc_actuel - commande_vit * Te;
+        // Limite pour acc_actuel
+        if (acc_actuel < 0) {
+            acc_actuel = 0;
+        }
 
+        consigne_vit = Vrob - acc_actuel * Te;
+        // Limite pour consigne_vit
+        if (consigne_vit > Vmax_consigne) {
+            consigne_vit = Vmax_consigne;
+        }
+
+        consigne_dist = odo_tick_droit + consigne_vit * Te;
+        if ((cons - odo_tick_droit) < 10.0) {
+            etat_actuel = ETAT_ARRET;
+        }
+        Serial.printf("DECELERATION|");
         break;
 
     case ETAT_ARRET:
@@ -183,11 +214,14 @@ double regulation_vitesse(float cons)
     }
 
     // Affichage des informations de débogage
-    Serial.printf("Etat %d | accactu %.2f | acccalc %.2f | ConsVit %3.0f | ConsDit %4.0f | err %.0f | distdeccel %.2f | Decl %f | odo %f | rest %f ",
-                  etat_actuel, accel, acc_actuel, consigne_vit, consigne_dist, erreur_test, distance_decl, decc, odo_tick_droit, (cons - odo_tick_droit));
+    Serial.printf("Etat %d | accactu %.2f | Vrob %.5f | ConsVit %3.0f | ConsDit %4.0f | err %.0f | distdeccel %.2f | Decl %f | odo %f | rest %f ",
+                  etat_actuel, accel, Vrob, consigne_vit, consigne_dist, erreur_test, distance_decl, decc, odo_tick_droit, (cons - odo_tick_droit));
 
     return consigne_dist;
 }
+
+
+
 
 void controle(void *parameters)
 {
