@@ -107,7 +107,6 @@ float erreur_vit, erreur_vit_precedente = 0;
 float somme_erreur_vit = 0, derivee_erreur_vit, integral_limit = 500;
 
 // Fonction de régulation de vitesse
-
 double regulation_vitesse(float cons)
 {
     float coeff = 1;
@@ -115,6 +114,9 @@ double regulation_vitesse(float cons)
     float accel = Amax * coeff;
     float decc = Dmax * coeff;
     double Vrob = (delta_droit) / Te; // Calcul de la vitesse actuelle
+
+    // Définir une limite pour la vitesse maximale de consigne
+    float Vmax_consigne = 100; // Ajuste cette valeur en fonction de la vitesse maximale souhaitée
 
     if (stop == 0)
     {
@@ -147,14 +149,24 @@ double regulation_vitesse(float cons)
             Ta_counter++;
             acc_actuel = fmin(accel, acc_actuel + commande_vit * Te);
             consigne_vit += (Vrob + acc_actuel * Te);
+
+            // Limiter la consigne de vitesse
+            consigne_vit = fmin(consigne_vit, Vmax_consigne); // Limite la vitesse à Vmax_consigne
+
             consigne_dist = odo_tick_droit + consigne_vit * Te;
         }
         else if ((cons - odo_tick_droit) <= distance_decl) // Commence la décélération plus tôt
         {
             acc_actuel = fmax(0, acc_actuel - commande_vit * Te);
             if (acc_actuel == 0)
+            {
                 stop = 1;
+            }
             consigne_vit = Vrob - acc_actuel * Te;
+
+            // Limiter la consigne de vitesse
+            consigne_vit = fmin(consigne_vit, Vmax_consigne); // Limite la vitesse à Vmax_consigne
+
             consigne_dist = odo_tick_droit + consigne_vit * Te;
         }
         else
@@ -163,15 +175,18 @@ double regulation_vitesse(float cons)
             Tc_counter++;
         }
 
-        // Ajustement pour précision finale
-        if ((cons - odo_tick_droit) < 1.0) // Tolérance pour la précision
+        if ((cons - odo_tick_droit) < 1.0)
         {
-            stop = 1;             // Arrêt lorsque la distance finale est atteinte avec précision
-            consigne_dist = cons; // Verrouille la consigne sur la valeur cible
+            stop = 1;
+            consigne_dist = cons;
+            stop_motors();
+            Serial.printf("BON C EST FINI cons %f ", cons);
+            Serial.println();
+            delay(10000);
         }
     }
 
-    Serial.printf("accactu %.2f acccalc %.2f ConsVit %3.0f ConsDit %4.0f err %.0f distdeccel%.2f Decl %f odo %f st%d dist%f ",
+    Serial.printf("accactu %.2f acccalc %.2f ConsVit %3.0f ConsDit %4.0f err %.0f distdeccel%.2f Decl %f odo %f st%d cons%f ",
                   accel, acc_actuel, consigne_vit, consigne_dist, erreur_test, distance_decl, decc, odo_tick_droit, stop, cons);
 
     return consigne_dist;
@@ -193,8 +208,14 @@ void controle(void *parameters)
         // Serial.printf("Vitesse droit = %4.6f mm/ms", vitesse_roue_droite_actuelle);
         // Serial.println();
         // asservissement_roue_folle_droite_tick(f, odo_tick_droit);
-        f = regulation_vitesse(dist);
-
+        if (stop == 0)
+        {
+            f = regulation_vitesse((dist));
+        }
+        else
+        {
+            // f = dist;
+        }
         if ((flag_controle = 1) == 1)
         {
             asservissement_roue_folle_droite_tick(f, odo_tick_droit);
