@@ -22,10 +22,10 @@ float vitesse_roue_droite_actuelle = 0;
 float Vmax = 250; // Vitesse maximale en m/s
 float coeff_amax = 0.01;
 float Amax = 50; // Accélération maximale en m/s² (rampe douce)
-float Dmax = 600;
+float Dmax = 5;
 float pouravoir = 0.1 / coeff_amax;
 float Afrein = 100;    // Accélération de freinage en m/s² (freinage rapide)
-float dist = 4096 * 2; // Distance en ticks (ajuster selon tes besoins)
+float dist = 4096 * 1; // Distance en ticks (ajuster selon tes besoins)
 
 float acc_actuel;
 float distanceActu;
@@ -102,92 +102,89 @@ double regulation_vitesse(float cons)
     return consigne_dist;
 }
 */
-float kp_vit = 2.5, ki_vit = 0.1, kd_vit = 0.05; // Ajustez ces valeurs pour obtenir la précision souhaitée
+// Définition des constantes et des variables d'état
+enum Etat
+{
+    ETAT_ACCELERATION,
+    ETAT_CROISIERE,
+    ETAT_DECELERATION,
+    ETAT_ARRET
+};
+Etat etat_actuel = ETAT_ACCELERATION;
+
+float kp_vit = 2.5, ki_vit = 0.1, kd_vit = 0.05;
 float erreur_vit, erreur_vit_precedente = 0;
 float somme_erreur_vit = 0, derivee_erreur_vit, integral_limit = 500;
 
-// Fonction de régulation de vitesse
 double regulation_vitesse(float cons)
 {
+    float Vmax_consigne = 150; // Limite de vitesse maximale souhaitée
+
     float coeff = 1;
-    float vit = Vmax * coeff;
+    float vit = Vmax_consigne * coeff;
     float accel = Amax * coeff;
     float decc = Dmax * coeff;
     double Vrob = (delta_droit) / Te; // Calcul de la vitesse actuelle
 
-    // Définir une limite pour la vitesse maximale de consigne
-    float Vmax_consigne = 100; // Ajuste cette valeur en fonction de la vitesse maximale souhaitée
+    // Calcul des distances et des temps
+    Ta = vit / accel;
+    Td = vit / decc;
+    Tc = (2.0 * cons - accel * (Ta * Ta + Td * Td)) / (2 * vit);
+    distance_accel = 0.5 * Ta * Ta * accel;
+    distance_decl = 0.5 * Td * Td * decc;
 
-    if (stop == 0)
+    // Calcul PID de la vitesse
+    erreur_vit = vit - Vrob;
+    somme_erreur_vit += erreur_vit * Te;
+    somme_erreur_vit = fmin(fmax(somme_erreur_vit, -integral_limit), integral_limit);
+    derivee_erreur_vit = (erreur_vit - erreur_vit_precedente) / Te;
+    erreur_vit_precedente = erreur_vit;
+    float commande_vit = kp_vit * erreur_vit + ki_vit * somme_erreur_vit + kd_vit * derivee_erreur_vit;
+
+    // Machine à états
+    switch (etat_actuel)
     {
-        Ta = vit / accel;
-        Td = vit / decc;
-        Tc = (2.0 * cons - accel * (Ta * Ta + Td * Td)) / (2 * vit);
-        distance_accel = 0.5 * Ta * Ta * accel;
-        distance_decl = 0.5 * Td * Td * decc;
-
-        // Calcul de l'erreur de vitesse
-        erreur_vit = vit - Vrob;
-        somme_erreur_vit += erreur_vit * Te;
-        if (somme_erreur_vit > integral_limit)
+    case ETAT_ACCELERATION:
+        acc_actuel = fmin(accel, acc_actuel + commande_vit * Te);
+        consigne_vit = fmin(Vrob + acc_actuel * Te, Vmax_consigne);
+        consigne_dist = odo_tick_droit + consigne_vit * Te;
+        Ta_counter++;
+        if (Ta_counter >= Ta)
         {
-            somme_erreur_vit = integral_limit;
-        }
-        else if (somme_erreur_vit < -integral_limit)
+            etat_actuel = ETAT_CROISIERE;
+        }Serial.printf("ACCELERATION|");
+        break;
+
+    case ETAT_CROISIERE:
+        consigne_vit = fmin(vit, Vmax_consigne);
+        consigne_dist = odo_tick_droit + consigne_vit * Te;
+        if ((cons - odo_tick_droit) < (distance_decl))
         {
-            somme_erreur_vit = -integral_limit;
-        }
-        derivee_erreur_vit = (erreur_vit - erreur_vit_precedente) / Te;
-        erreur_vit_precedente = erreur_vit;
+            etat_actuel = ETAT_DECELERATION;
+        }  Serial.printf("CROISIERE|");
+        break;
 
-        // PID pour la commande de vitesse
-        float commande_vit = kp_vit * erreur_vit + ki_vit * somme_erreur_vit + kd_vit * derivee_erreur_vit;
-
-        // Calcul de l'accélération/décélération en fonction de la commande PID
-        if (Ta_counter <= Ta)
+    case ETAT_DECELERATION:
+        acc_actuel = fmax(0, acc_actuel - commande_vit * Te);
+        consigne_vit = fmin(Vrob - acc_actuel * Te, Vmax_consigne);
+        consigne_dist = odo_tick_droit + consigne_vit * Te;
+        if ((cons - odo_tick_droit) < 10.0)
         {
-            Ta_counter++;
-            acc_actuel = fmin(accel, acc_actuel + commande_vit * Te);
-            consigne_vit += (Vrob + acc_actuel * Te);
+            etat_actuel = ETAT_ARRET;
+        }        Serial.printf("DECELERATION|");
 
-            // Limiter la consigne de vitesse
-            consigne_vit = fmin(consigne_vit, Vmax_consigne); // Limite la vitesse à Vmax_consigne
+        break;
 
-            consigne_dist = odo_tick_droit + consigne_vit * Te;
-        }
-        else if ((cons - odo_tick_droit) <= distance_decl) // Commence la décélération plus tôt
-        {
-            acc_actuel = fmax(0, acc_actuel - commande_vit * Te);
-            if (acc_actuel == 0)
-            {
-                stop = 1;
-            }
-            consigne_vit = Vrob - acc_actuel * Te;
-
-            // Limiter la consigne de vitesse
-            consigne_vit = fmin(consigne_vit, Vmax_consigne); // Limite la vitesse à Vmax_consigne
-
-            consigne_dist = odo_tick_droit + consigne_vit * Te;
-        }
-        else
-        {
-            consigne_dist = odo_tick_droit + consigne_vit * Te;
-            Tc_counter++;
-        }
-
-        if ((cons - odo_tick_droit) < 1.0)
-        {
-            stop = 1;
-            consigne_dist = cons;
-            stop_motors();
-            Serial.printf("BON C EST FINI cons %f ", cons);
-            Serial.println();
-            delay(10000);
-        }
+    case ETAT_ARRET:
+        consigne_dist = cons; // Fixe la consigne de distance finale
+        // stop_motors();        // Fonction d'arrêt des moteurs
+        Serial.printf("ARRÊT atteint|");
+        break;
     }
 
-    Serial.printf("accactu %.2f acccalc %.2f ConsVit %3.0f ConsDit %4.0f err %.0f distdeccel%.2f Decl %f odo %f st%d cons%f ",
-                  accel, acc_actuel, consigne_vit, consigne_dist, erreur_test, distance_decl, decc, odo_tick_droit, stop, cons);
+    // Affichage des informations de débogage
+    Serial.printf("Etat %d | accactu %.2f | acccalc %.2f | ConsVit %3.0f | ConsDit %4.0f | err %.0f | distdeccel %.2f | Decl %f | odo %f | rest %f ",
+                  etat_actuel, accel, acc_actuel, consigne_vit, consigne_dist, erreur_test, distance_decl, decc, odo_tick_droit, (cons - odo_tick_droit));
 
     return consigne_dist;
 }
@@ -219,7 +216,7 @@ void controle(void *parameters)
         if ((flag_controle = 1) == 1)
         {
             asservissement_roue_folle_droite_tick(f, odo_tick_droit);
-            // asservissement_roue_folle_gauche_tick(f, odo_tick_gauche);
+            asservissement_roue_folle_gauche_tick(f, odo_tick_gauche);
         }
         else
         {
