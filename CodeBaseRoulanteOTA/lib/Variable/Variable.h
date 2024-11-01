@@ -26,7 +26,7 @@ extern double erreur_test;
 #define TIC_PER_TOUR 2048.0
 #define RESOLUTION_ROUE_CODEUSE 10.0
 #define COEFF_ROUE_DROITE 1
-#define COEFF_ROUE_GAUCHE 1.19
+#define COEFF_ROUE_GAUCHE 1
 #define SIZE_WHEEL_DIAMETER_mm 50.0
 
 extern double theta_robot_prec;
@@ -66,6 +66,57 @@ extern float integral_limit_roue_folle_tick;
 
 extern float somme_integral_roue_folle_droite_tick;
 extern float somme_integral_roue_folle_gauche_tick;
+
+//************************Asservissement vitesse Roue folle en TICK */
+extern float Vmax;
+extern float Amax;
+extern float Dmax;
+
+extern float acc_actuel_droite;
+extern double consigne_vit_droite;
+extern double consigne_dist_droite;
+
+extern float acc_actuel_gauche;
+extern double consigne_vit_gauche;
+extern double consigne_dist_gauche;
+
+extern double Ta_counter_droite;
+extern double Ta_counter_gauche;
+extern double Td_counter_droite;
+extern double Td_counter_gauche;
+
+extern float distance_accel_droite;
+extern float distance_decl_droite;
+extern float distance_accel_gauche;
+extern float distance_decl_gauche;
+
+extern float kp_vit;
+extern float ki_vit;
+extern float kd_vit;
+extern float erreur_vit_precedente_roue_folle_droite;
+extern float integral_limit;
+extern float somme_erreur_vit_roue_folle_droite;
+extern float somme_erreur_vit_roue_folle_gauche;
+extern float erreur_vit_precedente_roue_folle_gauche;
+
+// Enumérations pour les états des roues en vitesse
+enum Etat_vitesse_roue_folle_droite {
+    ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE,
+    ETAT_CROISIERE_Vitesse_ROUE_FOLLE_DROITE,
+    ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE,
+    ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE
+};
+extern Etat_vitesse_roue_folle_droite etat_actuel_vit_roue_folle_droite;
+
+enum Etat_vitesse_roue_folle_gauche {
+    ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_GAUCHE,
+    ETAT_CROISIERE_Vitesse_ROUE_FOLLE_GAUCHE,
+    ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE,
+    ETAT_ARRET_Vitesse_ROUE_FOLLE_GAUCHE
+};
+extern Etat_vitesse_roue_folle_gauche etat_actuel_vit_roue_folle_gauche;
+
+
 
 //***********OTA******************* */
 
