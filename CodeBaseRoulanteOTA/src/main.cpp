@@ -7,8 +7,9 @@
 
 float f = 0;
 float e = 0;
-float avncement_droite = 4715/2; // Distance en ticks (ajuster selon tes besoins)
-float avncement_gauche = -4254/2;  // Distance en ticks (ajuster selon tes besoins)
+float avncement_droite = (4254 / 2)*20;  // Distance en ticks (ajuster selon tes besoins)
+float avncement_gauche = (-4254 / 2)*20; // Distance en ticks (ajuster selon tes besoins)
+float Vmax = 145; // Limite de vitesse maximale souhaitée
 float Amax = 50;
 float Dmax = 7.5 * 1.5;
 
@@ -34,7 +35,6 @@ float distance_decl_droite = 0;
 float distance_accel_gauche = 0;
 float distance_decl_gauche = 0;
 
-float Vmax = 145; // Limite de vitesse maximale souhaitée
 
 float kp_vit = 2.5, ki_vit = 0.1, kd_vit = 0.05;
 float erreur_vit_precedente_roue_folle_droite = 0;
@@ -216,6 +216,7 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
     // Serial.printf("return %4.4f", consigne_dist_droite);
     return consigne_dist_droite;
 }
+
 double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
 {
     // delay(500);
@@ -228,6 +229,7 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
     //     }
     // }
     float coeff = 1;
+
     float vit = Vmax_consigne * coeff;
     float accel = Amax * coeff;
     float decc = Dmax * coeff;
@@ -278,7 +280,7 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
         {
             consigne_vit_gauche = Vmax_consigne;
         }
-        if (consigne_vit_gauche < -Vmax_consigne)
+        else if (consigne_vit_gauche < Vmax_consigne)
         {
             consigne_vit_gauche = Vmax_consigne;
         }
@@ -342,7 +344,7 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
         {
             consigne_vit_gauche = Vmax_consigne;
         }
-        else if (consigne_vit_gauche < -Vmax_consigne)
+        else if (consigne_vit_gauche < Vmax_consigne)
         {
             consigne_vit_gauche = Vmax_consigne;
         }
@@ -650,7 +652,7 @@ void controle(void *parameters)
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        float vitesse_croisiere = 50;
+        float vitesse_croisiere = 45;
         f = regulation_vitesse_roue_folle_droite((avncement_droite), vitesse_croisiere);
         e = regulation_vitesse_roue_folle_gauche((avncement_gauche), -vitesse_croisiere);
         if ((flag_controle = 1) == 1)
@@ -672,6 +674,7 @@ void controle(void *parameters)
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
     }
 }
+
 void odo(void *parameters)
 {
     TickType_t xLastWakeTime;
