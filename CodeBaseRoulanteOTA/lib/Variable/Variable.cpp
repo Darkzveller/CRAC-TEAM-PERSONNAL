@@ -23,8 +23,8 @@ double distance_parcourue;
 // Variable asservissement
 //************Asservissement ROUE FOLLE EN TICK */
 
-float coeff_P_roue_folle_tick = 7.0/2;
-float coeff_D_roue_folle_tick = 0.25/2;
+float coeff_P_roue_folle_tick = 7.0;
+float coeff_D_roue_folle_tick = 0.25;
 float coeff_I_roue_folle_tick = 0.3;
 
 float erreur_prec_roue_folle_droite_tick = 0;
