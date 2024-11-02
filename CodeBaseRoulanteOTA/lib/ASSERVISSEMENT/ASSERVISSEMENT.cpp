@@ -74,7 +74,7 @@ void asservissement_roue_folle_gauche_tick(double consigne, double observation)
   bool sens = 0;
   double sortie_roue_folle;
 
-  double resolution_calculer = pow(2, resolution_pwm) - 1;
+  double resolution_calculer = (pow(2, resolution_pwm) - 1) * POURCENT_MAX_PWM;
   double erreur = consigne - observation;
 
   double proportionnel = erreur * coeff_P_roue_folle_tick;
