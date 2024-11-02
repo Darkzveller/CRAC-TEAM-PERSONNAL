@@ -4,7 +4,6 @@
 #define Variable_H
 // Parametre FreeRTOS
 #define Te 5
-extern double erreur_test;
 
 // Déclaration des variables externes
 #define frequence 19500

@@ -2,7 +2,6 @@
 
 // Définition des variables
 // Encodeur
-double erreur_test;
 
 double odo_dist_gauche;
 double odo_dist_droit;

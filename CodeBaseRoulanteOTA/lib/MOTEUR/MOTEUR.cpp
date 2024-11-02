@@ -17,7 +17,7 @@ void setup_motors()
 
 void moteur_droit(int pwm, bool sens)
 {
-    Serial.printf("Pwm MotorD %4d", pwm);
+    Serial.printf("Pwm MotorD %4d ", pwm);
 
     if (sens == true)
     {
