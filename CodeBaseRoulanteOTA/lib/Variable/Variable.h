@@ -70,6 +70,7 @@ extern float somme_integral_roue_folle_gauche_tick;
 extern float Vmax;
 extern float Amax;
 extern float Dmax;
+extern float limit_reprise_asser;
 
 extern float acc_actuel_droite;
 extern double consigne_vit_droite;

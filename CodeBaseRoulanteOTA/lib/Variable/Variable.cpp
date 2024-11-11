@@ -22,22 +22,23 @@ double distance_parcourue;
 // Variable asservissement
 //************Asservissement ROUE FOLLE EN TICK */
 
-float coeff_P_roue_folle_tick = 7.0;
-float coeff_D_roue_folle_tick = 0.25;
-float coeff_I_roue_folle_tick = 0.3;
+float coeff_P_roue_folle_tick = 7.0 / 5;
+float coeff_D_roue_folle_tick = 0.25 / 5;
+float coeff_I_roue_folle_tick = 0.3 * 2;
 
 float erreur_prec_roue_folle_droite_tick = 0;
 float erreur_prec_roue_folle_gauche_tick = 0;
-float integral_limit_roue_folle_tick = 500; 
+float integral_limit_roue_folle_tick = 500;
 
-float somme_integral_roue_folle_droite_tick = 0; 
+float somme_integral_roue_folle_droite_tick = 0;
 float somme_integral_roue_folle_gauche_tick = 0;
 
 //************************Asservissement vitesse Roue folle en TICK */
 
 float Vmax = 145;
 float Amax = 50;
-float Dmax = 7.5 * 1.5;
+float Dmax = 7.5;
+float limit_reprise_asser = 1;
 
 float acc_actuel_droite = 0;
 double consigne_vit_droite = 0;
@@ -76,6 +77,3 @@ float consigne_regulation_vitesse_gauche = 0;
 //***********OTA******************* */
 
 bool flag_controle = false;
-
-
-

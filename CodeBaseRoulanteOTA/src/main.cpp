@@ -5,7 +5,7 @@
 #include "ASSERVISSEMENT.h"
 #include <mat.h>
 
-float nbr_tour = 10 * 360 / 90;
+float nbr_tour = 1 * 360 / 90;
 float avncement_droite = 2250 * nbr_tour;
 float avncement_gauche = -2250 * nbr_tour;
 // float avncement_droite = 2238 * nbr_tour;
@@ -41,13 +41,25 @@ void rotation(int consigne, int vitesse, int sens)
         consigne_regulation_vitesse_gauche = consigne_regulation_vitesse_gauche - (consigne_regulation_vitesse_gauche + consigne_regulation_vitesse_droite);
     }
 }
+void ligne_droite(int consigne, int vitesse, int sens)
+{
+    float vitesse_croisiere_gauche = vitesse * sens;
+    float vitesse_croisiere_droit = vitesse * sens;
+
+    int consigne_gauche = consigne * sens;
+    int consigne_droite = consigne * sens;
+    consigne_regulation_vitesse_droite = regulation_vitesse_roue_folle_droite((consigne_droite), vitesse_croisiere_droit);
+    consigne_regulation_vitesse_gauche = regulation_vitesse_roue_folle_gauche((consigne_gauche), vitesse_croisiere_gauche);
+}
+
 void controle(void *parameters)
 {
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        rotation((2250 * nbr_tour), 40, 1);
+        rotation((2250 * nbr_tour), 70, 1);
+        //ligne_droite((6000*10), 145, 1);
         if ((flag_controle = 1) == 1)
         {
             asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
@@ -59,8 +71,8 @@ void controle(void *parameters)
         }
         // Serial.printf("obs %4.0f", observation);
         Serial.printf("| odo gauche %.0f odo droite %.0f", odo_tick_gauche, odo_tick_droit);
-        // // SerialWIFI.printf("|consigne_regulation_vitesse_droite %5.2f consigne_regulation_vitesse_gauche %5.2f ", consigne_regulation_vitesse_droite, consigne_regulation_vitesse_gauche);
-        // Serial.printf("| consigne_regulation_vitesse_droite %.0f consigne_regulation_vitesse_gauche_rec  %.0f consigne_regulation_vitesse_gauche_nonrec  %.0f|", consigne_regulation_vitesse_droite, consigne_regulation_vitesse_gauche, jsp);
+        // // // SerialWIFI.printf("|consigne_regulation_vitesse_droite %5.2f consigne_regulation_vitesse_gauche %5.2f ", consigne_regulation_vitesse_droite, consigne_regulation_vitesse_gauche);
+        // // Serial.printf("| consigne_regulation_vitesse_droite %.0f consigne_regulation_vitesse_gauche_rec  %.0f consigne_regulation_vitesse_gauche_nonrec  %.0f|", consigne_regulation_vitesse_droite, consigne_regulation_vitesse_gauche, jsp);
         Serial.printf(" Theta %3.1f ", theta_robot * 180 / 3.14);
         Serial.printf("nmbr tour %2.3f", (double)(theta_robot * 180 / M_PI / 360));
         Serial.println();
@@ -105,11 +117,11 @@ void setup()
     // delay(10000);
     // affichage_commande_wifi();
     Serial.println("on commence");
-    Serial.printf("avncement_gauche enter : %.0f\n", avncement_gauche);
-    Serial.printf("avncement_droite enter : %.0f\n", avncement_droite);
+    // Serial.printf("avncement_gauche enter : %.0f\n", avncement_gauche);
+    // Serial.printf("avncement_droite enter : %.0f\n", avncement_droite);
 
     reset_encodeur();
-    delay(5000);
+    delay(5);
     reset_encodeur();
 
     xTaskCreate(
