@@ -69,6 +69,10 @@ float erreur_vit_precedente_roue_folle_gauche = 0;
 Etat_vitesse_roue_folle_droite etat_actuel_vit_roue_folle_droite = ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE;
 Etat_vitesse_roue_folle_gauche etat_actuel_vit_roue_folle_gauche = ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_GAUCHE;
 
+//************************Convitesse de vitesse */
+float consigne_regulation_vitesse_droite = 0;
+float consigne_regulation_vitesse_gauche = 0;
+
 //***********OTA******************* */
 
 bool flag_controle = false;

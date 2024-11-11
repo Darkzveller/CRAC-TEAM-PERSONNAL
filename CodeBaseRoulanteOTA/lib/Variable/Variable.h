@@ -99,7 +99,8 @@ extern float somme_erreur_vit_roue_folle_gauche;
 extern float erreur_vit_precedente_roue_folle_gauche;
 
 // Enumérations pour les états des roues en vitesse
-enum Etat_vitesse_roue_folle_droite {
+enum Etat_vitesse_roue_folle_droite
+{
     ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE,
     ETAT_CROISIERE_Vitesse_ROUE_FOLLE_DROITE,
     ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE,
@@ -107,7 +108,8 @@ enum Etat_vitesse_roue_folle_droite {
 };
 extern Etat_vitesse_roue_folle_droite etat_actuel_vit_roue_folle_droite;
 
-enum Etat_vitesse_roue_folle_gauche {
+enum Etat_vitesse_roue_folle_gauche
+{
     ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_GAUCHE,
     ETAT_CROISIERE_Vitesse_ROUE_FOLLE_GAUCHE,
     ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE,
@@ -115,7 +117,9 @@ enum Etat_vitesse_roue_folle_gauche {
 };
 extern Etat_vitesse_roue_folle_gauche etat_actuel_vit_roue_folle_gauche;
 
-
+//************************Convitesse de vitesse */
+extern float consigne_regulation_vitesse_droite;
+extern float consigne_regulation_vitesse_gauche;
 
 //***********OTA******************* */
 

@@ -5,96 +5,49 @@
 #include "ASSERVISSEMENT.h"
 #include <mat.h>
 
-float consigne_regulation_vitesse_droite = 0;
-float consigne_regulation_vitesse_gauche = 0;
-float sommme_integral_regulation_vitesse = 0;
-float integral_limit_regulation_vitesse = 1000;
-float erreur_precedente_regulation_vitesse = 0;
-
-float coeff_P = 0.25;
-float coeff_D = 0;
-float coeff_I = 0;
-
 float nbr_tour = 10 * 360 / 90;
-// float avncement_droite = +4254 / 2 * nbr_tour; // Distance en ticks (ajuster selon tes besoins)
-// float avncement_gauche = +4254 / 2 * nbr_tour; // Distance en ticks (ajuster selon tes besoins)
-// float avncement_droite = 2250 * nbr_tour;
-// float avncement_gauche = -2250 * nbr_tour;
-float avncement_droite = 2238 * nbr_tour+400;
-float avncement_gauche = -2243 * nbr_tour;
+float avncement_droite = 2250 * nbr_tour;
+float avncement_gauche = -2250 * nbr_tour;
+// float avncement_droite = 2238 * nbr_tour;
+// float avncement_gauche = -2243 * nbr_tour;
 
-bool stop = 0;
-float vitesse_croisiere = 40;
-float vitesse_croisiere_droit = vitesse_croisiere;
-float vitesse_croisiere_gauche = vitesse_croisiere;
-float emballement = 1.15;
+void rotation(int consigne, int vitesse, int sens)
+{
+    float vitesse_croisiere_gauche = vitesse * sens;
+    float vitesse_croisiere_droit = vitesse * -sens;
 
+    int consigne_gauche = consigne * sens;
+    int consigne_droite = consigne * -sens;
+    // if (consigne_droite > 0)
+    // {
+    //     vitesse_croisiere_droit = vitesse_croisiere_droit;
+    // }
+    // else if (consigne_droite < 0)
+    // {
+    //     vitesse_croisiere_droit = -vitesse_croisiere_droit;
+    // }
+    // if (consigne_gauche > 0)
+    // {
+    //     vitesse_croisiere_gauche = vitesse_croisiere_gauche;
+    // }
+    // else if (consigne_gauche < 0)
+    // {
+    //     vitesse_croisiere_gauche = -vitesse_croisiere_gauche;
+    // }
+    consigne_regulation_vitesse_droite = regulation_vitesse_roue_folle_droite((consigne_droite), vitesse_croisiere_droit);
+    consigne_regulation_vitesse_gauche = regulation_vitesse_roue_folle_gauche((consigne_gauche), vitesse_croisiere_gauche);
+    if ((consigne_regulation_vitesse_droite != consigne_droite) && (consigne_regulation_vitesse_gauche != consigne_gauche))
+    {
+        consigne_regulation_vitesse_gauche = consigne_regulation_vitesse_gauche - (consigne_regulation_vitesse_gauche + consigne_regulation_vitesse_droite);
+    }
+}
 void controle(void *parameters)
 {
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        /*
-                double sortie;
-                double observation = consigne_regulation_vitesse_gauche + consigne_regulation_vitesse_droite;
-                double erreur = 0 - observation;
-                double proportionnel = erreur * coeff_P;
-
-                double deriver = coeff_D * (erreur - erreur_prec_roue_folle_droite_tick) / Te;
-
-                sommme_integral_regulation_vitesse += erreur * Te;
-                if (sommme_integral_regulation_vitesse > integral_limit_regulation_vitesse)
-                {
-                    sommme_integral_regulation_vitesse = integral_limit_regulation_vitesse;
-                }
-                else if (sommme_integral_regulation_vitesse < -integral_limit_regulation_vitesse)
-                {
-                    sommme_integral_regulation_vitesse = -integral_limit_regulation_vitesse;
-                }
-
-                double integral = coeff_I * sommme_integral_regulation_vitesse;
-
-                double commande = proportionnel + deriver + integral;
-
-                erreur_precedente_regulation_vitesse = erreur;
-
-                // Gestion des bornes de la commande
-                float saturation = 1000;
-                if (commande > 0)
-                {
-
-                    if (commande > (saturation))
-                    {
-                        sortie = (saturation);
-                    }
-                    else
-                    {
-                        sortie = commande;
-                    }
-                }
-                else
-                {
-                    if (commande < -(saturation))
-                    {
-
-                        sortie = -(saturation);
-                    }
-                    else
-                    {
-                        sortie = -commande;
-                    }
-                }*/
-        // consigne_regulation_vitesse_gauche = consigne_regulation_vitesse_gauche + sortie;
-        // float vitesse_croisiere_gauche =  vitesse_croisiere+ sortie;
-        consigne_regulation_vitesse_droite = regulation_vitesse_roue_folle_droite((avncement_droite), vitesse_croisiere_droit);
-        consigne_regulation_vitesse_gauche = regulation_vitesse_roue_folle_gauche((avncement_gauche), vitesse_croisiere_gauche);
-        float jsp = consigne_regulation_vitesse_gauche;
-        if ((consigne_regulation_vitesse_droite != avncement_droite) )
-        {
-            consigne_regulation_vitesse_gauche = consigne_regulation_vitesse_gauche - (consigne_regulation_vitesse_gauche + consigne_regulation_vitesse_droite);
-        } // Serial.printf("cmd %5.2f err %5.2f obs %5.2f  consigne_croisiere_droit %5.2f consigne_croisiere_gauche %4.0f ", commande, erreur, (observation), consigne_regulation_vitesse_droite, consigne_regulation_vitesse_gauche);
-
+        rotation((2250 * nbr_tour), 40, 1);
         if ((flag_controle = 1) == 1)
         {
             asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
@@ -105,12 +58,12 @@ void controle(void *parameters)
             stop_motors();
         }
         // Serial.printf("obs %4.0f", observation);
-        SerialWIFI.printf("| odo gauche %.0f odo droite %.0f", odo_tick_gauche, odo_tick_droit);
-        // SerialWIFI.printf("|consigne_regulation_vitesse_droite %5.2f consigne_regulation_vitesse_gauche %5.2f ", consigne_regulation_vitesse_droite, consigne_regulation_vitesse_gauche);
-        Serial.printf("| consigne_regulation_vitesse_droite %.0f consigne_regulation_vitesse_gauche_rec  %.0f consigne_regulation_vitesse_gauche_nonrec  %.0f|", consigne_regulation_vitesse_droite, consigne_regulation_vitesse_gauche, jsp);
+        Serial.printf("| odo gauche %.0f odo droite %.0f", odo_tick_gauche, odo_tick_droit);
+        // // SerialWIFI.printf("|consigne_regulation_vitesse_droite %5.2f consigne_regulation_vitesse_gauche %5.2f ", consigne_regulation_vitesse_droite, consigne_regulation_vitesse_gauche);
+        // Serial.printf("| consigne_regulation_vitesse_droite %.0f consigne_regulation_vitesse_gauche_rec  %.0f consigne_regulation_vitesse_gauche_nonrec  %.0f|", consigne_regulation_vitesse_droite, consigne_regulation_vitesse_gauche, jsp);
         Serial.printf(" Theta %3.1f ", theta_robot * 180 / 3.14);
-        SerialWIFI.printf("nmbr tour %2.3f", (double)(theta_robot * 180 / M_PI / 360));
-        SerialWIFI.println();
+        Serial.printf("nmbr tour %2.3f", (double)(theta_robot * 180 / M_PI / 360));
+        Serial.println();
         // delay(1000);
         // FlagCalcul = 1;
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
@@ -126,7 +79,6 @@ void odo(void *parameters)
 
         read_x_y_theta();
 
-        // FlagCalcul = 1;
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
     }
 }
@@ -155,22 +107,7 @@ void setup()
     Serial.println("on commence");
     Serial.printf("avncement_gauche enter : %.0f\n", avncement_gauche);
     Serial.printf("avncement_droite enter : %.0f\n", avncement_droite);
-    if (avncement_droite > 0)
-    {
-        vitesse_croisiere_droit = vitesse_croisiere_droit;
-    }
-    else if (avncement_droite < 0)
-    {
-        vitesse_croisiere_droit = -vitesse_croisiere_droit;
-    }
-    if (avncement_gauche > 0)
-    {
-        vitesse_croisiere_gauche = vitesse_croisiere_gauche;
-    }
-    else if (avncement_gauche < 0)
-    {
-        vitesse_croisiere_gauche = -vitesse_croisiere_gauche;
-    }
+
     reset_encodeur();
     delay(5000);
     reset_encodeur();
