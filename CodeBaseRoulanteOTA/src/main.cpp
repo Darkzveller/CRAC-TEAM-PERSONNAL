@@ -5,7 +5,7 @@
 #include "ASSERVISSEMENT.h"
 #include <mat.h>
 
-float nbr_tour = 1 * 360 / 90;
+float nbr_tour = 10 * 360 / 90;
 float avncement_droite = 2250 * nbr_tour;
 float avncement_gauche = -2250 * nbr_tour;
 // float avncement_droite = 2238 * nbr_tour;
@@ -34,12 +34,16 @@ void rotation(int consigne, int vitesse, int sens)
     // {
     //     vitesse_croisiere_gauche = -vitesse_croisiere_gauche;
     // }
-    consigne_regulation_vitesse_droite = regulation_vitesse_roue_folle_droite((consigne_droite), vitesse_croisiere_droit);
-    consigne_regulation_vitesse_gauche = regulation_vitesse_roue_folle_gauche((consigne_gauche), vitesse_croisiere_gauche);
-    if ((consigne_regulation_vitesse_droite != consigne_droite) && (consigne_regulation_vitesse_gauche != consigne_gauche))
-    {
-        consigne_regulation_vitesse_gauche = consigne_regulation_vitesse_gauche - (consigne_regulation_vitesse_gauche + consigne_regulation_vitesse_droite);
-    }
+    // Calcul initial des consignes de vitesse pour chaque roue
+    consigne_regulation_vitesse_droite = regulation_vitesse_roue_folle_droite(consigne_droite, vitesse_croisiere_droit);
+    consigne_regulation_vitesse_gauche = regulation_vitesse_roue_folle_gauche(consigne_gauche, vitesse_croisiere_gauche);
+
+    // Imposer une symétrie des consignes de vitesse
+    float vitesse_moyenne = (consigne_regulation_vitesse_droite - consigne_regulation_vitesse_gauche) / 2;
+
+    // On force les consignes à être égales et opposées
+    consigne_regulation_vitesse_droite = vitesse_moyenne;
+    consigne_regulation_vitesse_gauche = -vitesse_moyenne;
 }
 void ligne_droite(int consigne, int vitesse, int sens)
 {
@@ -50,6 +54,14 @@ void ligne_droite(int consigne, int vitesse, int sens)
     int consigne_droite = consigne * sens;
     consigne_regulation_vitesse_droite = regulation_vitesse_roue_folle_droite((consigne_droite), vitesse_croisiere_droit);
     consigne_regulation_vitesse_gauche = regulation_vitesse_roue_folle_gauche((consigne_gauche), vitesse_croisiere_gauche);
+
+    float kp_angle_correction = 0.1;
+
+    float erreur_angle_correction = consigne_regulation_vitesse_droite - consigne_regulation_vitesse_gauche;
+    float correction = kp_angle_correction * erreur_angle_correction;
+
+    consigne_regulation_vitesse_droite -= correction;
+    consigne_regulation_vitesse_gauche += correction;
 }
 
 void controle(void *parameters)
@@ -59,7 +71,7 @@ void controle(void *parameters)
     while (1)
     {
         rotation((2250 * nbr_tour), 70, 1);
-        //ligne_droite((6000*10), 145, 1);
+        // ligne_droite((6000 * 10) / 2, 145, 1);
         if ((flag_controle = 1) == 1)
         {
             asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);

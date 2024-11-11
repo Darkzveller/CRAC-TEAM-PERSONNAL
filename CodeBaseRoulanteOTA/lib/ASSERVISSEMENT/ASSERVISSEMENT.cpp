@@ -302,6 +302,8 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
     // Serial.printf("return %4.4f", consigne_dist_droite);
     return consigne_dist_droite;
 }
+
+
 double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
 {
     if ((etat_actuel_vit_roue_folle_gauche == ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_GAUCHE) || (etat_actuel_vit_roue_folle_gauche == ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_GAUCHE))
@@ -470,6 +472,8 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
     // Serial.printf("return %4.4f", consigne_dist_gauche);
     return consigne_dist_gauche;
 }
+
+
 
 /*
 double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
