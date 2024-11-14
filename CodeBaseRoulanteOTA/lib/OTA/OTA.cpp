@@ -222,25 +222,25 @@ void receptionWIFI(char ch)
       SerialWIFI.println("Reset encodeur");
     }
 
-    if (commande == "P")
-    {
-      coeff_P_roue_folle_tick = valeur.toFloat();
-      SerialWIFI.printf("P = %4.6f", coeff_P_roue_folle_tick);
-      SerialWIFI.println();
-    }
+    // if (commande == "P")
+    // {
+    //   coeff_P_roue_folle_tick = valeur.toFloat();
+    //   SerialWIFI.printf("P = %4.6f", coeff_P_roue_folle_tick);
+    //   SerialWIFI.println();
+    // }
 
-    if (commande == "D")
-    {
-      coeff_D_roue_folle_tick = valeur.toFloat();
-      SerialWIFI.printf("D = %4.6f", coeff_D_roue_folle_tick);
-      SerialWIFI.println();
-    }
-    if (commande == "I")
-    {
-      coeff_I_roue_folle_tick = valeur.toFloat();
-      SerialWIFI.printf("I = %4.6f", coeff_I_roue_folle_tick);
-      SerialWIFI.println();
-    }
+    // if (commande == "D")
+    // {
+    //   coeff_D_roue_folle_tick = valeur.toFloat();
+    //   SerialWIFI.printf("D = %4.6f", coeff_D_roue_folle_tick);
+    //   SerialWIFI.println();
+    // }
+    // if (commande == "I")
+    // {
+    //   coeff_I_roue_folle_tick = valeur.toFloat();
+    //   SerialWIFI.printf("I = %4.6f", coeff_I_roue_folle_tick);
+    //   SerialWIFI.println();
+    // }
     if (commande == "SI")
     {
       integral_limit_roue_folle_tick = valeur.toInt();
@@ -249,9 +249,9 @@ void receptionWIFI(char ch)
     }
     if (commande == "all_coeff_tick")
     {
-      SerialWIFI.printf("P = %4.3f", coeff_P_roue_folle_tick);
-      SerialWIFI.printf(" D = %4.3f ", coeff_D_roue_folle_tick);
-      SerialWIFI.printf(" I = %4.3f", coeff_I_roue_folle_tick);
+      // SerialWIFI.printf("P = %4.3f", coeff_P_roue_folle_tick);
+      // SerialWIFI.printf(" D = %4.3f ", coeff_D_roue_folle_tick);
+      // SerialWIFI.printf(" I = %4.3f", coeff_I_roue_folle_tick);
       SerialWIFI.printf(" SI = %4.1f ", integral_limit_roue_folle_tick);
       SerialWIFI.println();
     }

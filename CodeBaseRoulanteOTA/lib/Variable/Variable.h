@@ -55,9 +55,13 @@ extern double odo_dist_gauche;
 extern double odo_dist_droit;
 //************Asservissement ROUE FOLLE EN TICK */
 
-extern float coeff_P_roue_folle_tick;
-extern float coeff_D_roue_folle_tick;
-extern float coeff_I_roue_folle_tick;
+extern float coeff_P_roue_folle_tick_gauche;
+extern float coeff_D_roue_folle_tick_gauche;
+extern float coeff_I_roue_folle_tick_gauche;
+
+extern float coeff_P_roue_folle_tick_droite;
+extern float coeff_D_roue_folle_tick_droite;
+extern float coeff_I_roue_folle_tick_droite;
 
 extern float erreur_prec_roue_folle_droite_tick;
 extern float erreur_prec_roue_folle_gauche_tick;
@@ -84,6 +88,15 @@ extern double Ta_counter_droite;
 extern double Ta_counter_gauche;
 extern double Td_counter_droite;
 extern double Td_counter_gauche;
+extern double Tc_counter_droite;
+extern double Tc_counter_gauche;
+extern double T_attente_droite ;
+extern double T_counter_attente_droite;
+
+extern volatile bool type_ligne_droite ;
+
+extern double T_attente_gauche ;
+extern double T_counter_attente_gauche;
 
 extern float distance_accel_droite;
 extern float distance_decl_droite;

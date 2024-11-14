@@ -13,6 +13,8 @@ float avncement_gauche = -2250 * nbr_tour;
 
 void rotation(int consigne, int vitesse, int sens)
 {
+    type_ligne_droite = false;
+
     float vitesse_croisiere_gauche = vitesse * sens;
     float vitesse_croisiere_droit = vitesse * -sens;
 
@@ -47,6 +49,7 @@ void rotation(int consigne, int vitesse, int sens)
 }
 void ligne_droite(int consigne, int vitesse, int sens)
 {
+    type_ligne_droite = true;
     float vitesse_croisiere_gauche = vitesse * sens;
     float vitesse_croisiere_droit = vitesse * sens;
 
@@ -70,8 +73,8 @@ void controle(void *parameters)
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        rotation((2250 * nbr_tour), 70, 1);
-        // ligne_droite((6000 * 10) / 2, 145, 1);
+        // rotation((2250 * nbr_tour), 70, 1);
+        ligne_droite(-6000, 145, 1);
         if ((flag_controle = 1) == 1)
         {
             asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
@@ -84,8 +87,8 @@ void controle(void *parameters)
         // Serial.printf("obs %4.0f", observation);
         Serial.printf("| odo gauche %.0f odo droite %.0f", odo_tick_gauche, odo_tick_droit);
         // // // SerialWIFI.printf("|consigne_regulation_vitesse_droite %5.2f consigne_regulation_vitesse_gauche %5.2f ", consigne_regulation_vitesse_droite, consigne_regulation_vitesse_gauche);
-        // // Serial.printf("| consigne_regulation_vitesse_droite %.0f consigne_regulation_vitesse_gauche_rec  %.0f consigne_regulation_vitesse_gauche_nonrec  %.0f|", consigne_regulation_vitesse_droite, consigne_regulation_vitesse_gauche, jsp);
-        Serial.printf(" Theta %3.1f ", theta_robot * 180 / 3.14);
+        Serial.printf("| consigne_regulation_vitesse_droite %.0f consigne_regulation_vitesse_gauche_rec  %.0f", consigne_regulation_vitesse_droite, consigne_regulation_vitesse_gauche);
+        // Serial.printf(" Theta %3.1f ", theta_robot * 180 / 3.14);
         Serial.printf("nmbr tour %2.3f", (double)(theta_robot * 180 / M_PI / 360));
         Serial.println();
         // delay(1000);
@@ -133,7 +136,7 @@ void setup()
     // Serial.printf("avncement_droite enter : %.0f\n", avncement_droite);
 
     reset_encodeur();
-    delay(5);
+    delay(1000);
     reset_encodeur();
 
     xTaskCreate(
