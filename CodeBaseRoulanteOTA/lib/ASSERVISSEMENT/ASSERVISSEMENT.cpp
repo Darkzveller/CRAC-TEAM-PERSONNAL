@@ -237,11 +237,6 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
         {
             etat_actuel_vit_roue_folle_droite = ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE;
         }
-        // Tc_counter_droite++;
-        // if (Tc_counter_droite >= fabs(Tc))
-        // {
-        //     etat_actuel_vit_roue_folle_droite = ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE;
-        // }
         Serial.printf("CROISIERE|");
         break;
 
@@ -285,25 +280,32 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
         break;
 
     case ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE:
-if(type_ligne_droite){
-        consigne_dist_droite = cons * 1 / facteur_ajustement_consigne;
-        T_counter_attente_droite++;
-        if (T_counter_attente_droite > T_attente_droite)
+        if (type_ligne_droite)
         {
-            coeff_P_roue_folle_tick_droite = 7.0 / 2;
-            coeff_D_roue_folle_tick_droite = 0.25 / 2;
-            coeff_I_roue_folle_tick_droite = 0.3 * 2;
+            consigne_dist_droite = cons * 1 / facteur_ajustement_consigne;
+            T_counter_attente_droite++;
+            if (T_counter_attente_droite > T_attente_droite)
+            {
+                coeff_P_roue_folle_tick_droite = 7.0 / 2;
+                coeff_D_roue_folle_tick_droite = 0.25 / 2;
+                coeff_I_roue_folle_tick_droite = 0.3 * 2;
+                etat_actuel_vit_roue_folle_droite = ETAT_VIDE_Vitesse_ROUE_FOLLE_DROITE;
+            }
+            else
+            {
+                coeff_P_roue_folle_tick_droite = 7.0 / 50;
+                coeff_D_roue_folle_tick_droite = 0;
+                coeff_I_roue_folle_tick_droite = 0.3 * 2;
+            }
         }
         else
         {
-            coeff_P_roue_folle_tick_droite = 7.0 / 50;
-            coeff_D_roue_folle_tick_droite = 0;
-            coeff_I_roue_folle_tick_droite = 0.3 * 2;
-        }}else{consigne_dist_droite=cons;}
+            consigne_dist_droite = cons;
+        }
         // stop_motors();
         Serial.printf("ARRÊT atteint|");
         break;
-    }
+        }
 
     // Serial.printf("accactu %.2f | Vrob %.5f | ConsVit %3.0f | ConsDit %4.0f | err %.0f | distdeccel %.2f | Decl %f | odo %f | rest %f ",
     //               accel, Vrob, consigne_vit_droite, consigne_dist_droite, erreur_test, distance_decl_droite, decc, odo_tick_droit, (cons - odo_tick_droit));
@@ -419,13 +421,7 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
         {
             etat_actuel_vit_roue_folle_gauche = ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE;
         }
-        // Serial.printf("CROISIERE|");
-        // Tc_counter_gauche++;
-        // if (Tc_counter_gauche >= fabs(Tc))
-        // {
-        //     etat_actuel_vit_roue_folle_gauche = ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE;
-        // }
-
+       
         break;
 
     case ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE:
@@ -483,7 +479,11 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
                 coeff_D_roue_folle_tick_gauche = 0;
                 coeff_I_roue_folle_tick_gauche = 0.3 * 2;
             }
-        }else{consigne_dist_gauche=cons;}
+        }
+        else
+        {
+            consigne_dist_gauche = cons;
+        }
 
         // stop_motors();
         // Serial.printf("ARRÊT atteint|");

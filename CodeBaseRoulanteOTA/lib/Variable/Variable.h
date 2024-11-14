@@ -118,7 +118,8 @@ enum Etat_vitesse_roue_folle_droite
     ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE,
     ETAT_CROISIERE_Vitesse_ROUE_FOLLE_DROITE,
     ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE,
-    ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE
+    ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE,
+    ETAT_VIDE_Vitesse_ROUE_FOLLE_DROITE
 };
 extern Etat_vitesse_roue_folle_droite etat_actuel_vit_roue_folle_droite;
 
@@ -127,7 +128,8 @@ enum Etat_vitesse_roue_folle_gauche
     ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_GAUCHE,
     ETAT_CROISIERE_Vitesse_ROUE_FOLLE_GAUCHE,
     ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE,
-    ETAT_ARRET_Vitesse_ROUE_FOLLE_GAUCHE
+    ETAT_ARRET_Vitesse_ROUE_FOLLE_GAUCHE,
+    ETAT_VIDE_Vitesse_ROUE_FOLLE_GAUCHE
 };
 extern Etat_vitesse_roue_folle_gauche etat_actuel_vit_roue_folle_gauche;
 

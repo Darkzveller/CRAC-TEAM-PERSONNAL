@@ -39,7 +39,7 @@ float somme_integral_roue_folle_gauche_tick = 0;
 
 //************************Asservissement vitesse Roue folle en TICK */
 
-float Vmax = 145;
+float Vmax = 200;
 float Amax = 50;
 float Dmax = 2.5;
 float limit_reprise_asser = 50;
