@@ -299,16 +299,7 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
     float accel = Amax;
     float decc = Dmax;
 
-    if (Vmax_consigne > 0)
-    {
-        accel = fabs(accel);
-        decc = fabs(decc);
-    }
-    else
-    {
-        accel = -fabs(accel);
-        decc = -fabs(decc);
-    }
+   
     double Vrob = (delta_gauche) / Te;
 
     float Ta = vit / accel;
@@ -382,7 +373,8 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
         if (fabs(cons - odo_tick_gauche) < fabs(distance_decl_gauche))
         {
             etat_actuel_vit_roue_folle_gauche = ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE;
-        }
+        }    
+
         break;
 
     case ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE:

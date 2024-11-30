@@ -3,7 +3,7 @@
 
 ESP32Encoder encodergauche;
 ESP32Encoder encoderdroite;
-float offset = 100000;
+float offset = 0;
 void setup_encodeur()
 {
     ESP32Encoder::useInternalWeakPullResistors = UP; // Utilise les résistances internes

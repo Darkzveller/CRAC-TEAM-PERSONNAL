@@ -6,36 +6,97 @@
 #include "MOUVEMENT.h"
 #include <mat.h>
 
-float nbr_tour = 1 * 360 / 90;
-float avncement_droite = 2250 * nbr_tour;
-float avncement_gauche = -2250 * nbr_tour;
-// float avncement_droite = 2238 * nbr_tour;
-// float avncement_gauche = -2243 * nbr_tour;
 extern float offset;
 
-float consigne_odo_droite_prec = offset;
-float consigne_odo_gauche_prec = offset;
+float consigne_odo_droite_prec = 0;
+float consigne_odo_gauche_prec = 0;
+
+int state = 0;
+int distance_ticks = 5000;
+int rotation_ticks = 2250;
+int time_wait = 10000;
+bool inverter_mouv_order = 1;
 void controle(void *parameters)
 {
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        rotation((2250 * 1), 70, -1);
-        // ligne_droite(+30000, 135, 1);
-        if ((flag_controle = 1) == 1)
+
+        switch (state)
         {
-            asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
-            asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
+        case 0:
+            if (inverter_mouv_order)
+            {
+                rotation(rotation_ticks, 70, 1);
+            }
+            else
+            {
+                ligne_droite(distance_ticks, 130, 1);
+            }
+            if ((etat_actuel_vit_roue_folle_droite == ETAT_VIDE_Vitesse_ROUE_FOLLE_DROITE) && (etat_actuel_vit_roue_folle_gauche == ETAT_VIDE_Vitesse_ROUE_FOLLE_GAUCHE))
+            {
+                etat_actuel_vit_roue_folle_droite = ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE;
+                etat_actuel_vit_roue_folle_gauche = ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_GAUCHE;
+
+                consigne_odo_droite_prec = distance_ticks;
+                consigne_odo_gauche_prec = distance_ticks;
+
+                stop_motors();
+                delay(time_wait);
+                // Serial.printf("Etat Rotation");
+                delay(time_wait);
+                state = 1;
+            }
+            break;
+        case 1:
+            if (inverter_mouv_order)
+            {
+                ligne_droite(distance_ticks, 130, 1);
+            }
+            else
+            {
+                rotation(rotation_ticks, 70, 1);
+            }
+            if ((etat_actuel_vit_roue_folle_droite == ETAT_VIDE_Vitesse_ROUE_FOLLE_DROITE) && (etat_actuel_vit_roue_folle_gauche == ETAT_VIDE_Vitesse_ROUE_FOLLE_GAUCHE))
+            {
+                stop_motors();
+                delay(time_wait);
+                // Serial.printf("Etat Finish");
+                delay(time_wait);
+
+                state = 2;
+            }
+
+            break;
+        case 2:
+            // Serial.printf("JE SUIS UN BOSS");
+            break;
+
+        default:
+            break;
         }
-        else
-        {
-            stop_motors();
-        }
+
+        asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
+        asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
+
+        /*
+       rotation((2250 * 1), 70, -1);
+       // ligne_droite(+30000, 135, 1);
+       if ((flag_controle = 1) == 1)
+       {
+           asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
+           asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
+       }
+       else
+       {
+           stop_motors();
+       }
+       */
         // Serial.printf("obs %4.0f", observation);
         Serial.printf("| odo gauche %.0f odo droite %.0f", odo_tick_gauche, odo_tick_droit);
-        Serial.printf("| consigne_regulation_vitesse_droite %.0f consigne_regulation_vitesse_gauche_rec  %.0f", consigne_regulation_vitesse_droite, consigne_regulation_vitesse_gauche);
-        // Serial.printf(" Theta %3.1f ", theta_robot * 180 / 3.14);
+        // Serial.printf("| consigne_regulation_vitesse_droite %.0f consigne_regulation_vitesse_gauche_rec  %.0f", consigne_regulation_vitesse_droite, consigne_regulation_vitesse_gauche);
+        Serial.printf(" Theta %3.1f ", theta_robot * 180 / 3.14);
         // Serial.printf("nmbr tour %2.3f", (double)(theta_robot * 180 / M_PI / 360));
         Serial.println();
         // delay(1000);
