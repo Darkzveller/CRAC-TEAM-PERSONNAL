@@ -43,6 +43,11 @@ extern double delta_gauche;
 
 extern double distance_parcourue;
 
+extern float consigne_odo_droite_prec;
+extern float consigne_odo_gauche_prec;
+extern float consigne_theta_prec;
+
+
 #define PIN_ENCODEUR_1 23
 #define PIN_ENCODEUR_2 22
 
@@ -114,7 +119,7 @@ extern float erreur_vit_precedente_roue_folle_gauche;
 
 // Enumérations pour les états des roues en vitesse
 enum Etat_vitesse_roue_folle_droite
-{
+{ETAT_ATTENTE_Vitesse_ROUE_FOLLE_DROITE,
     ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE,
     ETAT_CROISIERE_Vitesse_ROUE_FOLLE_DROITE,
     ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE,
@@ -124,7 +129,7 @@ enum Etat_vitesse_roue_folle_droite
 extern Etat_vitesse_roue_folle_droite etat_actuel_vit_roue_folle_droite;
 
 enum Etat_vitesse_roue_folle_gauche
-{
+{ETAT_ATTENTE_Vitesse_ROUE_FOLLE_GAUCHE,
     ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_GAUCHE,
     ETAT_CROISIERE_Vitesse_ROUE_FOLLE_GAUCHE,
     ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE,

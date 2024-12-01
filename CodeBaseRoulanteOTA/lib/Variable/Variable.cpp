@@ -19,6 +19,12 @@ double delta_droit;
 double delta_gauche;
 
 double distance_parcourue;
+
+
+float consigne_odo_droite_prec = 0;
+float consigne_odo_gauche_prec = 0;
+float consigne_theta_prec = 0;
+
 // Variable asservissement
 //************Asservissement ROUE FOLLE EN TICK */
 
@@ -42,7 +48,7 @@ float somme_integral_roue_folle_gauche_tick = 0;
 float Vmax = 200;
 float Amax = 50;
 float Dmax = 2.5;
-float limit_reprise_asser = 50;
+float limit_reprise_asser = 100;
 
 float acc_actuel_droite = 0;
 double consigne_vit_droite = 0;
@@ -58,7 +64,7 @@ double Td_counter_droite = 0;
 double Td_counter_gauche = 0;
 double Tc_counter_droite = 0;
 double Tc_counter_gauche = 0;
-double T_attente_gauche=200 ;
+double T_attente_gauche=10 ;
 double T_counter_attente_gauche;
 double T_attente_droite =T_attente_gauche;
 double T_counter_attente_droite;
@@ -79,8 +85,8 @@ float somme_erreur_vit_roue_folle_droite = 0;
 float somme_erreur_vit_roue_folle_gauche = 0;
 float erreur_vit_precedente_roue_folle_gauche = 0;
 
-Etat_vitesse_roue_folle_droite etat_actuel_vit_roue_folle_droite = ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE;
-Etat_vitesse_roue_folle_gauche etat_actuel_vit_roue_folle_gauche = ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_GAUCHE;
+Etat_vitesse_roue_folle_droite etat_actuel_vit_roue_folle_droite = ETAT_ATTENTE_Vitesse_ROUE_FOLLE_DROITE;
+Etat_vitesse_roue_folle_gauche etat_actuel_vit_roue_folle_gauche = ETAT_ATTENTE_Vitesse_ROUE_FOLLE_GAUCHE;
 
 //************************Convitesse de vitesse */
 float consigne_regulation_vitesse_droite = 0;
