@@ -18,16 +18,38 @@ extern float offset;
 int state = 0;
 int cons_distance_ticks = 5000;
 int cons_rotation_ticks = 2250;
+int vitesse_ligne_droite = 70;
+int vitesse_rot = 120;
 int time_wait = 5000;
 bool inverter_mouv_order = 1;
 // Fonction pour convertir un état en texte
-String toString(Etat_vitesse_roue_folle_droite etat)
+String toStringG(Etat_vitesse_roue_folle_gauche etat)
+{
+    switch (etat)
+    {
+    case ETAT_ATTENTE_Vitesse_ROUE_FOLLE_GAUCHE:
+        return "ETAT_ATTENTE_Vitesse_ROUE_FOLLE_GAUCHE";
+
+    case ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_GAUCHE:
+        return "ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_GAUCHE";
+    case ETAT_CROISIERE_Vitesse_ROUE_FOLLE_GAUCHE:
+        return "ETAT_CROISIERE_Vitesse_ROUE_FOLLE_GAUCHE";
+    case ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE:
+        return "ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE";
+    case ETAT_ARRET_Vitesse_ROUE_FOLLE_GAUCHE:
+        return "ETAT_ARRET_Vitesse_ROUE_FOLLE_GAUCHE";
+    case ETAT_VIDE_Vitesse_ROUE_FOLLE_GAUCHE:
+        return "ETAT_VIDE_Vitesse_ROUE_FOLLE_GAUCHE";
+    default:
+        return "ETAT_INCONNU";
+    }
+}
+String toStringD(Etat_vitesse_roue_folle_droite etat)
 {
     switch (etat)
     {
     case ETAT_ATTENTE_Vitesse_ROUE_FOLLE_DROITE:
         return "ETAT_ATTENTE_Vitesse_ROUE_FOLLE_DROITE";
-
     case ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE:
         return "ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE";
     case ETAT_CROISIERE_Vitesse_ROUE_FOLLE_DROITE:
@@ -50,35 +72,39 @@ void controle(void *parameters)
     while (1)
     {
         /**/
+
         switch (state)
         {
         case 0:
             if (inverter_mouv_order)
             {
-                rotation(cons_rotation_ticks, 100, 1);
+                rotation(cons_rotation_ticks, vitesse_rot, -1);
+                consigne_theta_prec = theta_robot;
             }
             else
             {
-                ligne_droite(cons_distance_ticks, 100, 1);
+                ligne_droite(cons_distance_ticks, vitesse_ligne_droite, 1);
             }
             if ((start_asservissement_roue_droite == false) && (start_asservissement_roue_gauche == false))
             {
+                // stop_motors();
+                // delay(250000);
                 state = 1;
                 start_asservissement_roue_droite = true;
                 start_asservissement_roue_gauche = true;
             }
             break;
         case 1:
-            Serial.printf(" consigne_odo_gauche_prec %.0f ", consigne_odo_gauche_prec);
-            Serial.printf(" consigne_odo_droite_prec %.0f ", consigne_odo_droite_prec);
+            // Serial.printf(" consigne_odo_gauche_prec %.0f ", consigne_odo_gauche_prec);
+            // Serial.printf(" consigne_odo_droite_prec %.0f ", consigne_odo_droite_prec);
 
             if (inverter_mouv_order)
             {
-                ligne_droite(cons_distance_ticks , 40, 1);
+                ligne_droite(cons_distance_ticks, vitesse_ligne_droite, 1);
             }
             else
             {
-                rotation(cons_rotation_ticks, 100, 1);
+                rotation(cons_rotation_ticks, vitesse_rot, -1);
             }
             if ((start_asservissement_roue_droite == false) && (start_asservissement_roue_gauche == false))
             {
@@ -97,10 +123,10 @@ void controle(void *parameters)
         }
         asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
         asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
-
+        
         /*
        rotation((2250 * 1), 70, -1);
-       // ligne_droite(+30000, 135, 1);
+    //    ligne_droite(+4000, 100, 1);
        if ((flag_controle = 1) == 1)
        {
            asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
@@ -110,14 +136,19 @@ void controle(void *parameters)
        {
            stop_motors();
        }
-       */
+*/
         // Serial.printf("obs %4.0f", observation);
 
         Serial.printf("| odo gauche %.0f odo droite %.0f", odo_tick_gauche, odo_tick_droit);
         // Serial.printf("| consigne_regulation_vitesse_droite %.0f consigne_regulation_vitesse_gauche_rec  %.0f", consigne_regulation_vitesse_droite, consigne_regulation_vitesse_gauche);
-        Serial.printf(" Theta %3.1f ", theta_robot * 180 / 3.14);
+        // Serial.printf(" Theta %3.1f ", theta_robot * 180 / 3.14);
         // Serial.printf("nmbr tour %2.3f", (double)(theta_robot * 180 / M_PI / 360));
-        Serial.println("Etat actuel : " + toString(etat_actuel_vit_roue_folle_droite));
+        Serial.printf(" consigne_regulation_vitesse_gauche_cc%.0f ", consigne_regulation_vitesse_gauche);
+        Serial.printf(" consigne_regulation_vitesse_droite_cc %.0f ", consigne_regulation_vitesse_droite);
+
+        Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
+        Serial.println(" " + toStringD(etat_actuel_vit_roue_folle_droite));
+
         //   Serial.println();
         // delay(1000);
         // FlagCalcul = 1;

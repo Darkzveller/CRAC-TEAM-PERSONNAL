@@ -1,6 +1,7 @@
 #include "Variable.h"
 #include "ASSERVISSEMENT.h"
 #include "MOUVEMENT.h"
+#include "MOTEUR.h"
 
 void rotation(int consigne, int vitesse, int sens)
 {
@@ -18,11 +19,29 @@ void rotation(int consigne, int vitesse, int sens)
     int consigne_droite = consigne * -sens;
     consigne_gauche = (consigne_gauche + consigne_odo_gauche_prec);
     consigne_droite = (consigne_droite + consigne_odo_droite_prec);
-    Serial.printf(" consigne_gauche %d ", consigne_gauche);
-    Serial.printf(" consigne_droite %d ", consigne_droite);
+    // Serial.printf(" consigne_gauche %d ", consigne_gauche);
+    // Serial.printf(" consigne_droite %d ", consigne_droite);
 
     // Serial.printf(" vitesse_croisiere_gauche %.0f ", vitesse_croisiere_gauche);
     // Serial.printf(" vitesse_croisiere_droit %.0f ", vitesse_croisiere_droit);
+    // stop_motors();
+
+    // Serial.println();
+    // Serial.println();
+    // Serial.println();
+    // while (true)
+    // {
+    //     Serial.printf(" consigne_gauche %d ", consigne_gauche);
+    //     Serial.printf(" consigne_droite %d ", consigne_droite);
+
+    //     Serial.printf(" consigne_odo_gauche_prec %.0f ", consigne_odo_gauche_prec);
+    //     Serial.printf(" consigne_odo_droite_prec %.0f ", consigne_odo_droite_prec);
+    //     Serial.printf("| odo gauche %.0f odo droite %.0f", odo_tick_gauche, odo_tick_droit);
+
+    //     Serial.println();
+    // }
+    // Serial.println();
+
 
     // Calcul initial des consignes de vitesse pour chaque roue
     consigne_regulation_vitesse_droite = regulation_vitesse_roue_folle_droite(consigne_droite, vitesse_croisiere_droit);
@@ -45,13 +64,32 @@ void ligne_droite(int consigne, int vitesse, int sens)
     int consigne_droite = consigne * sens;
     consigne_gauche = (consigne_gauche + consigne_odo_gauche_prec);
     consigne_droite = (consigne_droite + consigne_odo_droite_prec);
+    float kp_angle_correction = 0.5;
 
-    Serial.printf(" consigne_gauche %d ", consigne_gauche);
-    Serial.printf(" consigne_droite %d ", consigne_droite);
+    float erreur_angle_correction = consigne_regulation_vitesse_droite - consigne_regulation_vitesse_gauche;
+    float correction = kp_angle_correction * erreur_angle_correction;
 
-    // Serial.printf(" consigne_odo_gauche_prec %.0f ", consigne_odo_gauche_prec);
-    // Serial.printf(" consigne_odo_droite_prec %.0f ", consigne_odo_droite_prec);
+    consigne_regulation_vitesse_droite -= correction;
+    consigne_regulation_vitesse_gauche += correction;
+    // stop_motors();
 
+    // Serial.println();
+    // Serial.println();
+    // Serial.println();
+    // while (true)
+    // {
+    //     Serial.printf(" consigne_gauche %d ", consigne_gauche);
+    //     Serial.printf(" consigne_droite %d ", consigne_droite);
+
+    //     Serial.printf(" consigne_odo_gauche_prec %.0f ", consigne_odo_gauche_prec);
+    //     Serial.printf(" consigne_odo_droite_prec %.0f ", consigne_odo_droite_prec);
+    //     Serial.printf("| odo gauche %.0f odo droite %.0f", odo_tick_gauche, odo_tick_droit);
+
+    //     Serial.println();
+    // }
+    // Serial.println();
+
+    // delay(1000000);
     // Calcul initial des consignes de vitesse pour chaque roue
     consigne_regulation_vitesse_droite = regulation_vitesse_roue_folle_droite(consigne_droite, vitesse_croisiere_droit);
     consigne_regulation_vitesse_gauche = regulation_vitesse_roue_folle_gauche(consigne_gauche, vitesse_croisiere_gauche);
