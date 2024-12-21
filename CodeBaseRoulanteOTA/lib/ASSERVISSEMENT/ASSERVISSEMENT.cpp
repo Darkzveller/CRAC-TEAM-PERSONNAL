@@ -3,12 +3,6 @@
 #include "ASSERVISSEMENT.h"
 #include "OTA.h"
 float facteur_ajustement_consigne = 0.5;
-extern bool stop_asservissement_roue_gauche;
-extern bool stop_asservissement_roue_droite;
-extern bool start_asservissement_roue_gauche;
-extern bool start_asservissement_roue_droite;
-extern float consigne_odo_droite_delta;
-extern float consigne_odo_gauche_delta;
 
 void asservissement_roue_folle_droite_tick(double consigne, double observation)
 {
@@ -489,7 +483,7 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
         if (((cons - odo_tick_droit) < limit_reprise_asser) && ((cons - odo_tick_droit) > -limit_reprise_asser))
         // if ((fabs(delta_droit) < 100) || (fabs(delta_droit) > 100))
         {
-            stop_moteur_droit();
+            // stop_moteur_droit();
             etat_actuel_vit_roue_folle_droite = ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE;
         }
 
@@ -649,7 +643,7 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
         if (((cons - odo_tick_gauche) < limit_reprise_asser) && ((cons - odo_tick_gauche) > -limit_reprise_asser))
         // if ((fabs(delta_gauche) < 100) || (fabs(delta_gauche) > 100))
         {
-            stop_moteur_gauche();
+            // stop_moteur_gauche();
             etat_actuel_vit_roue_folle_gauche = ETAT_ARRET_Vitesse_ROUE_FOLLE_GAUCHE;
         }
 

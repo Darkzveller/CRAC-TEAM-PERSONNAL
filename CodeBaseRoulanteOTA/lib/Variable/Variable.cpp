@@ -20,7 +20,6 @@ double delta_gauche;
 
 double distance_parcourue;
 
-
 float consigne_odo_droite_prec = 0;
 float consigne_odo_gauche_prec = 0;
 float consigne_theta_prec = 0;
@@ -32,9 +31,9 @@ float coeff_P_roue_folle_tick_gauche = 7.0 / 2;
 float coeff_D_roue_folle_tick_gauche = 0.25 / 2;
 float coeff_I_roue_folle_tick_gauche = 0.3 * 2;
 
-float coeff_P_roue_folle_tick_droite = 7.0 / 2;
-float coeff_D_roue_folle_tick_droite = 0.25 / 2;
-float coeff_I_roue_folle_tick_droite = 0.3 * 2;
+float coeff_P_roue_folle_tick_droite = coeff_P_roue_folle_tick_gauche;
+float coeff_D_roue_folle_tick_droite = coeff_D_roue_folle_tick_gauche;
+float coeff_I_roue_folle_tick_droite = coeff_I_roue_folle_tick_gauche;
 
 float erreur_prec_roue_folle_droite_tick = 0;
 float erreur_prec_roue_folle_gauche_tick = 0;
@@ -65,9 +64,9 @@ double Td_counter_droite = 0;
 double Td_counter_gauche = 0;
 double Tc_counter_droite = 0;
 double Tc_counter_gauche = 0;
-double T_attente_gauche=10 ;
+double T_attente_gauche = 10;
 double T_counter_attente_gauche;
-double T_attente_droite =T_attente_gauche;
+double T_attente_droite = T_attente_gauche;
 double T_counter_attente_droite;
 
 volatile bool type_ligne_droite = false;
@@ -86,6 +85,9 @@ float somme_erreur_vit_roue_folle_droite = 0;
 float somme_erreur_vit_roue_folle_gauche = 0;
 float erreur_vit_precedente_roue_folle_gauche = 0;
 
+bool start_asservissement_roue_gauche = false;
+bool start_asservissement_roue_droite = false;
+
 Etat_vitesse_roue_folle_droite etat_actuel_vit_roue_folle_droite = ETAT_ATTENTE_Vitesse_ROUE_FOLLE_DROITE;
 Etat_vitesse_roue_folle_gauche etat_actuel_vit_roue_folle_gauche = ETAT_ATTENTE_Vitesse_ROUE_FOLLE_GAUCHE;
 
@@ -96,3 +98,17 @@ float consigne_regulation_vitesse_gauche = 0;
 //***********OTA******************* */
 
 bool flag_controle = false;
+
+//***********CAN******************* */
+
+CANMessage myData;     // data received by BT to write on CAN
+CANMessage DATAtoSend; // data received by CAN to send on BT
+
+CANMessage rxMsg[SIZE_FIFO]; // data received by CAN to control the robot
+CANMessage DATArobot;        // DATA that the robot will write on CAN
+unsigned char FIFO_ecriture = 0;
+signed char FIFO_lecture = 0;
+signed char FIFO_occupation = 0;
+signed char FIFO_max_occupation = 0;
+//***********Ordre de déplacement******************* */
+bool flag_fin_mvt = true;

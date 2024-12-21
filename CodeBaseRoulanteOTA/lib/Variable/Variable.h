@@ -4,6 +4,7 @@
 #define Variable_H
 // Parametre FreeRTOS
 #define Te 5
+#define Tcan 10
 
 // Déclaration des variables externes
 #define frequence 19500
@@ -46,7 +47,6 @@ extern double distance_parcourue;
 extern float consigne_odo_droite_prec;
 extern float consigne_odo_gauche_prec;
 extern float consigne_theta_prec;
-
 
 #define PIN_ENCODEUR_1 23
 #define PIN_ENCODEUR_2 22
@@ -95,12 +95,12 @@ extern double Td_counter_droite;
 extern double Td_counter_gauche;
 extern double Tc_counter_droite;
 extern double Tc_counter_gauche;
-extern double T_attente_droite ;
+extern double T_attente_droite;
 extern double T_counter_attente_droite;
 
-extern volatile bool type_ligne_droite ;
+extern volatile bool type_ligne_droite;
 
-extern double T_attente_gauche ;
+extern double T_attente_gauche;
 extern double T_counter_attente_gauche;
 
 extern float distance_accel_droite;
@@ -117,24 +117,29 @@ extern float somme_erreur_vit_roue_folle_droite;
 extern float somme_erreur_vit_roue_folle_gauche;
 extern float erreur_vit_precedente_roue_folle_gauche;
 
+extern bool start_asservissement_roue_gauche;
+extern bool start_asservissement_roue_droite;
+
 // Enumérations pour les états des roues en vitesse
 enum Etat_vitesse_roue_folle_droite
-{ETAT_ATTENTE_Vitesse_ROUE_FOLLE_DROITE,
-    ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE,
-    ETAT_CROISIERE_Vitesse_ROUE_FOLLE_DROITE,
-    ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE,
-    ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE,
-    ETAT_VIDE_Vitesse_ROUE_FOLLE_DROITE
+{
+  ETAT_ATTENTE_Vitesse_ROUE_FOLLE_DROITE,
+  ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE,
+  ETAT_CROISIERE_Vitesse_ROUE_FOLLE_DROITE,
+  ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE,
+  ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE,
+  ETAT_VIDE_Vitesse_ROUE_FOLLE_DROITE
 };
 extern Etat_vitesse_roue_folle_droite etat_actuel_vit_roue_folle_droite;
 
 enum Etat_vitesse_roue_folle_gauche
-{ETAT_ATTENTE_Vitesse_ROUE_FOLLE_GAUCHE,
-    ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_GAUCHE,
-    ETAT_CROISIERE_Vitesse_ROUE_FOLLE_GAUCHE,
-    ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE,
-    ETAT_ARRET_Vitesse_ROUE_FOLLE_GAUCHE,
-    ETAT_VIDE_Vitesse_ROUE_FOLLE_GAUCHE
+{
+  ETAT_ATTENTE_Vitesse_ROUE_FOLLE_GAUCHE,
+  ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_GAUCHE,
+  ETAT_CROISIERE_Vitesse_ROUE_FOLLE_GAUCHE,
+  ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE,
+  ETAT_ARRET_Vitesse_ROUE_FOLLE_GAUCHE,
+  ETAT_VIDE_Vitesse_ROUE_FOLLE_GAUCHE
 };
 extern Etat_vitesse_roue_folle_gauche etat_actuel_vit_roue_folle_gauche;
 
@@ -145,5 +150,36 @@ extern float consigne_regulation_vitesse_gauche;
 //***********OTA******************* */
 
 extern bool flag_controle;
+
+//***********CAN******************* */
+
+#define SIZE_FIFO 32
+
+typedef struct CANMessage
+{
+  bool extented = false;
+  bool RTR = false;
+  unsigned int ID = 0;
+  char ln = 0;
+  unsigned char dt[8] = {0};
+} CANMessage;
+extern CANMessage myData;           // data received by BT to write on CAN
+extern CANMessage DATAtoSend;       // data received by CAN to send on BT
+extern CANMessage rxMsg[SIZE_FIFO]; // data received by CAN to control the robot
+extern CANMessage DATArobot;        // DATA that the robot will write on CAN
+extern unsigned char FIFO_ecriture;
+extern signed char FIFO_lecture;
+extern signed char FIFO_occupation;
+extern signed char FIFO_max_occupation;
+
+//***********Ordre de déplacement******************* */
+#define TYPE_DEPLACEMENT_IMMOBILE 1
+#define TYPE_DEPLACEMENT_LIGNE_DROITE 2
+#define TYPE_DEPLACEMENT_ROTATION 3
+#define TYPE_DEPLACEMENT_X_Y_THETA 4
+#define TYPE_DEPLACEMENT_RECALAGE 5
+#define TYPE_VIDE 6
+
+extern bool flag_fin_mvt;
 
 #endif

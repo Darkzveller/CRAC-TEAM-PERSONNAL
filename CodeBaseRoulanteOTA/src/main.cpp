@@ -4,24 +4,18 @@
 #include "EncoderManager.h"
 #include "ASSERVISSEMENT.h"
 #include "MOUVEMENT.h"
+#include "ID_CAN.h"
+#include "CAN_ESP32E.h"
 #include <mat.h>
 
-bool stop_asservissement_roue_gauche = 0;
-bool stop_asservissement_roue_droite = 0;
-bool start_asservissement_roue_gauche = 0;
-bool start_asservissement_roue_droite = 0;
-
-float consigne_odo_droite_delta = 0;
-float consigne_odo_gauche_delta = 0;
-extern float offset;
-
-int state = 0;
+int etat_mouvement = 0;
 int cons_distance_ticks = 5000;
 int cons_rotation_ticks = 2250;
 int vitesse_ligne_droite = 70;
 int vitesse_rot = 120;
 int time_wait = 5000;
-bool inverter_mouv_order = 1;
+bool inverter_mouv_order = 0;
+float seuil_recalage = 500;
 // Fonction pour convertir un état en texte
 String toStringG(Etat_vitesse_roue_folle_gauche etat)
 {
@@ -65,6 +59,24 @@ String toStringD(Etat_vitesse_roue_folle_droite etat)
     }
 }
 
+struct Ordre_deplacement
+{
+    int general_purpose;
+    int angle;
+    int sens_rotation;
+    double distance;
+    int vitesse_croisiere;
+    int sens_ligne_droite;
+    int consigne_distance_recalage;
+    int vitesse_recalage;
+    int sens_recalage;
+    float data8;
+    float data9;
+    float data10;
+    float data11;
+};
+Ordre_deplacement liste = {TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 void controle(void *parameters)
 {
     TickType_t xLastWakeTime;
@@ -73,57 +85,55 @@ void controle(void *parameters)
     {
         /**/
 
-        switch (state)
+        switch (liste.general_purpose)
         {
-        case 0:
-            if (inverter_mouv_order)
-            {
-                rotation(cons_rotation_ticks, vitesse_rot, -1);
-                consigne_theta_prec = theta_robot;
-            }
-            else
-            {
-                ligne_droite(cons_distance_ticks, vitesse_ligne_droite, 1);
-            }
-            if ((start_asservissement_roue_droite == false) && (start_asservissement_roue_gauche == false))
-            {
-                // stop_motors();
-                // delay(250000);
-                state = 1;
-                start_asservissement_roue_droite = true;
-                start_asservissement_roue_gauche = true;
-            }
-            break;
-        case 1:
-            // Serial.printf(" consigne_odo_gauche_prec %.0f ", consigne_odo_gauche_prec);
-            // Serial.printf(" consigne_odo_droite_prec %.0f ", consigne_odo_droite_prec);
+        case TYPE_DEPLACEMENT_LIGNE_DROITE:
 
-            if (inverter_mouv_order)
-            {
-                ligne_droite(cons_distance_ticks, vitesse_ligne_droite, 1);
-            }
-            else
-            {
-                rotation(cons_rotation_ticks, vitesse_rot, -1);
-            }
+            ligne_droite(liste.distance, liste.vitesse_croisiere, liste.sens_ligne_droite);
+
             if ((start_asservissement_roue_droite == false) && (start_asservissement_roue_gauche == false))
             {
-                state = 2;
+                flag_fin_mvt = true;
             }
             break;
-        case 2:
-            Serial.print(" FONO ");
-            // stop_motors();
-            // consigne_regulation_vitesse_droite = consigne_odo_droite_prec;
-            // consigne_regulation_vitesse_gauche = consigne_odo_gauche_prec;
+        case TYPE_DEPLACEMENT_ROTATION:
+
+            rotation(liste.angle, liste.vitesse_croisiere, liste.sens_rotation);
+
+            if ((start_asservissement_roue_droite == false) && (start_asservissement_roue_gauche == false))
+            {
+                flag_fin_mvt = true;
+            }
+            break;
+        case TYPE_DEPLACEMENT_IMMOBILE:
+            consigne_regulation_vitesse_droite = consigne_odo_droite_prec;
+            consigne_regulation_vitesse_gauche = consigne_odo_gauche_prec;
+            Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE \n");
+            liste.general_purpose = TYPE_VIDE;
+            flag_fin_mvt = true;
+
+            break;
+        case TYPE_DEPLACEMENT_RECALAGE:
+
+            recalage(liste.consigne_distance_recalage, seuil_recalage, liste.vitesse_recalage, liste.sens_recalage);
+
+            if ((start_asservissement_roue_droite == false) && (start_asservissement_roue_gauche == false))
+            {
+                flag_fin_mvt = true;
+            }
+            break;
+
+        case TYPE_VIDE:
+            // Serial.printf(" TYPE_VIDE \n");
             break;
 
         default:
             break;
         }
+
         asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
         asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
-        
+
         /*
        rotation((2250 * 1), 70, -1);
     //    ligne_droite(+4000, 100, 1);
@@ -137,18 +147,15 @@ void controle(void *parameters)
            stop_motors();
        }
 */
-        // Serial.printf("obs %4.0f", observation);
+        // Serial.printf(" consigne_odo_droite_prec %f", consigne_odo_droite_prec);
+        // Serial.printf(" consigne_odo_gauche_prec %f ", consigne_odo_gauche_prec);
+        /*
+                Serial.printf(" odo_tick_gauche %f", odo_tick_gauche);
+                Serial.printf(" odo_tick_droit %f", odo_tick_droit);
 
-        Serial.printf("| odo gauche %.0f odo droite %.0f", odo_tick_gauche, odo_tick_droit);
-        // Serial.printf("| consigne_regulation_vitesse_droite %.0f consigne_regulation_vitesse_gauche_rec  %.0f", consigne_regulation_vitesse_droite, consigne_regulation_vitesse_gauche);
-        // Serial.printf(" Theta %3.1f ", theta_robot * 180 / 3.14);
-        // Serial.printf("nmbr tour %2.3f", (double)(theta_robot * 180 / M_PI / 360));
-        Serial.printf(" consigne_regulation_vitesse_gauche_cc%.0f ", consigne_regulation_vitesse_gauche);
-        Serial.printf(" consigne_regulation_vitesse_droite_cc %.0f ", consigne_regulation_vitesse_droite);
-
-        Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
-        Serial.println(" " + toStringD(etat_actuel_vit_roue_folle_droite));
-
+                Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
+                Serial.println(" " + toStringD(etat_actuel_vit_roue_folle_droite));
+        */
         //   Serial.println();
         // delay(1000);
         // FlagCalcul = 1;
@@ -169,6 +176,100 @@ void odo(void *parameters)
     }
 }
 
+void bus_can(void *parameters)
+{
+    TickType_t xLastWakeTime;
+    xLastWakeTime = xTaskGetTickCount();
+    while (1)
+    {
+        sendCANMessage();
+        delay(100);
+        readCANMessage();
+        /*
+                FIFO_occupation = FIFO_ecriture - FIFO_lecture;
+                if (FIFO_occupation < 0)
+                {
+                    FIFO_occupation = FIFO_occupation + SIZE_FIFO;
+                }
+                if (FIFO_max_occupation < FIFO_occupation)
+                {
+                    FIFO_max_occupation = FIFO_occupation;
+                }
+        */
+        // if (!FIFO_occupation)
+        // {
+        //     vTaskDelay(pdMS_TO_TICKS(Tcan)); // Temporisation avant de continuer la boucle
+        //     continue;                        // Passe à la prochaine itération sans faire un return
+        // }
+        // // Attendre la fin du mouvement avant de passer à l'ordre suivant
+        // if (flag_fin_mvt)
+        // {
+        //     FIFO_lecture = (FIFO_lecture + 1) % SIZE_FIFO;
+        //     flag_fin_mvt = false; // Réinitialiser le flag pour le prochain ordre
+
+        //     // vTaskDelay(pdMS_TO_TICKS(Tcan)); // Temporisation pour éviter une boucle trop rapide
+        //     // continue;                        // Retourne au début de la boucle en attendant que flag_fin_mvt soit vrai
+        // }
+        /*
+                switch (rxMsg[FIFO_lecture].ID)
+                {
+
+                case ESP32_RESTART:
+                    Serial.println("ESP32_RESTART");
+                    esp_restart();
+
+                    break;
+
+                case ROTATION:
+                {
+                    int16_t angle = (rxMsg[FIFO_lecture].dt[1] << 8) | rxMsg[FIFO_lecture].dt[0];
+                    int8_t sens_rotation = rxMsg[FIFO_lecture].dt[2];
+                    int8_t vitesse = rxMsg[FIFO_lecture].dt[3];
+
+                    liste.general_purpose = TYPE_DEPLACEMENT_ROTATION;
+                    liste.angle = LARGEUR_ROBOT_mm * M_PI * TIC_PER_TOUR * angle / (3600 * SIZE_WHEEL_DIAMETER_mm);
+                    liste.sens_rotation = sens_rotation;
+                    liste.vitesse_croisiere = vitesse;
+
+                    Serial.printf("ROTATION ");
+                    Serial.printf(" angle %f ", (float)liste.angle);
+                    Serial.printf(" sens_rotation %d ", liste.sens_rotation);
+                    Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
+
+                    createStruct(DATArobot, ACKNOWLEDGE_MOTEUR, 2, ROTATION, 0, 0, 0, 0, 0, 0, 0);
+                    writeStructInCAN(DATArobot);
+                }
+
+                case LIGNE_DROITE:
+                {
+                    double distance = (int16_t)((rxMsg[FIFO_lecture].dt[1] << 8) | rxMsg[FIFO_lecture].dt[0]);
+                    int8_t sens_ligne_droite = rxMsg[FIFO_lecture].dt[2];
+                    int8_t vitesse = rxMsg[FIFO_lecture].dt[3];
+
+                    liste.general_purpose = TYPE_DEPLACEMENT_LIGNE_DROITE;
+                    liste.distance = (distance * RESOLUTION_ROUE_CODEUSE) / SIZE_WHEEL_DIAMETER_mm;
+                    liste.sens_ligne_droite = sens_ligne_droite;
+                    liste.vitesse_croisiere = vitesse;
+
+                    Serial.printf("LIGNE_DROITE ");
+                    Serial.printf(" liste.distance %d ", liste.distance);
+                    Serial.printf(" liste.sens_ligne_droite %d ", liste.sens_ligne_droite);
+                    Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
+                    Serial.println();
+                    createStruct(DATArobot, ACKNOWLEDGE_MOTEUR, 2, LIGNE_DROITE, 0, 0, 0, 0, 0, 0, 0);
+                    writeStructInCAN(DATArobot);
+                }
+
+                break;
+
+                default:
+                    break;
+                }
+        */
+        vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Tcan));
+    }
+}
+
 void setup()
 { // calcul coeff filtre
     // delay(10000);
@@ -181,6 +282,8 @@ void setup()
     setup_motors();
     // Initialisation des encodeurs
     setup_encodeur();
+    // Initialisation du Can
+    setupCAN(1000E3);
 
     // Boucle jusqu'à ce qu'un client soit connecté via le port série WiFi
     // while (!SerialWIFI.available())
@@ -191,14 +294,14 @@ void setup()
     // delay(10000);
     // affichage_commande_wifi();
     Serial.println("on commence");
+
     // Serial.printf("avncement_gauche enter : %.0f\n", avncement_gauche);
     // Serial.printf("avncement_droite enter : %.0f\n", avncement_droite);
 
     reset_encodeur();
     delay(1000);
     reset_encodeur();
-    start_asservissement_roue_droite = true;
-    start_asservissement_roue_gauche = true;
+
     xTaskCreate(
         controle,   // nom de la fonction
         "controle", // nom de la tache que nous venons de vréer
@@ -214,6 +317,14 @@ void setup()
         NULL,  // parametre
         11,    // tres haut niveau de priorite
         NULL   // descripteur
+    );
+    xTaskCreate(
+        bus_can,   // nom de la fonction
+        "bus_can", // nom de la tache que nous venons de vréer
+        10000,     // taille de la pile en octet
+        NULL,      // parametre
+        9,         // tres haut niveau de priorite
+        NULL       // descripteur
     );
 }
 

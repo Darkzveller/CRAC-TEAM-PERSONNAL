@@ -126,7 +126,7 @@ void setupOTA()
   ArduinoOTA.begin();
 
   // Démarre la communication série WiFi
-  SerialWIFI.begin();
+  TelnetStream.begin();
 
   // Affiche les informations une fois prêtes
   Serial.println("Ready");
@@ -154,9 +154,9 @@ void setupOTA()
 /*
 void receptionWIFI()
 {
-  if (SerialWIFI.available())
+  if (TelnetStream.available())
   {
-    String input = SerialWIFI.readString(); // Lire la chaîne complète
+    String input = TelnetStream.readString(); // Lire la chaîne complète
     Serial.print("Reçu: ");
     Serial.println(input); // Afficher ce qui a été reçu
     int f = 0;
@@ -166,11 +166,11 @@ void receptionWIFI()
     if (input.equals("S")) // Vérifier si l'entrée est "stop"
     {
       // i = 0; // Remise à zéro de la variable
-      SerialWIFI.println("STOP BASE ROULANTE");
+      TelnetStream.println("STOP BASE ROULANTE");
     }
     if (input.equals("M")) // Vérifier si l'entrée est "start"
     {
-      SerialWIFI.println("START TEST");
+      TelnetStream.println("START TEST");
     }
   }
 }
@@ -179,8 +179,8 @@ void receptionWIFI()
 void affichage_commande_wifi()
 {
 
-  SerialWIFI.println("S pour tout stopper");
-  SerialWIFI.println("M pour tout mettre en marche");
+  TelnetStream.println("S pour tout stopper");
+  TelnetStream.println("M pour tout mettre en marche");
 }
 
 void receptionWIFI(char ch)
@@ -209,51 +209,51 @@ void receptionWIFI(char ch)
     if (commande == "start")
     {
       flag_controle = 1;
-      SerialWIFI.println("Start");
+      TelnetStream.println("Start");
     }
     if (commande == "s")
     {
       flag_controle = 0;
-      SerialWIFI.println("stop all");
+      TelnetStream.println("stop all");
     }
     if (commande == "resetO")
     {
       reset_encodeur();
-      SerialWIFI.println("Reset encodeur");
+      TelnetStream.println("Reset encodeur");
     }
 
     // if (commande == "P")
     // {
     //   coeff_P_roue_folle_tick = valeur.toFloat();
-    //   SerialWIFI.printf("P = %4.6f", coeff_P_roue_folle_tick);
-    //   SerialWIFI.println();
+    //   TelnetStream.printf("P = %4.6f", coeff_P_roue_folle_tick);
+    //   TelnetStream.println();
     // }
 
     // if (commande == "D")
     // {
     //   coeff_D_roue_folle_tick = valeur.toFloat();
-    //   SerialWIFI.printf("D = %4.6f", coeff_D_roue_folle_tick);
-    //   SerialWIFI.println();
+    //   TelnetStream.printf("D = %4.6f", coeff_D_roue_folle_tick);
+    //   TelnetStream.println();
     // }
     // if (commande == "I")
     // {
     //   coeff_I_roue_folle_tick = valeur.toFloat();
-    //   SerialWIFI.printf("I = %4.6f", coeff_I_roue_folle_tick);
-    //   SerialWIFI.println();
+    //   TelnetStream.printf("I = %4.6f", coeff_I_roue_folle_tick);
+    //   TelnetStream.println();
     // }
     if (commande == "SI")
     {
       integral_limit_roue_folle_tick = valeur.toInt();
-      SerialWIFI.printf("SI = %4.6f", integral_limit_roue_folle_tick);
-      SerialWIFI.println();
+      TelnetStream.printf("SI = %4.6f", integral_limit_roue_folle_tick);
+      TelnetStream.println();
     }
     if (commande == "all_coeff_tick")
     {
-      // SerialWIFI.printf("P = %4.3f", coeff_P_roue_folle_tick);
-      // SerialWIFI.printf(" D = %4.3f ", coeff_D_roue_folle_tick);
-      // SerialWIFI.printf(" I = %4.3f", coeff_I_roue_folle_tick);
-      SerialWIFI.printf(" SI = %4.1f ", integral_limit_roue_folle_tick);
-      SerialWIFI.println();
+      // TelnetStream.printf("P = %4.3f", coeff_P_roue_folle_tick);
+      // TelnetStream.printf(" D = %4.3f ", coeff_D_roue_folle_tick);
+      // TelnetStream.printf(" I = %4.3f", coeff_I_roue_folle_tick);
+      TelnetStream.printf(" SI = %4.1f ", integral_limit_roue_folle_tick);
+      TelnetStream.println();
     }
 
     // Exemple de commande possible
@@ -277,14 +277,14 @@ void receptionWIFI(char ch)
 }
 void SerialWIFIActivites()
 {
-  while (SerialWIFI.available() > 0) // tant qu'il y a des caractères à lire
+  while (TelnetStream.available() > 0) // tant qu'il y a des caractères à lire
   {
     if (justepouraffichage == 0)
     {
-      SerialWIFI.println("Bien veneu dans le terminal WIFI");
+      TelnetStream.println("Bien veneu dans le terminal WIFI");
     }
     justepouraffichage = 1;
 
-    receptionWIFI(SerialWIFI.read());
+    receptionWIFI(TelnetStream.read());
   }
 }
