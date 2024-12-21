@@ -101,11 +101,9 @@ bool flag_controle = false;
 
 //***********CAN******************* */
 
-CANMessage myData;     // data received by BT to write on CAN
-CANMessage DATAtoSend; // data received by CAN to send on BT
 
-CANMessage rxMsg[SIZE_FIFO]; // data received by CAN to control the robot
-CANMessage DATArobot;        // DATA that the robot will write on CAN
+CANMessage rxMsg; // data received by CAN to control the robot
+int etat_lecture_can;
 unsigned char FIFO_ecriture = 0;
 signed char FIFO_lecture = 0;
 signed char FIFO_occupation = 0;

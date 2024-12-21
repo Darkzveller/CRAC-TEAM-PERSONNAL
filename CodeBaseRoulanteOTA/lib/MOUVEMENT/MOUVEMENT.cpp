@@ -127,5 +127,5 @@ void recalage(int cons_distance_ticks, float SEUIL_RECALAGE, int vitesse_recalag
             stop_moteur_gauche();
         }
     }
-    Serial.printf("OdoGauche: %d, OdoDroite: %d, Distance Parcourue: %d\n", odo_dist_droit, odo_dist_gauche, distance_parcourue);
+    // Serial.printf("OdoGauche: %d, OdoDroite: %d, Distance Parcourue: %d\n", odo_dist_droit, odo_dist_gauche, distance_parcourue);
 }

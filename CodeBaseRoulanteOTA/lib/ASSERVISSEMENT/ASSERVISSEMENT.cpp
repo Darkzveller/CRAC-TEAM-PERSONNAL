@@ -511,7 +511,7 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
         break;
     }
     // Serial.printf(" consB %.0f ", cons);
-    Serial.printf(" consigne_dist_droite %.0f ", consigne_dist_droite);
+    // Serial.printf(" consigne_dist_droite %.0f ", consigne_dist_droite);
 
     return consigne_dist_droite;
 }

@@ -76,7 +76,12 @@ struct Ordre_deplacement
     float data11;
 };
 Ordre_deplacement liste = {TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int fusion_octet(int octet0, int octet1)
+{
 
+    int16_t octet16 = (octet0 << 8) | octet1;
+    return octet16;
+}
 void controle(void *parameters)
 {
     TickType_t xLastWakeTime;
@@ -90,27 +95,34 @@ void controle(void *parameters)
         case TYPE_DEPLACEMENT_LIGNE_DROITE:
 
             ligne_droite(liste.distance, liste.vitesse_croisiere, liste.sens_ligne_droite);
+            Serial.printf("TYPE_DEPLACEMENT_LIGNE_DROITE");
 
             if ((start_asservissement_roue_droite == false) && (start_asservissement_roue_gauche == false))
             {
                 flag_fin_mvt = true;
+                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_LIGNE_DROITE, 0, 0, 0, 0, 0);
+                liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
             }
             break;
         case TYPE_DEPLACEMENT_ROTATION:
 
+            Serial.printf("TYPE_DEPLACEMENT_ROTATION");
             rotation(liste.angle, liste.vitesse_croisiere, liste.sens_rotation);
 
             if ((start_asservissement_roue_droite == false) && (start_asservissement_roue_gauche == false))
             {
                 flag_fin_mvt = true;
+                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_ROTATION, 0, 0, 0, 0, 0);
+                liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
             }
             break;
         case TYPE_DEPLACEMENT_IMMOBILE:
             consigne_regulation_vitesse_droite = consigne_odo_droite_prec;
             consigne_regulation_vitesse_gauche = consigne_odo_gauche_prec;
-            Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE \n");
+            Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE ");
             liste.general_purpose = TYPE_VIDE;
             flag_fin_mvt = true;
+            sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0);
 
             break;
         case TYPE_DEPLACEMENT_RECALAGE:
@@ -120,6 +132,8 @@ void controle(void *parameters)
             if ((start_asservissement_roue_droite == false) && (start_asservissement_roue_gauche == false))
             {
                 flag_fin_mvt = true;
+                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_RECALAGE, 0, 0, 0, 0, 0);
+                liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
             }
             break;
 
@@ -133,6 +147,12 @@ void controle(void *parameters)
 
         asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
         asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
+        Serial.printf(" consigne_regulation_vitesse_droite %f", consigne_regulation_vitesse_droite);
+        Serial.printf(" consigne_regulation_vitesse_gauche %f", consigne_regulation_vitesse_gauche);
+        Serial.printf(" odo_tick_gauche %f", odo_tick_gauche);
+        Serial.printf(" odo_tick_droit %f", odo_tick_droit);
+        Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
+        Serial.println(" " + toStringD(etat_actuel_vit_roue_folle_droite));
 
         /*
        rotation((2250 * 1), 70, -1);
@@ -182,25 +202,9 @@ void bus_can(void *parameters)
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        sendCANMessage();
-        delay(100);
+        // sendCANMessage(0x123, 0, 0, 7, 0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x01, 0x02);
         readCANMessage();
-        /*
-                FIFO_occupation = FIFO_ecriture - FIFO_lecture;
-                if (FIFO_occupation < 0)
-                {
-                    FIFO_occupation = FIFO_occupation + SIZE_FIFO;
-                }
-                if (FIFO_max_occupation < FIFO_occupation)
-                {
-                    FIFO_max_occupation = FIFO_occupation;
-                }
-        */
-        // if (!FIFO_occupation)
-        // {
-        //     vTaskDelay(pdMS_TO_TICKS(Tcan)); // Temporisation avant de continuer la boucle
-        //     continue;                        // Passe à la prochaine itération sans faire un return
-        // }
+
         // // Attendre la fin du mouvement avant de passer à l'ordre suivant
         // if (flag_fin_mvt)
         // {
@@ -210,62 +214,78 @@ void bus_can(void *parameters)
         //     // vTaskDelay(pdMS_TO_TICKS(Tcan)); // Temporisation pour éviter une boucle trop rapide
         //     // continue;                        // Retourne au début de la boucle en attendant que flag_fin_mvt soit vrai
         // }
-        /*
-                switch (rxMsg[FIFO_lecture].ID)
-                {
 
-                case ESP32_RESTART:
-                    Serial.println("ESP32_RESTART");
-                    esp_restart();
+        switch (rxMsg.id)
+        {
 
-                    break;
+        case ESP32_RESTART:
+            Serial.println("ESP32_RESTART");
+            esp_restart();
 
-                case ROTATION:
-                {
-                    int16_t angle = (rxMsg[FIFO_lecture].dt[1] << 8) | rxMsg[FIFO_lecture].dt[0];
-                    int8_t sens_rotation = rxMsg[FIFO_lecture].dt[2];
-                    int8_t vitesse = rxMsg[FIFO_lecture].dt[3];
+            break;
 
-                    liste.general_purpose = TYPE_DEPLACEMENT_ROTATION;
-                    liste.angle = LARGEUR_ROBOT_mm * M_PI * TIC_PER_TOUR * angle / (3600 * SIZE_WHEEL_DIAMETER_mm);
-                    liste.sens_rotation = sens_rotation;
-                    liste.vitesse_croisiere = vitesse;
+        case ROTATION:
+        {
+            flag_fin_mvt = false;
 
-                    Serial.printf("ROTATION ");
-                    Serial.printf(" angle %f ", (float)liste.angle);
-                    Serial.printf(" sens_rotation %d ", liste.sens_rotation);
-                    Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
+            int16_t angle = fusion_octet(rxMsg.data[0], rxMsg.data[1]);
+            int8_t sens_rotation = rxMsg.data[2];
+            int8_t vitesse = rxMsg.data[3];
 
-                    createStruct(DATArobot, ACKNOWLEDGE_MOTEUR, 2, ROTATION, 0, 0, 0, 0, 0, 0, 0);
-                    writeStructInCAN(DATArobot);
-                }
+            liste.general_purpose = TYPE_DEPLACEMENT_ROTATION;
+            // liste.angle = LARGEUR_ROBOT_mm * M_PI * TIC_PER_TOUR * angle / (3600 * SIZE_WHEEL_DIAMETER_mm);
+            liste.angle = TIC_PER_TOUR * angle / 90.0;
+            liste.sens_rotation = sens_rotation;
+            liste.vitesse_croisiere = vitesse;
+            start_asservissement_roue_droite = true;
+            start_asservissement_roue_gauche = true;
 
-                case LIGNE_DROITE:
-                {
-                    double distance = (int16_t)((rxMsg[FIFO_lecture].dt[1] << 8) | rxMsg[FIFO_lecture].dt[0]);
-                    int8_t sens_ligne_droite = rxMsg[FIFO_lecture].dt[2];
-                    int8_t vitesse = rxMsg[FIFO_lecture].dt[3];
+            rxMsg.id = 6845132;
+            // Serial.printf("ROTATION ");
+            // Serial.printf(" angle %f ", (float)angle);
+            // Serial.printf(" liste.angle %f", (float)liste.angle);
+            // Serial.printf(" sens_rotation %d ", liste.sens_rotation);
+            // Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
+            // Serial.println();
+        }
+        break;
 
-                    liste.general_purpose = TYPE_DEPLACEMENT_LIGNE_DROITE;
-                    liste.distance = (distance * RESOLUTION_ROUE_CODEUSE) / SIZE_WHEEL_DIAMETER_mm;
-                    liste.sens_ligne_droite = sens_ligne_droite;
-                    liste.vitesse_croisiere = vitesse;
+        case LIGNE_DROITE:
 
-                    Serial.printf("LIGNE_DROITE ");
-                    Serial.printf(" liste.distance %d ", liste.distance);
-                    Serial.printf(" liste.sens_ligne_droite %d ", liste.sens_ligne_droite);
-                    Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
-                    Serial.println();
-                    createStruct(DATArobot, ACKNOWLEDGE_MOTEUR, 2, LIGNE_DROITE, 0, 0, 0, 0, 0, 0, 0);
-                    writeStructInCAN(DATArobot);
-                }
+        {
+            flag_fin_mvt = false;
 
-                break;
+            double distance = fusion_octet(rxMsg.data[0], rxMsg.data[1]);
+            int8_t sens_ligne_droite = rxMsg.data[2];
+            int8_t vitesse = rxMsg.data[3];
 
-                default:
-                    break;
-                }
-        */
+            liste.general_purpose = TYPE_DEPLACEMENT_LIGNE_DROITE;
+            // liste.distance = (distance * TIC_PER_TOUR) / SIZE_WHEEL_DIAMETER_mm;
+            liste.distance = distance * (TIC_PER_TOUR / (2 * M_PI * SIZE_WHEEL_DIAMETER_mm / 2.0));
+            liste.sens_ligne_droite = sens_ligne_droite;
+            liste.vitesse_croisiere = vitesse;
+            start_asservissement_roue_droite = true;
+            start_asservissement_roue_gauche = true;
+
+            rxMsg.id = 6845132;
+
+            // Serial.printf("LIGNE_DROITE ");
+            // Serial.printf(" distance %f ", distance);
+            // Serial.printf(" liste.distance %f ", liste.distance);
+            // Serial.printf(" liste.sens_ligne_droite %d ", liste.sens_ligne_droite);
+            // Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
+            // Serial.println();
+        }
+
+        break;
+        case 6845132:
+
+            break;
+
+        default:
+            break;
+        }
+
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Tcan));
     }
 }

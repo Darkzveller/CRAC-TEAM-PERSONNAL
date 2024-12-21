@@ -157,16 +157,14 @@ extern bool flag_controle;
 
 typedef struct CANMessage
 {
-  bool extented = false;
-  bool RTR = false;
-  unsigned int ID = 0;
-  char ln = 0;
-  unsigned char dt[8] = {0};
+  bool extd = false;
+  bool rtr = false;
+  uint32_t id = 0;
+  uint8_t lenght = 0;
+  uint8_t data[8] = {0};
 } CANMessage;
-extern CANMessage myData;           // data received by BT to write on CAN
-extern CANMessage DATAtoSend;       // data received by CAN to send on BT
-extern CANMessage rxMsg[SIZE_FIFO]; // data received by CAN to control the robot
-extern CANMessage DATArobot;        // DATA that the robot will write on CAN
+extern CANMessage rxMsg; // data received by CAN to control the robot
+extern int etat_lecture_can;
 extern unsigned char FIFO_ecriture;
 extern signed char FIFO_lecture;
 extern signed char FIFO_occupation;

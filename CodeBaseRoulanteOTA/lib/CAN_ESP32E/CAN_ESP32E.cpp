@@ -71,56 +71,55 @@ void setupCAN(int baudrate)
     delay(5000);
 }
 
-void sendCANMessage()
+void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, int data2, int data3, int data4, int data5, int data6)
 {
     // Exemple : Envoi d'un message CAN
     twai_message_t message;
-    message.rtr = false;        // Définit le message comme un message de données, pas un RTR
-    message.identifier = 0x123; // ID CAN
-    //   message.extended = true; // Active le mode identifiant étendu (29 bits)
+    message.identifier = id; // ID CAN
+    message.extd = rtr;
+    message.rtr = ext;            // Active le mode identifiant étendu (29 bits)
     message.data_length_code = 7; // DLC : Nombre d'octets dans le message
-    message.data[0] = 0xDE;       // Exemple de données
-    message.data[1] = 0xAD;
-    message.data[2] = 0xBE;
-    message.data[3] = 0xEF;
-    message.data[4] = 0x00;
-    message.data[5] = 0x01;
-    message.data[6] = 0x02;
+    message.data[0] = data0;      // Données a envoyés
+    message.data[1] = data1;
+    message.data[2] = data2;
+    message.data[3] = data3;
+    message.data[4] = data4;
+    message.data[5] = data5;
+    message.data[6] = data6;
     //   message.data[7] = 0x03;
     // Envoi du message avec un délai d'attente de 1000 ms
     if (twai_transmit(&message, pdMS_TO_TICKS(10)) == ESP_OK)
     {
-        Serial.println("Message envoyé avec succès.");
+        // Serial.println("Message envoyé avec succès.");
     }
     else
     {
-        Serial.println("Erreur lors de l'envoi du message.");
+        // Serial.println("Erreur lors de l'envoi du message.");
     }
 }
+
 void readCANMessage()
 {
     // Exemple : Réception d'un message CAN
     twai_message_t rx_message;
 
     if (twai_receive(&rx_message, pdMS_TO_TICKS(Tcan)) == ESP_OK)
-    {   /*
-           Serial.print("Message reçu : ID=");
-           Serial.print(rx_message.identifier, HEX);
-           Serial.print(" DLC=");
-           Serial.print(rx_message.data_length_code);
-           Serial.print(" Data=");
-           for (int i = 0; i < rx_message.data_length_code; i++)
-           {
-               Serial.print(rx_message.data[i], HEX);
-               Serial.print(" ");
-           }
-           Serial.println();
-      */
-        // Vérification si l'ID du message est pris en compte
-        Serial.print("flag=");
-        Serial.print(rx_message.flags); // Affiche l'ID du message en hexadécimal
+    { /*
+         Serial.print("Message reçu : ID=");
+         Serial.print(rx_message.identifier, HEX);
+         Serial.print(" DLC=");
+         Serial.print(rx_message.data_length_code);
+         Serial.print(" Data=");
+         for (int i = 0; i < rx_message.data_length_code; i++)
+         {
+             Serial.print(rx_message.data[i], HEX);
+             Serial.print(" ");
+         }
+         Serial.println();
+    */
         if (messageCANForMe(rx_message.identifier))
         {
+            /*
             // Si l'ID est valide, traitement du message
             Serial.print(" Message reçu : ID=");
             Serial.print(rx_message.identifier, HEX); // Affiche l'ID du message en hexadécimal
@@ -132,26 +131,31 @@ void readCANMessage()
             Serial.print(" DLC=");
             Serial.print(rx_message.data_length_code); // Affiche le Data Length Code (DLC)
             Serial.print(" Data=");
-
+*/
+            rxMsg.id = rx_message.identifier;
+            rxMsg.extd = rx_message.extd;
+            rxMsg.rtr = rx_message.rtr;
+            rxMsg.lenght = rx_message.data_length_code;
             // Affichage des données du message
             for (int i = 0; i < rx_message.data_length_code; i++)
             {
-                Serial.print(rx_message.data[i], HEX); // Affiche chaque octet de données en hexadécimal
-                Serial.print(" ");
+                rxMsg.data[i] = rx_message.data[i];
+                // Serial.print(rxMsg.data[i], HEX); // Affiche chaque octet de données en hexadécimal
+                // Serial.print(" ");
             }
-        }
-        else
-        {
-            // Si l'ID n'est pas pris en compte, on l'ignore
-            Serial.print(" Message reçu avec ID non pris en compte : ");
-            Serial.print(rx_message.identifier, HEX);
-        }
-    }
-    else
-    {
-        Serial.print(" Pas de message reçu.");
-    }
-    Serial.println();
+        } /*
+         else
+         {
+             // Si l'ID n'est pas pris en compte, on l'ignore
+             Serial.print(" Message reçu avec ID non pris en compte : ");
+             Serial.print(rx_message.identifier, HEX);
+         }*/
+    } /*
+     else
+     {
+         Serial.print(" Pas de message reçu.");
+     }    Serial.println();
+ */
 }
 
 bool messageCANForMe(uint16_t ID)
@@ -161,11 +165,24 @@ bool messageCANForMe(uint16_t ID)
     case ESP32_RESTART:
         return true;
         break;
+    case ROTATION:
+        return true;
+        break;
+    case LIGNE_DROITE:
+        return true;
+        break;
+
+    case IMMOBILE:
+        return true;
+        break;
+
+    case RECALAGE:
+        return true;
+        break;
 
     default:
         return false;
         break;
     }
-
-    return false;
+return false;
 }
