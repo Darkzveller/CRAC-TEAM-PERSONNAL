@@ -32,7 +32,7 @@ void ota_handle(void *parameter)
   xLastWakeTime = xTaskGetTickCount();
   for (;;)
   {
-    SerialWIFIActivites(); // Gestion des opérations OTA (vérifie si une mise à jour est en cours)
+    // SerialWIFIActivites(); // Gestion des opérations OTA (vérifie si une mise à jour est en cours)
     ArduinoOTA.handle();
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(500));
   }
@@ -126,7 +126,7 @@ void setupOTA()
   ArduinoOTA.begin();
 
   // Démarre la communication série WiFi
-  TelnetStream.begin();
+  // SerialWIFI.begin();
 
   // Affiche les informations une fois prêtes
   Serial.println("Ready");
@@ -151,140 +151,140 @@ void setupOTA()
       1,            /* Priorité de la tâche */
       NULL);        /* Handle de la tâche (aucun ici) */
 }
-/*
-void receptionWIFI()
-{
-  if (TelnetStream.available())
-  {
-    String input = TelnetStream.readString(); // Lire la chaîne complète
-    Serial.print("Reçu: ");
-    Serial.println(input); // Afficher ce qui a été reçu
-    int f = 0;
-    // Supprimer les espaces ou caractères indésirables (comme le retour à la ligne)
-    input.trim(); // Enlève les espaces superflus et les retours à la ligne
+// /*
+// void receptionWIFI()
+// {
+//   if (SerialWIFI.available())
+//   {
+//     String input = SerialWIFI.readString(); // Lire la chaîne complète
+//     Serial.print("Reçu: ");
+//     Serial.println(input); // Afficher ce qui a été reçu
+//     int f = 0;
+//     // Supprimer les espaces ou caractères indésirables (comme le retour à la ligne)
+//     input.trim(); // Enlève les espaces superflus et les retours à la ligne
 
-    if (input.equals("S")) // Vérifier si l'entrée est "stop"
-    {
-      // i = 0; // Remise à zéro de la variable
-      TelnetStream.println("STOP BASE ROULANTE");
-    }
-    if (input.equals("M")) // Vérifier si l'entrée est "start"
-    {
-      TelnetStream.println("START TEST");
-    }
-  }
-}
-*/
+//     if (input.equals("S")) // Vérifier si l'entrée est "stop"
+//     {
+//       // i = 0; // Remise à zéro de la variable
+//       SerialWIFI.println("STOP BASE ROULANTE");
+//     }
+//     if (input.equals("M")) // Vérifier si l'entrée est "start"
+//     {
+//       SerialWIFI.println("START TEST");
+//     }
+//   }
+// }
+// */
 
-void affichage_commande_wifi()
-{
+// void affichage_commande_wifi()
+// {
 
-  TelnetStream.println("S pour tout stopper");
-  TelnetStream.println("M pour tout mettre en marche");
-}
+//   // SerialWIFI.println("S pour tout stopper");
+//   // SerialWIFI.println("M pour tout mettre en marche");
+// }
+// /*
+// void receptionWIFI(char ch)
+// {
 
-void receptionWIFI(char ch)
-{
+//   static int i = 0;
+//   static String chaine = "";
+//   String commande;
+//   String valeur;
+//   int index, length;
 
-  static int i = 0;
-  static String chaine = "";
-  String commande;
-  String valeur;
-  int index, length;
+//   if ((ch == 13) or (ch == 10))
+//   {
+//     index = chaine.indexOf(' ');
+//     length = chaine.length();
+//     if (index == -1)
+//     {
+//       commande = chaine;
+//       valeur = "";
+//     }
+//     else
+//     {
+//       commande = chaine.substring(0, index);
+//       valeur = chaine.substring(index + 1, length);
+//     }
+//     if (commande == "start")
+//     {
+//       flag_controle = 1;
+//       SerialWIFI.println("Start");
+//     }
+//     if (commande == "s")
+//     {
+//       flag_controle = 0;
+//       SerialWIFI.println("stop all");
+//     }
+//     if (commande == "resetO")
+//     {
+//       reset_encodeur();
+//       SerialWIFI.println("Reset encodeur");
+//     }
 
-  if ((ch == 13) or (ch == 10))
-  {
-    index = chaine.indexOf(' ');
-    length = chaine.length();
-    if (index == -1)
-    {
-      commande = chaine;
-      valeur = "";
-    }
-    else
-    {
-      commande = chaine.substring(0, index);
-      valeur = chaine.substring(index + 1, length);
-    }
-    if (commande == "start")
-    {
-      flag_controle = 1;
-      TelnetStream.println("Start");
-    }
-    if (commande == "s")
-    {
-      flag_controle = 0;
-      TelnetStream.println("stop all");
-    }
-    if (commande == "resetO")
-    {
-      reset_encodeur();
-      TelnetStream.println("Reset encodeur");
-    }
+//     // if (commande == "P")
+//     // {
+//     //   coeff_P_roue_folle_tick = valeur.toFloat();
+//     //   SerialWIFI.printf("P = %4.6f", coeff_P_roue_folle_tick);
+//     //   SerialWIFI.println();
+//     // }
 
-    // if (commande == "P")
-    // {
-    //   coeff_P_roue_folle_tick = valeur.toFloat();
-    //   TelnetStream.printf("P = %4.6f", coeff_P_roue_folle_tick);
-    //   TelnetStream.println();
-    // }
+//     // if (commande == "D")
+//     // {
+//     //   coeff_D_roue_folle_tick = valeur.toFloat();
+//     //   SerialWIFI.printf("D = %4.6f", coeff_D_roue_folle_tick);
+//     //   SerialWIFI.println();
+//     // }
+//     // if (commande == "I")
+//     // {
+//     //   coeff_I_roue_folle_tick = valeur.toFloat();
+//     //   SerialWIFI.printf("I = %4.6f", coeff_I_roue_folle_tick);
+//     //   SerialWIFI.println();
+//     // }
+//     if (commande == "SI")
+//     {
+//       integral_limit_roue_folle_tick = valeur.toInt();
+//       SerialWIFI.printf("SI = %4.6f", integral_limit_roue_folle_tick);
+//       SerialWIFI.println();
+//     }
+//     if (commande == "all_coeff_tick")
+//     {
+//       // SerialWIFI.printf("P = %4.3f", coeff_P_roue_folle_tick);
+//       // SerialWIFI.printf(" D = %4.3f ", coeff_D_roue_folle_tick);
+//       // SerialWIFI.printf(" I = %4.3f", coeff_I_roue_folle_tick);
+//       SerialWIFI.printf(" SI = %4.1f ", integral_limit_roue_folle_tick);
+//       SerialWIFI.println();
+//     }
 
-    // if (commande == "D")
-    // {
-    //   coeff_D_roue_folle_tick = valeur.toFloat();
-    //   TelnetStream.printf("D = %4.6f", coeff_D_roue_folle_tick);
-    //   TelnetStream.println();
-    // }
-    // if (commande == "I")
-    // {
-    //   coeff_I_roue_folle_tick = valeur.toFloat();
-    //   TelnetStream.printf("I = %4.6f", coeff_I_roue_folle_tick);
-    //   TelnetStream.println();
-    // }
-    if (commande == "SI")
-    {
-      integral_limit_roue_folle_tick = valeur.toInt();
-      TelnetStream.printf("SI = %4.6f", integral_limit_roue_folle_tick);
-      TelnetStream.println();
-    }
-    if (commande == "all_coeff_tick")
-    {
-      // TelnetStream.printf("P = %4.3f", coeff_P_roue_folle_tick);
-      // TelnetStream.printf(" D = %4.3f ", coeff_D_roue_folle_tick);
-      // TelnetStream.printf(" I = %4.3f", coeff_I_roue_folle_tick);
-      TelnetStream.printf(" SI = %4.1f ", integral_limit_roue_folle_tick);
-      TelnetStream.println();
-    }
+//     // Exemple de commande possible
+//     /*
+//         if (commande == "Te")
+//         {
+//             Te = valeur.toInt();
+//         }
+//         if (commande == "Kp_moteur")
+//         {
+//             // Serial.printf("Kp_moteur");
+//             Kp_moteur = valeur.toDouble();
+//         }*/
 
-    // Exemple de commande possible
-    /*
-        if (commande == "Te")
-        {
-            Te = valeur.toInt();
-        }
-        if (commande == "Kp_moteur")
-        {
-            // Serial.printf("Kp_moteur");
-            Kp_moteur = valeur.toDouble();
-        }*/
+//     chaine = "";
+//   }
+//   else
+//   {
+//     chaine += ch;
+//   }
+// }
+// void SerialWIFIActivites()
+// {
+//   while (SerialWIFI.available() > 0) // tant qu'il y a des caractères à lire
+//   {
+//     if (justepouraffichage == 0)
+//     {
+//       SerialWIFI.println("Bien veneu dans le terminal WIFI");
+//     }
+//     justepouraffichage = 1;
 
-    chaine = "";
-  }
-  else
-  {
-    chaine += ch;
-  }
-}
-void SerialWIFIActivites()
-{
-  while (TelnetStream.available() > 0) // tant qu'il y a des caractères à lire
-  {
-    if (justepouraffichage == 0)
-    {
-      TelnetStream.println("Bien veneu dans le terminal WIFI");
-    }
-    justepouraffichage = 1;
-
-    receptionWIFI(TelnetStream.read());
-  }
-}
+//     receptionWIFI(SerialWIFI.read());
+//   }
+// }*/

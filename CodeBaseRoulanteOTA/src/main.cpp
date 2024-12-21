@@ -125,17 +125,7 @@ void controle(void *parameters)
             sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0);
 
             break;
-        case TYPE_DEPLACEMENT_RECALAGE:
-
-            recalage(liste.consigne_distance_recalage, seuil_recalage, liste.vitesse_recalage, liste.sens_recalage);
-
-            if ((start_asservissement_roue_droite == false) && (start_asservissement_roue_gauche == false))
-            {
-                flag_fin_mvt = true;
-                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_RECALAGE, 0, 0, 0, 0, 0);
-                liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
-            }
-            break;
+    
 
         case TYPE_VIDE:
             // Serial.printf(" TYPE_VIDE \n");

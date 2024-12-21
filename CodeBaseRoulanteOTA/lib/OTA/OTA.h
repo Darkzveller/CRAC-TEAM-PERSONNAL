@@ -11,6 +11,6 @@
 
 void setupOTA();
 void receptionWIFI();
-void affichage_commande_wifi();
-void SerialWIFIActivites();
+// void affichage_commande_wifi();
+// void SerialWIFIActivites();
 #endif

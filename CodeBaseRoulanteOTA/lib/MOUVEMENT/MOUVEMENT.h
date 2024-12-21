@@ -7,7 +7,7 @@
 
 void rotation(int consigne, int vitesse, int sens);
 void ligne_droite(int consigne, int vitesse, int sens);
-void recalage(int cons_distance_ticks, float SEUIL_RECALAGE, int vitesse_recalage, int sens_recalage);
+void asservissement_correction_angle(double consigne, double observation);
 
 
 #endif
