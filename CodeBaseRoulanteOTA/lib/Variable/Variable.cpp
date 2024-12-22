@@ -47,8 +47,8 @@ float somme_integral_roue_folle_gauche_tick = 0;
 float Vmax = 200;
 float Amax = 50;
 // float Dmax = 2.5;
-float Dmax = 7;
-float limit_reprise_asser = 100;
+float Dmax = 20;
+float limit_reprise_asser = 50.0*3.0;
 
 float acc_actuel_droite = 0;
 double consigne_vit_droite = 0;

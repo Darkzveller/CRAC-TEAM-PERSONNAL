@@ -6,9 +6,9 @@
 // je fixe le nom de mon réseau Wi-Fi, ce qui simplifie les démarches, notamment lors des débogages
 //  Informations de connexion WiFi
 
-// #define MON_TELEPHONE
+#define MON_TELEPHONE
 // #define MA_FREEBOX
-#define MON_PC
+// #define MON_PC
 
 const char *name_card_elec = "sniffercan";
 // BESOIN DE ME SIMPLIFIER MA VIE
@@ -225,6 +225,9 @@ void receptionWIFI(char ch)
         }
       }
       cmd = fabs(cmd);
+      uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
+      uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
+
       TelnetStream.println();
 
       TelnetStream.printf("Send command Rotation with cons");
@@ -236,7 +239,7 @@ void receptionWIFI(char ch)
       Serial.printf(" sens %d", sens);
       Serial.println();
 
-      sendCANMessage(ROTATION, 0, 0, 4, 0, cmd, sens, 0x7B, 0, 0, 0);
+      sendCANMessage(ROTATION, 0, 0, 4, highByte, lowByte, sens, 0x7B, 0, 0, 0);
     }
     if (commande == "LIGNE")
     {

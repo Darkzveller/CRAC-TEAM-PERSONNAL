@@ -13,8 +13,6 @@ void setup()
   Serial.begin(115200);
   Serial.printf("CACA");
   setupCAN(1000E3);
-  delay(1000);
-
   setupOTA();
   int i = 0;
   // while (!TelnetStream.available())
@@ -80,12 +78,14 @@ void reception(char ch)
         }
       }
       cmd = fabs(cmd);
+      uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
+      uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
 
       Serial.printf("Send command Rotation with cons");
       Serial.printf(" cmd %d", cmd);
       Serial.printf(" sens %d", sens);
       Serial.println();
-      sendCANMessage(ROTATION, 0, 0, 4, 0, cmd, sens, 0x7B, 0, 0, 0);
+      sendCANMessage(ROTATION, 0, 0, 4, highByte, lowByte, sens, 0x7B, 0, 0, 0);
     }
     if (commande == "LIGNE")
     {

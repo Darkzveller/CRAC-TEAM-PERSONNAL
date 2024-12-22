@@ -462,9 +462,10 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
         break;
 
     case ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE:
+       
         if (consigne_vit_droite > 0)
         {
-            freinage_moteur_droit(true, fabs(consigne_vit_droite) * 100);
+            freinage_moteur_droit(false, fabs(consigne_vit_droite) * 100);
             consigne_vit_droite -= fabs(decc * Te);
 
             if (consigne_vit_droite <= 0)
@@ -474,7 +475,7 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
         }
         else if (consigne_vit_droite < 0)
         {
-            freinage_moteur_droit(false, fabs(consigne_vit_droite));
+            freinage_moteur_droit(true, fabs(consigne_vit_droite));
 
             consigne_vit_droite += fabs(decc * Te);
 
@@ -489,7 +490,7 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
         if (((cons - odo_tick_droit) < limit_reprise_asser) && ((cons - odo_tick_droit) > -limit_reprise_asser))
         // if ((fabs(delta_droit) < 100) || (fabs(delta_droit) > 100))
         {
-            stop_moteur_droit();
+            // stop_moteur_droit();
             etat_actuel_vit_roue_folle_droite = ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE;
         }
 
@@ -624,7 +625,7 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
     case ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE:
         if (consigne_vit_gauche > 0)
         {
-            freinage_moteur_gauche(true, fabs(consigne_vit_gauche) * 100);
+            freinage_moteur_gauche(false, fabs(consigne_vit_gauche));
             consigne_vit_gauche -= fabs(decc * Te);
 
             if (consigne_vit_gauche <= 0)
@@ -634,7 +635,7 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
         }
         else if (consigne_vit_gauche < 0)
         {
-            freinage_moteur_gauche(false, fabs(consigne_vit_gauche));
+            freinage_moteur_gauche(true, fabs(consigne_vit_gauche));
 
             consigne_vit_gauche += fabs(decc * Te);
 
@@ -649,7 +650,7 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
         if (((cons - odo_tick_gauche) < limit_reprise_asser) && ((cons - odo_tick_gauche) > -limit_reprise_asser))
         // if ((fabs(delta_gauche) < 100) || (fabs(delta_gauche) > 100))
         {
-            stop_moteur_gauche();
+            // stop_moteur_gauche();
             etat_actuel_vit_roue_folle_gauche = ETAT_ARRET_Vitesse_ROUE_FOLLE_GAUCHE;
         }
 
