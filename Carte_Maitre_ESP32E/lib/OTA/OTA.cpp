@@ -260,11 +260,11 @@ void receptionWIFI(char ch)
       uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
       uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
       TelnetStream.println();
-      TelnetStream.printf("Send command Rotation with cons");
+      TelnetStream.printf("Send command LIGNE with cons");
       TelnetStream.printf(" cmd %d", cmd);
       TelnetStream.printf(" sens %d", sens);
       TelnetStream.println();
-      Serial.printf("Send command Rotation with cons");
+      Serial.printf("Send command LIGNE with cons");
       Serial.printf(" cmd %d", cmd);
       Serial.printf(" sens %d", sens);
       Serial.println();

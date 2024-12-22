@@ -14,13 +14,19 @@ void setup()
   Serial.printf("CACA");
   setupCAN(1000E3);
   delay(1000);
-  setupOTA();
 
-  while (!TelnetStream.available())
-  {
-    delay(500);                                             // Attente de 500 ms avant de vérifier à nouveau
-    Serial.println("Aucun client connecté, en attente..."); // Message indiquant qu'il n'y a pas de client connecté
-  }
+  setupOTA();
+  int i = 0;
+  // while (!TelnetStream.available())
+  // {
+  //   delay(500);                                             // Attente de 500 ms avant de vérifier à nouveau
+  //   Serial.println("Aucun client connecté, en attente..."); // Message indiquant qu'il n'y a pas de client connecté
+  //   i++;
+  //   // if (i == 22)
+  //   // {
+  //   //   esp_restart();
+  //   // }
+  // }
   affichage_commande_wifi();
 }
 
