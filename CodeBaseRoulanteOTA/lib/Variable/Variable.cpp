@@ -27,9 +27,9 @@ float consigne_theta_prec = 0;
 // Variable asservissement
 //************Asservissement ROUE FOLLE EN TICK */
 
-float coeff_P_roue_folle_tick_gauche = 7.0 / 2;
+float coeff_P_roue_folle_tick_gauche = 7.0  / 2;
 float coeff_D_roue_folle_tick_gauche = 0.25 / 2;
-float coeff_I_roue_folle_tick_gauche = 0.3 * 2;
+float coeff_I_roue_folle_tick_gauche = 0.3  * 2;
 
 float coeff_P_roue_folle_tick_droite = coeff_P_roue_folle_tick_gauche;
 float coeff_D_roue_folle_tick_droite = coeff_D_roue_folle_tick_gauche;
@@ -48,7 +48,7 @@ float Vmax = 200;
 float Amax = 50;
 // float Dmax = 2.5;
 float Dmax = 20;
-float limit_reprise_asser = 50.0*3.0;
+float limit_reprise_asser = 150;
 
 float acc_actuel_droite = 0;
 double consigne_vit_droite = 0;
@@ -91,9 +91,19 @@ bool start_asservissement_roue_droite = false;
 Etat_vitesse_roue_folle_droite etat_actuel_vit_roue_folle_droite = ETAT_ATTENTE_Vitesse_ROUE_FOLLE_DROITE;
 Etat_vitesse_roue_folle_gauche etat_actuel_vit_roue_folle_gauche = ETAT_ATTENTE_Vitesse_ROUE_FOLLE_GAUCHE;
 
-//************************Convitesse de vitesse */
+//************************Consigne de vitesse */
 float consigne_regulation_vitesse_droite = 0;
 float consigne_regulation_vitesse_gauche = 0;
+
+//************************Freinage */
+float coeff_P_freinage = 3;
+float coeff_D_freinage = 0.125 * coeff_P_freinage;
+float coeff_I_freinage = 0.01;
+float integral_limit_freinage = 500;
+float somme_erreur_freinage_roue_folle_droite = 0;
+float erreur_prec_freinage_roue_folle_droite = 0;
+float somme_erreur_freinage_roue_folle_gauche = 0;
+float erreur_prec_freinage_roue_folle_gauche = 0;
 
 //***********OTA******************* */
 

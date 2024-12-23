@@ -95,10 +95,14 @@ void controle(void *parameters)
         case TYPE_DEPLACEMENT_LIGNE_DROITE:
 
             ligne_droite(liste.distance, liste.vitesse_croisiere, liste.sens_ligne_droite);
-            Serial.printf("TYPE_DEPLACEMENT_LIGNE_DROITE");
+            // Serial.printf("TYPE_DEPLACEMENT_LIGNE_DROITE");
 
             if ((start_asservissement_roue_droite == false) && (start_asservissement_roue_gauche == false))
             {
+                // stop_motors();
+                // while(1){
+
+                // }
                 flag_fin_mvt = true;
                 sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_LIGNE_DROITE, 0, 0, 0, 0, 0);
                 liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
@@ -106,7 +110,7 @@ void controle(void *parameters)
             break;
         case TYPE_DEPLACEMENT_ROTATION:
 
-            Serial.printf("TYPE_DEPLACEMENT_ROTATION");
+            // Serial.printf("TYPE_DEPLACEMENT_ROTATION");
             rotation(liste.angle, liste.vitesse_croisiere, liste.sens_rotation);
 
             if ((start_asservissement_roue_droite == false) && (start_asservissement_roue_gauche == false))
@@ -119,7 +123,7 @@ void controle(void *parameters)
         case TYPE_DEPLACEMENT_IMMOBILE:
             consigne_regulation_vitesse_droite = consigne_odo_droite_prec;
             consigne_regulation_vitesse_gauche = consigne_odo_gauche_prec;
-            Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE ");
+            // Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE ");
             liste.general_purpose = TYPE_VIDE;
             flag_fin_mvt = true;
             sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0);
@@ -137,12 +141,12 @@ void controle(void *parameters)
 
         asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
         asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
-        Serial.printf(" consigne_regulation_vitesse_droite %f", consigne_regulation_vitesse_droite);
-        Serial.printf(" consigne_regulation_vitesse_gauche %f", consigne_regulation_vitesse_gauche);
-        Serial.printf(" odo_tick_gauche %f", odo_tick_gauche);
-        Serial.printf(" odo_tick_droit %f", odo_tick_droit);
-        Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
-        Serial.println(" " + toStringD(etat_actuel_vit_roue_folle_droite));
+        // Serial.printf(" consigne_regulation_vitesse_droite %f", consigne_regulation_vitesse_droite);
+        // Serial.printf(" consigne_regulation_vitesse_gauche %f", consigne_regulation_vitesse_gauche);
+        // Serial.printf(" odo_tick_gauche %f", odo_tick_gauche);
+        // Serial.printf(" odo_tick_droit %f", odo_tick_droit);
+        // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
+        // Serial.println(" " + toStringD(etat_actuel_vit_roue_folle_droite));
 
         /*
        rotation((2250 * 1), 70, -1);
@@ -166,7 +170,8 @@ void controle(void *parameters)
                 Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
                 Serial.println(" " + toStringD(etat_actuel_vit_roue_folle_droite));
         */
-        //   Serial.println();
+       Serial.printf(" theta %f",degrees(theta_robot));
+          Serial.println();
         // delay(1000);
         // FlagCalcul = 1;
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
@@ -210,7 +215,11 @@ void bus_can(void *parameters)
 
         case ESP32_RESTART:
             Serial.println("ESP32_RESTART");
+            liste.general_purpose = TYPE_VIDE;
+            for(int i = 0;i<1000;i++){
+            stop_motors();}
             esp_restart();
+            
 
             break;
 

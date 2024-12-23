@@ -147,6 +147,16 @@ extern Etat_vitesse_roue_folle_gauche etat_actuel_vit_roue_folle_gauche;
 extern float consigne_regulation_vitesse_droite;
 extern float consigne_regulation_vitesse_gauche;
 
+//************************Freinage */
+extern float coeff_P_freinage ;
+extern float coeff_D_freinage;
+extern float coeff_I_freinage ;
+extern float integral_limit_freinage ;
+extern float somme_erreur_freinage_roue_folle_droite ;
+extern float erreur_prec_freinage_roue_folle_droite;
+extern float somme_erreur_freinage_roue_folle_gauche;
+extern float erreur_prec_freinage_roue_folle_gauche ;
+
 //***********OTA******************* */
 
 extern bool flag_controle;

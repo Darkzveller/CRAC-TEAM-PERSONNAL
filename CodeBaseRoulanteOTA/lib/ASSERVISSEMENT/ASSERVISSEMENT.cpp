@@ -3,13 +3,6 @@
 #include "ASSERVISSEMENT.h"
 #include "OTA.h"
 float facteur_ajustement_consigne = 0.5;
-extern bool stop_asservissement_roue_gauche;
-extern bool stop_asservissement_roue_droite;
-extern bool start_asservissement_roue_gauche;
-extern bool start_asservissement_roue_droite;
-extern float consigne_odo_droite_delta;
-extern float consigne_odo_gauche_delta;
-
 void asservissement_roue_folle_droite_tick(double consigne, double observation)
 {
     bool sens = 0;
@@ -63,7 +56,10 @@ void asservissement_roue_folle_droite_tick(double consigne, double observation)
             sortie_roue_folle = -commande;
         }
     }
-    moteur_droit(sortie_roue_folle, sens);
+    if (etat_actuel_vit_roue_folle_droite != ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE)
+    {
+        moteur_droit(sortie_roue_folle, sens);
+    }
 }
 
 void asservissement_roue_folle_gauche_tick(double consigne, double observation)
@@ -125,248 +121,12 @@ void asservissement_roue_folle_gauche_tick(double consigne, double observation)
             sortie_roue_folle = -commande;
         }
     }
-
-    moteur_gauche(sortie_roue_folle, sens);
+    if (etat_actuel_vit_roue_folle_gauche != ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE)
+    {
+        moteur_gauche(sortie_roue_folle, sens);
+    }
 }
-//
-// double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
-// {
-//     if (type_ligne_droite)
-//     {
-//         cons = cons * facteur_ajustement_consigne;
-//     }
-//     float erreur_vit;
-//     float vit = Vmax_consigne;
-//     float accel = Amax;
-//     float decc = Dmax;
 
-//     double Vrob = (delta_droit) / Te;
-
-//     float Ta = vit / accel;
-//     float Td = vit / decc;
-//     float Tc = (2.0 * cons - accel * (Ta * Ta + Td * Td)) / (2 * vit);
-//     distance_accel_droite = 0.5 * Ta * Ta * accel;
-//     distance_decl_droite = 0.5 * Td * Td * decc;
-
-//     erreur_vit = vit - (Vrob * Vmax);
-//     somme_erreur_vit_roue_folle_droite += erreur_vit * Te;
-
-//     if (somme_erreur_vit_roue_folle_droite > integral_limit)
-//     {
-//         somme_erreur_vit_roue_folle_droite = integral_limit;
-//     }
-//     else if (somme_erreur_vit_roue_folle_droite < -integral_limit)
-//     {
-//         somme_erreur_vit_roue_folle_droite = -integral_limit;
-//     }
-
-//     float derivee_erreur_vit = (erreur_vit - erreur_vit_precedente_roue_folle_droite) / Te;
-//     erreur_vit_precedente_roue_folle_droite = erreur_vit;
-//     float commande_vit = kp_vit * erreur_vit + ki_vit * somme_erreur_vit_roue_folle_droite + kd_vit * derivee_erreur_vit;
-//     switch (etat_actuel_vit_roue_folle_droite)
-//     {
-//     case ETAT_ATTENTE_Vitesse_ROUE_FOLLE_DROITE:
-//         if (start_asservissement_roue_droite)
-//         {
-//             etat_actuel_vit_roue_folle_droite = ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE;
-//         }
-//         break;
-//     case ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE:
-//         acc_actuel_droite = acc_actuel_droite + commande_vit * Te;
-
-//         if (acc_actuel_droite > accel)
-//         {
-//             acc_actuel_droite = accel;
-//         }
-//         else if (acc_actuel_droite < -accel)
-//         {
-//             acc_actuel_droite = -accel;
-//         }
-
-//         consigne_vit_droite = Vrob + acc_actuel_droite * Te;
-
-//         if (consigne_vit_droite > Vmax_consigne)
-//         {
-//             consigne_vit_droite = Vmax_consigne;
-//         }
-//         else if (consigne_vit_droite < Vmax_consigne)
-//         {
-//             consigne_vit_droite = Vmax_consigne;
-//         }
-
-//         consigne_dist_droite = odo_tick_droit + consigne_vit_droite * Te;
-
-//         Ta_counter_droite++;
-//         if (Ta_counter_droite >= fabs(Ta))
-//         {
-//             etat_actuel_vit_roue_folle_droite = ETAT_CROISIERE_Vitesse_ROUE_FOLLE_DROITE;
-//         }
-//         break;
-
-//     case ETAT_CROISIERE_Vitesse_ROUE_FOLLE_DROITE:
-//         consigne_vit_droite = vit;
-
-//         if (consigne_vit_droite > Vmax_consigne)
-//         {
-//             consigne_vit_droite = Vmax_consigne;
-//         }
-//         else if (consigne_vit_droite < Vmax_consigne)
-//         {
-//             consigne_vit_droite = Vmax_consigne;
-//         }
-
-//         consigne_dist_droite = odo_tick_droit + consigne_vit_droite * Te;
-
-//         if (fabs(cons - odo_tick_droit) < fabs(distance_decl_droite))
-//         {
-//             etat_actuel_vit_roue_folle_droite = ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE;
-//         }
-//         break;
-
-//     case ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE:
-//         /* acc_actuel_droite = acc_actuel_droite - commande_vit * Te;
-//          if (decc > 0)
-//          {
-//              if (acc_actuel_droite < 0)
-//              {
-//                  acc_actuel_droite = 0;
-//              }
-//          }
-//          else if (decc < 0)
-//          {
-
-//              if (acc_actuel_droite > 0)
-//              {
-//                  acc_actuel_droite = 0;
-//              }
-//          }
-
-//          consigne_vit_droite = Vrob - acc_actuel_droite * Te;
-
-//          if (consigne_vit_droite > Vmax_consigne)
-//          {
-//              consigne_vit_droite = Vmax_consigne;
-//          }
-//          else if (consigne_vit_droite < -Vmax_consigne)
-//          {
-//              consigne_vit_droite = Vmax_consigne;
-//          }
-
-//          consigne_dist_droite = odo_tick_droit + consigne_vit_droite * Te;
-
-//  */
-//         // stop_motors();
-//         // freinage_moteur_droit(true, Vmax_consigne);
-
-//         // if (((cons - odo_tick_droit) < limit_reprise_asser) || ((cons - odo_tick_droit) > -limit_reprise_asser))
-//         // {
-//         //     etat_actuel_vit_roue_folle_droite = ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE;
-//         // }
-//         // Serial.printf(" ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE ");
-//         /*
-//                 // Utiliser le freinage actif si la décélération naturelle est insuffisante
-//                 if (consigne_vit_droite > 0)
-//                 {
-//                     // Réduire la vitesse rapidement avec le freinage moteur
-//                     freinage_moteur_droit(true, consigne_vit_droite);
-
-//                     // Réduire progressivement la consigne de vitesse
-//                     consigne_vit_droite -= fabs(decc * Te);
-
-//                     if (consigne_vit_droite < 0)
-//                     {
-//                         consigne_vit_droite = 0; // Empêcher des vitesses négatives
-//                     }
-//                 }
-//         */
-//         // Si la vitesse est positive, on applique un freinage actif classique
-//         if (consigne_vit_droite > 0)
-//         {
-//             // Réduire la vitesse rapidement avec le freinage moteur
-//             freinage_moteur_droit(true, consigne_vit_droite);
-
-//             // Réduire progressivement la consigne de vitesse
-//             consigne_vit_droite -= fabs(decc * Te);
-
-//             // Empêcher des vitesses négatives
-//             if (consigne_vit_droite <= 0)
-//             {
-//                 consigne_vit_droite = 0;
-//             }
-//         }
-//         // Si la vitesse est négative (freinage inverse), appliquer le freinage inverse
-//         else if (consigne_vit_droite < 0)
-//         {
-//             // Freinage inverse pour ralentir la vitesse négative
-//             freinage_moteur_droit(false, fabs(consigne_vit_droite));
-
-//             // Augmenter la vitesse négative progressivement (décélération inverse)
-//             consigne_vit_droite += fabs(decc * Te);
-
-//             // S'assurer que la vitesse ne dépasse pas la valeur maximale en sens inverse
-//             if (consigne_vit_droite >= 0)
-//             {
-//                 consigne_vit_droite = 0; // Arrêter complètement si la vitesse atteint 0
-//             }
-//         }
-
-//         // Mise à jour de la consigne de distance
-//         consigne_dist_droite = odo_tick_droit + consigne_vit_droite * Te;
-
-//         // Vérifier si on est assez proche de la destination pour arrêter
-//         if (((cons - odo_tick_droit) < limit_reprise_asser) || ((cons - odo_tick_droit) > -limit_reprise_asser))
-//         {
-//             stop_moteur_droit();
-//             etat_actuel_vit_roue_folle_droite = ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE;
-//         }
-
-//         break;
-
-//     case ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE:
-//         if (type_ligne_droite)
-//         {
-//             consigne_dist_droite = cons * 1 / facteur_ajustement_consigne;
-//         }
-//         T_counter_attente_droite++;
-//         // if (T_counter_attente_droite > T_attente_droite)
-//         consigne_odo_droite_delta = delta_droit;
-//         if (consigne_odo_droite_delta == 0)
-//         {
-
-//             consigne_dist_droite = cons;
-//             start_asservissement_roue_droite = 0;
-//             consigne_odo_droite_prec = odo_tick_droit;
-
-//             // coeff_P_roue_folle_tick_droite = 7.0 / 2;
-//             // coeff_D_roue_folle_tick_droite = 0.25 / 2;
-//             // coeff_I_roue_folle_tick_droite = 0.3 * 2;
-//             etat_actuel_vit_roue_folle_droite = ETAT_VIDE_Vitesse_ROUE_FOLLE_DROITE;
-//         }
-//         else
-//         {
-//             stop_moteur_droit();
-//             consigne_dist_droite = odo_tick_droit + 0 * Te;
-//             // coeff_P_roue_folle_tick_droite = 7.0 / 50;
-//             // coeff_D_roue_folle_tick_droite = 0;
-//             // coeff_I_roue_folle_tick_droite = 0.3 * 2;
-//         }
-//         // }
-//         // else
-//         // {
-//         //     etat_actuel_vit_roue_folle_droite = ETAT_VIDE_Vitesse_ROUE_FOLLE_DROITE;
-//         // }
-
-//         break;
-
-//     case ETAT_VIDE_Vitesse_ROUE_FOLLE_DROITE:
-
-//         etat_actuel_vit_roue_folle_droite = ETAT_ATTENTE_Vitesse_ROUE_FOLLE_DROITE;
-
-//         break;
-//     }
-
-//     return consigne_dist_droite;
-// }
 double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
 {
     if (type_ligne_droite)
@@ -462,38 +222,71 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
         break;
 
     case ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE:
-       
-        if (consigne_vit_droite > 0)
-        {
-            freinage_moteur_droit(false, fabs(consigne_vit_droite) * 100);
-            consigne_vit_droite -= fabs(decc * Te);
+        /* if (consigne_vit_droite > 0)
+         {
+             // Active le freinage dans le sens avant
+             freinage_moteur_droit(true, -1 * consigne_vit_droite);
 
-            if (consigne_vit_droite <= 0)
+             // Diminue progressivement la vitesse consigne
+             consigne_vit_droite -= decc * Te;
+
+             // Assure que la consigne de vitesse ne descend pas en dessous de zéro
+             if (consigne_vit_droite <= 0)
+             {
+                 consigne_vit_droite = 0;
+             }
+         }
+         else if (consigne_vit_droite < 0)
+         {
+             // Active le freinage dans le sens arrière
+             freinage_moteur_droit(true, -1 * consigne_vit_droite);
+
+             // Augmente progressivement la vitesse consigne vers zéro
+             consigne_vit_droite += decc * Te;
+
+             // Assure que la consigne de vitesse ne dépasse pas zéro
+             if (consigne_vit_droite >= 0)
+             {
+                 consigne_vit_droite = 0;
+             }
+         }
+ */
+        /*acc_actuel_droite = acc_actuel_droite - commande_vit * Te;
+        if (decc > 0)
+        {
+            if (acc_actuel_droite < 0)
             {
-                consigne_vit_droite = 0;
+                acc_actuel_droite = 0;
             }
         }
-        else if (consigne_vit_droite < 0)
+        else if (decc < 0)
         {
-            freinage_moteur_droit(true, fabs(consigne_vit_droite));
 
-            consigne_vit_droite += fabs(decc * Te);
-
-            if (consigne_vit_droite >= 0)
+            if (acc_actuel_droite > 0)
             {
-                consigne_vit_droite = 0;
+                acc_actuel_droite = 0;
             }
         }
 
-        consigne_dist_droite = odo_tick_droit + consigne_vit_droite * Te;
+        consigne_vit_droite = Vrob - acc_actuel_droite * Te;
 
+        if (consigne_vit_droite > Vmax_consigne)
+        {
+            consigne_vit_droite = Vmax_consigne;
+        }
+        else if (consigne_vit_droite < -Vmax_consigne)
+        {
+            consigne_vit_droite = Vmax_consigne;
+        }
+        // Met à jour la consigne de distance
+        consigne_dist_droite = odo_tick_droit + consigne_vit_droite * Te;*/
+        asservissement_freinage_roue_folle_droite(cons, odo_tick_droit);
+        // Transition vers l'état d'arrêt si proche de la consigne
         if (((cons - odo_tick_droit) < limit_reprise_asser) && ((cons - odo_tick_droit) > -limit_reprise_asser))
-        // if ((fabs(delta_droit) < 100) || (fabs(delta_droit) > 100))
         {
-            // stop_moteur_droit();
             etat_actuel_vit_roue_folle_droite = ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE;
+            stop_moteur_droit();
         }
-
         break;
 
     case ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE:
@@ -518,7 +311,7 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
         break;
     }
     // Serial.printf(" consB %.0f ", cons);
-    Serial.printf(" consigne_dist_droite %.0f ", consigne_dist_droite);
+    // Serial.printf(" consigne_dist_droite %.0f ", consigne_dist_droite);
 
     return consigne_dist_droite;
 }
@@ -623,37 +416,46 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
         break;
 
     case ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE:
-        if (consigne_vit_gauche > 0)
-        {
-            freinage_moteur_gauche(false, fabs(consigne_vit_gauche));
-            consigne_vit_gauche -= fabs(decc * Te);
+        /* if (consigne_vit_gauche > 0)
+         {
+             // Active le freinage dans le sens avant
+             freinage_moteur_gauche(true, -1 * consigne_vit_gauche);
 
-            if (consigne_vit_gauche <= 0)
-            {
-                consigne_vit_gauche = 0;
-            }
-        }
-        else if (consigne_vit_gauche < 0)
-        {
-            freinage_moteur_gauche(true, fabs(consigne_vit_gauche));
+             // Diminue progressivement la vitesse consigne
+             consigne_vit_gauche -= (decc * Te);
 
-            consigne_vit_gauche += fabs(decc * Te);
+             // Assure que la consigne de vitesse ne descend pas en dessous de zéro
+             if (consigne_vit_gauche <= 0)
+             {
+                 consigne_vit_gauche = 0;
+             }
+         }
+         else if (consigne_vit_gauche < 0)
+         {
+             // Active le freinage dans le sens arrière
+             freinage_moteur_gauche(true, -1 * consigne_vit_gauche);
 
-            if (consigne_vit_gauche >= 0)
-            {
-                consigne_vit_gauche = 0;
-            }
-        }
+             // Augmente progressivement la vitesse consigne vers zéro
+             consigne_vit_gauche += (decc * Te);
 
-        consigne_dist_gauche = odo_tick_gauche + consigne_vit_gauche * Te;
+             // Assure que la consigne de vitesse ne dépasse pas zéro
+             if (consigne_vit_gauche >= 0)
+             {
+                 consigne_vit_gauche = 0;
+             }
+         }
 
+         // Met à jour la consigne de distance
+         consigne_dist_gauche = odo_tick_gauche + consigne_vit_gauche * Te;
+ */
+        asservissement_freinage_roue_folle_gauche(cons, odo_tick_droit);
+
+        // Transition vers l'état d'arrêt si proche de la consigne
         if (((cons - odo_tick_gauche) < limit_reprise_asser) && ((cons - odo_tick_gauche) > -limit_reprise_asser))
-        // if ((fabs(delta_gauche) < 100) || (fabs(delta_gauche) > 100))
         {
-            // stop_moteur_gauche();
             etat_actuel_vit_roue_folle_gauche = ETAT_ARRET_Vitesse_ROUE_FOLLE_GAUCHE;
+            stop_moteur_gauche();
         }
-
         break;
 
     case ETAT_ARRET_Vitesse_ROUE_FOLLE_GAUCHE:
@@ -680,4 +482,120 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
     }
     // Serial.printf(" consB %.0f ", cons);
     return consigne_dist_gauche;
+}
+
+void asservissement_freinage_roue_folle_droite(float consigne, float observation)
+{
+    bool sens = 0;
+    double sortie_roue_folle;
+
+    double resolution_calculer = (pow(2, resolution_pwm) - 1) * POURCENT_MAX_PWM;
+    double erreur = consigne - observation;
+    double proportionnel = erreur * coeff_P_freinage;
+
+    double deriver = coeff_D_freinage * (erreur - erreur_prec_roue_folle_droite_tick) / Te;
+
+    somme_erreur_freinage_roue_folle_droite += erreur * Te;
+    if (somme_erreur_freinage_roue_folle_droite > integral_limit_freinage)
+    {
+        somme_erreur_freinage_roue_folle_droite = integral_limit_freinage;
+    }
+    else if (somme_erreur_freinage_roue_folle_droite < -integral_limit_freinage)
+    {
+        somme_erreur_freinage_roue_folle_droite = -integral_limit_freinage;
+    }
+
+    double integral = coeff_I_freinage * somme_erreur_freinage_roue_folle_droite;
+
+    double commande = proportionnel + deriver + integral;
+
+    erreur_prec_freinage_roue_folle_droite = erreur;
+
+    // Gestion des bornes de la commande
+    if (commande > 0)
+    {
+        sens = false;
+        if (commande > resolution_calculer)
+        {
+            sortie_roue_folle = resolution_calculer;
+        }
+        else
+        {
+            sortie_roue_folle = commande;
+        }
+    }
+    else
+    {
+        sens = true;
+        if (commande < -resolution_calculer)
+        {
+
+            sortie_roue_folle = resolution_calculer;
+        }
+        else
+        {
+            sortie_roue_folle = -commande;
+        }
+    }
+    Serial.printf(" erreur %f", erreur);
+    Serial.printf(" sortie_roue_folle %f", sortie_roue_folle);
+    Serial.println();
+    freinage_moteur_droit(true, sortie_roue_folle);
+}
+
+void asservissement_freinage_roue_folle_gauche(float consigne, float observation)
+{
+
+    bool sens = 0;
+    double sortie_roue_folle;
+
+    double resolution_calculer = (pow(2, resolution_pwm) - 1) * POURCENT_MAX_PWM;
+    double erreur = consigne - observation;
+    double proportionnel = erreur * coeff_P_freinage;
+
+    double deriver = coeff_D_freinage * (erreur - erreur_prec_roue_folle_gauche_tick) / Te;
+
+    somme_erreur_freinage_roue_folle_gauche += erreur * Te;
+    if (somme_erreur_freinage_roue_folle_gauche > integral_limit_freinage)
+    {
+        somme_erreur_freinage_roue_folle_gauche = integral_limit_freinage;
+    }
+    else if (somme_erreur_freinage_roue_folle_gauche < -integral_limit_freinage)
+    {
+        somme_erreur_freinage_roue_folle_gauche = -integral_limit_freinage;
+    }
+
+    double integral = coeff_I_freinage * somme_erreur_freinage_roue_folle_gauche;
+
+    double commande = proportionnel + deriver + integral;
+
+    erreur_prec_freinage_roue_folle_gauche = erreur;
+
+    // Gestion des bornes de la commande
+    if (commande > 0)
+    {
+        sens = false;
+        if (commande > resolution_calculer)
+        {
+            sortie_roue_folle = resolution_calculer;
+        }
+        else
+        {
+            sortie_roue_folle = commande;
+        }
+    }
+    else
+    {
+        sens = true;
+        if (commande < -resolution_calculer)
+        {
+
+            sortie_roue_folle = resolution_calculer;
+        }
+        else
+        {
+            sortie_roue_folle = -commande;
+        }
+    }
+    freinage_moteur_gauche(true, sortie_roue_folle);
 }

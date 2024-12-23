@@ -10,7 +10,7 @@
 // #define MA_FREEBOX
 // #define MON_PC
 
-const char *name_card_elec = "sniffercan";
+const char *name_card_elec = "espmaitre";
 // BESOIN DE ME SIMPLIFIER MA VIE
 #ifdef MON_TELEPHONE                // Nom d'hôte de la carte ESP32
 const char *ssid = "Me voici";      // SSID du réseau WiFi
