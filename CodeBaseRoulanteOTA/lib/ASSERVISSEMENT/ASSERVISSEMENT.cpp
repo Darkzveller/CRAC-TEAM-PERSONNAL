@@ -537,9 +537,9 @@ void asservissement_freinage_roue_folle_droite(float consigne, float observation
             sortie_roue_folle = -commande;
         }
     }
-    Serial.printf(" erreur %f", erreur);
-    Serial.printf(" sortie_roue_folle %f", sortie_roue_folle);
-    Serial.println();
+    // Serial.printf(" erreur %f", erreur);
+    // Serial.printf(" sortie_roue_folle %f", sortie_roue_folle);
+    // Serial.println();
     freinage_moteur_droit(true, sortie_roue_folle);
 }
 

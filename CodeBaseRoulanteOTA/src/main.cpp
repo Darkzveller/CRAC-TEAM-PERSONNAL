@@ -173,6 +173,7 @@ void controle(void *parameters)
 
         Serial.printf(" theta %f", degrees(theta_robot));
         Serial.println();
+
         // delay(1000);
         // FlagCalcul = 1;
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
@@ -327,7 +328,7 @@ void setup()
     // Serial.printf("avncement_droite enter : %.0f\n", avncement_droite);
 
     reset_encodeur();
-    delay(1000);
+    // delay(1000);
     reset_encodeur();
 
     xTaskCreate(

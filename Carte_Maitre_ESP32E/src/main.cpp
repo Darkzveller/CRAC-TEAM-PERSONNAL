@@ -85,7 +85,7 @@ void reception(char ch)
       Serial.printf(" cmd %d", cmd);
       Serial.printf(" sens %d", sens);
       Serial.println();
-      sendCANMessage(ROTATION, 0, 0, 4, highByte, lowByte, sens, 0x7B, 0, 0, 0);
+      sendCANMessage(ROTATION, 0, 0, 4, highByte, lowByte, sens, 100, 0, 0, 0);
     }
     if (commande == "LIGNE")
     {
@@ -113,7 +113,7 @@ void reception(char ch)
       Serial.printf(" cmd %d", cmd);
       Serial.printf(" sens %d", sens);
       Serial.println();
-      sendCANMessage(LIGNE_DROITE, 0, 0, 4, highByte, lowByte, sens, 0x7B, 0, 0, 0);
+      sendCANMessage(LIGNE_DROITE, 0, 0, 4, highByte, lowByte, sens, 100, 0, 0, 0);
     }
     if (commande == "RESTART")
     {
