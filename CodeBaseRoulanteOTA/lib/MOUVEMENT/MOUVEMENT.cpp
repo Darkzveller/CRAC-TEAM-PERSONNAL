@@ -67,25 +67,8 @@ void ligne_droite(int consigne, int vitesse, int sens)
     int consigne_droite = consigne * sens;
     consigne_gauche = (consigne_gauche + consigne_odo_gauche_prec);
     consigne_droite = (consigne_droite + consigne_odo_droite_prec);
-    // stop_motors();
-
-    // Serial.println();
-    // Serial.println();
-    // Serial.println();
-    // while (true)
-    // {
-    //     Serial.printf(" consigne_gauche %d ", consigne_gauche);
-    //     Serial.printf(" consigne_droite %d ", consigne_droite);
-
-    //     Serial.printf(" consigne_odo_gauche_prec %.0f ", consigne_odo_gauche_prec);
-    //     Serial.printf(" consigne_odo_droite_prec %.0f ", consigne_odo_droite_prec);
-    //     Serial.printf("| odo gauche %.0f odo droite %.0f", odo_tick_gauche, odo_tick_droit);
-
-    //     Serial.println();
-    // }
-    // Serial.println();
-
-    // delay(1000000);
+   
+   
     // Calcul initial des consignes de vitesse pour chaque roue
     consigne_regulation_vitesse_droite = regulation_vitesse_roue_folle_droite(consigne_droite, vitesse_croisiere_droit);
     consigne_regulation_vitesse_gauche = regulation_vitesse_roue_folle_gauche(consigne_gauche, vitesse_croisiere_gauche);

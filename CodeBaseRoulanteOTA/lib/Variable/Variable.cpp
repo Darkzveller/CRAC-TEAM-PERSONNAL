@@ -2,6 +2,7 @@
 
 // Définition des variables
 // Encodeur
+float perimetre_robot = M_PI * LARGEUR_ROBOT_mm;
 
 double odo_dist_gauche;
 double odo_dist_droit;
@@ -27,9 +28,9 @@ float consigne_theta_prec = 0;
 // Variable asservissement
 //************Asservissement ROUE FOLLE EN TICK */
 
-float coeff_P_roue_folle_tick_gauche = 7.0  / 2;
+float coeff_P_roue_folle_tick_gauche = 7.0 / 2;
 float coeff_D_roue_folle_tick_gauche = 0.25 / 2;
-float coeff_I_roue_folle_tick_gauche = 0.3  * 2;
+float coeff_I_roue_folle_tick_gauche = 0.3 * 2;
 
 float coeff_P_roue_folle_tick_droite = coeff_P_roue_folle_tick_gauche;
 float coeff_D_roue_folle_tick_droite = coeff_D_roue_folle_tick_gauche;
@@ -110,7 +111,6 @@ float erreur_prec_freinage_roue_folle_gauche = 0;
 bool flag_controle = false;
 
 //***********CAN******************* */
-
 
 CANMessage rxMsg; // data received by CAN to control the robot
 int etat_lecture_can;
