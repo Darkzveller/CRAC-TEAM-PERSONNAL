@@ -88,7 +88,6 @@ void controle(void *parameters)
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        /**/
 
         switch (liste.general_purpose)
         {
@@ -129,7 +128,6 @@ void controle(void *parameters)
             sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0);
 
             break;
-    
 
         case TYPE_VIDE:
             // Serial.printf(" TYPE_VIDE \n");
@@ -170,8 +168,11 @@ void controle(void *parameters)
                 Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
                 Serial.println(" " + toStringD(etat_actuel_vit_roue_folle_droite));
         */
-       Serial.printf(" theta %f",degrees(theta_robot));
-          Serial.println();
+        Serial.printf(" odo_x %f ", odo_x);
+        Serial.printf(" odo_y %f ", odo_y);
+
+        Serial.printf(" theta %f", degrees(theta_robot));
+        Serial.println();
         // delay(1000);
         // FlagCalcul = 1;
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
@@ -216,10 +217,11 @@ void bus_can(void *parameters)
         case ESP32_RESTART:
             Serial.println("ESP32_RESTART");
             liste.general_purpose = TYPE_VIDE;
-            for(int i = 0;i<1000;i++){
-            stop_motors();}
+            for (int i = 0; i < 1000; i++)
+            {
+                stop_motors();
+            }
             esp_restart();
-            
 
             break;
 
@@ -233,7 +235,12 @@ void bus_can(void *parameters)
 
             liste.general_purpose = TYPE_DEPLACEMENT_ROTATION;
             // liste.angle = LARGEUR_ROBOT_mm * M_PI * TIC_PER_TOUR * angle / (3600 * SIZE_WHEEL_DIAMETER_mm);
-            liste.angle = TIC_PER_TOUR * angle / 90.0;
+            float perimetre_robot = M_PI * LARGEUR_ROBOT_mm;
+            float distance_a_faire_en_mm = angle * perimetre_robot / 360;
+            float consigne_roue_odo = distance_a_faire_en_mm * (TIC_PER_TOUR / (2 * M_PI * SIZE_WHEEL_DIAMETER_mm / 2.0));
+
+            liste.angle = TIC_PER_TOUR * angle / 80.0;
+
             liste.sens_rotation = sens_rotation;
             liste.vitesse_croisiere = vitesse;
             start_asservissement_roue_droite = true;
@@ -243,6 +250,7 @@ void bus_can(void *parameters)
             // Serial.printf("ROTATION ");
             // Serial.printf(" angle %f ", (float)angle);
             // Serial.printf(" liste.angle %f", (float)liste.angle);
+            // Serial.println();
             // Serial.printf(" sens_rotation %d ", liste.sens_rotation);
             // Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
             // Serial.println();
@@ -299,6 +307,7 @@ void setup()
     setupOTA();
     // Initialisation des moteurs
     setup_motors();
+    stop_motors();
     // Initialisation des encodeurs
     setup_encodeur();
     // Initialisation du Can

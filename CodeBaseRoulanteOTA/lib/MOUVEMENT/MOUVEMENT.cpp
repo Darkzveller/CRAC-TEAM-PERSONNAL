@@ -42,17 +42,19 @@ void rotation(int consigne, int vitesse, int sens)
     // }
     // Serial.println();
 
-
     // Calcul initial des consignes de vitesse pour chaque roue
     consigne_regulation_vitesse_droite = regulation_vitesse_roue_folle_droite(consigne_droite, vitesse_croisiere_droit);
     consigne_regulation_vitesse_gauche = regulation_vitesse_roue_folle_gauche(consigne_gauche, vitesse_croisiere_gauche);
 
     // Imposer une symétrie des consignes de vitesse
-    float vitesse_moyenne = (consigne_regulation_vitesse_droite - consigne_regulation_vitesse_gauche) / 2;
+    float vitesse_moyenne = (consigne_regulation_vitesse_droite + consigne_regulation_vitesse_gauche) / 2;
 
     // On force les consignes à être égales et opposées
     // consigne_regulation_vitesse_droite = -sens * vitesse_moyenne;
-    // consigne_regulation_vitesse_gauche = sens * vitesse_moyenne;
+    // consigne_regulation_vitesse_gauche = sens * vitesse_moyenne;    Serial.printf(" vitesse_moyenne %.0f ", vitesse_moyenne);
+
+    // Serial.printf(" consigne_regulation_vitesse_droite %.0f ", consigne_regulation_vitesse_droite);
+    // Serial.printf(" consigne_regulation_vitesse_gauche %.0f ", consigne_regulation_vitesse_gauche);
 }
 void ligne_droite(int consigne, int vitesse, int sens)
 {
