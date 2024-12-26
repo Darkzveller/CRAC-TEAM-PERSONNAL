@@ -1,3 +1,5 @@
+#include <mat.h>
+#include <Arduino.h>
 #include "OTA.h" // Inclusion de la bibliothèque OTA (Over-The-Air) pour les mises à jour sans fil
 #include "Variable.h"
 #include "MOTEUR.h"
@@ -6,7 +8,7 @@
 #include "MOUVEMENT.h"
 #include "ID_CAN.h"
 #include "CAN_ESP32E.h"
-#include <mat.h>
+#include "USE_FUNCTION.h"
 
 int etat_mouvement = 0;
 int cons_distance_ticks = 5000;
@@ -70,18 +72,13 @@ struct Ordre_deplacement
     int consigne_distance_recalage;
     int vitesse_recalage;
     int sens_recalage;
-    float data8;
-    float data9;
-    float data10;
-    float data11;
+    int x;
+    int y;
+    int theta;
+    int vitesse_x_y_theta;
 };
-Ordre_deplacement liste = {TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int fusion_octet(int octet0, int octet1)
-{
+Ordre_deplacement liste = {TYPE_DEPLACEMENT_X_Y_THETA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    int16_t octet16 = (octet0 << 8) | octet1;
-    return octet16;
-}
 void controle(void *parameters)
 {
     TickType_t xLastWakeTime;
@@ -96,12 +93,8 @@ void controle(void *parameters)
             ligne_droite(liste.distance, liste.vitesse_croisiere, liste.sens_ligne_droite);
             // Serial.printf("TYPE_DEPLACEMENT_LIGNE_DROITE");
 
-            if ((start_asservissement_roue_droite == false) && (start_asservissement_roue_gauche == false))
+            if (return_flag_asser_roue())
             {
-                // stop_motors();
-                // while(1){
-
-                // }
                 flag_fin_mvt = true;
                 sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_LIGNE_DROITE, 0, 0, 0, 0, 0);
                 liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
@@ -112,7 +105,7 @@ void controle(void *parameters)
             // Serial.printf("TYPE_DEPLACEMENT_ROTATION");
             rotation(liste.angle, liste.vitesse_croisiere, liste.sens_rotation);
 
-            if ((start_asservissement_roue_droite == false) && (start_asservissement_roue_gauche == false))
+            if (return_flag_asser_roue())
             {
                 flag_fin_mvt = true;
                 sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_ROTATION, 0, 0, 0, 0, 0);
@@ -128,7 +121,19 @@ void controle(void *parameters)
             sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0);
 
             break;
+        case TYPE_DEPLACEMENT_X_Y_THETA:
+            // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
+            // Serial.println(" " + toStringD(etat_actuel_vit_roue_folle_droite));
 
+            x_y_theta(100, 100, 90, 100);
+
+            if (etat_x_y_theta == -1)
+            {
+                flag_fin_mvt = true;
+                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_X_Y_THETA, 0, 0, 0, 0, 0);
+                liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
+            }
+            break;
         case TYPE_VIDE:
             // Serial.printf(" TYPE_VIDE \n");
             break;
@@ -136,11 +141,12 @@ void controle(void *parameters)
         default:
             break;
         }
-
         asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
         asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
-
-
+        Serial.printf(" Odo x %.3f ", odo_x);
+        Serial.printf(" odo_y %.3f ", odo_y);
+        Serial.printf(" teheta %.3f ", degrees(theta_robot));
+        Serial.println();
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
     }
 }
@@ -206,9 +212,7 @@ void bus_can(void *parameters)
 
             liste.sens_rotation = sens_rotation;
             liste.vitesse_croisiere = vitesse;
-            start_asservissement_roue_droite = true;
-            start_asservissement_roue_gauche = true;
-
+            lauch_flag_asser_roue(true);
             rxMsg.id = 0;
             // Serial.printf("ROTATION ");
             // Serial.printf(" angle %f ", (float)angle);
@@ -233,8 +237,7 @@ void bus_can(void *parameters)
             liste.distance = distance * (TIC_PER_TOUR / (2 * M_PI * SIZE_WHEEL_DIAMETER_mm / 2.0));
             liste.sens_ligne_droite = sens_ligne_droite;
             liste.vitesse_croisiere = vitesse;
-            start_asservissement_roue_droite = true;
-            start_asservissement_roue_gauche = true;
+            lauch_flag_asser_roue(true);
 
             rxMsg.id = 0;
 

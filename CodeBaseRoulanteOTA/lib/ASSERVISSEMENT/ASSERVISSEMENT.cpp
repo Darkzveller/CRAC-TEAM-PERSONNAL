@@ -280,7 +280,8 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
         }
         // Met à jour la consigne de distance
         consigne_dist_droite = odo_tick_droit + consigne_vit_droite * Te;*/
-        asservissement_freinage_roue_folle_droite(cons, odo_tick_droit);
+        // asservissement_freinage_roue_folle_droite(cons, odo_tick_droit);
+        stop_moteur_droit();
         // Transition vers l'état d'arrêt si proche de la consigne
         if (((cons - odo_tick_droit) < limit_reprise_asser) && ((cons - odo_tick_droit) > -limit_reprise_asser))
         {
@@ -298,6 +299,7 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
         consigne_dist_droite = cons;
         start_asservissement_roue_droite = false;
         consigne_odo_droite_prec = odo_tick_droit;
+
         // if ((delta_droit < 100) || (delta_droit > 100))
         // {
         etat_actuel_vit_roue_folle_droite = ETAT_VIDE_Vitesse_ROUE_FOLLE_DROITE;
@@ -448,7 +450,8 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
          // Met à jour la consigne de distance
          consigne_dist_gauche = odo_tick_gauche + consigne_vit_gauche * Te;
  */
-        asservissement_freinage_roue_folle_gauche(cons, odo_tick_droit);
+        // asservissement_freinage_roue_folle_gauche(cons, odo_tick_droit);
+        stop_moteur_gauche();
 
         // Transition vers l'état d'arrêt si proche de la consigne
         if (((cons - odo_tick_gauche) < limit_reprise_asser) && ((cons - odo_tick_gauche) > -limit_reprise_asser))
@@ -467,6 +470,7 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
         consigne_dist_gauche = cons;
         start_asservissement_roue_gauche = false;
         consigne_odo_gauche_prec = odo_tick_gauche;
+
         if ((delta_gauche < 100) || (delta_gauche > 100))
         {
             etat_actuel_vit_roue_folle_gauche = ETAT_VIDE_Vitesse_ROUE_FOLLE_GAUCHE;
@@ -598,4 +602,24 @@ void asservissement_freinage_roue_folle_gauche(float consigne, float observation
         }
     }
     freinage_moteur_gauche(true, sortie_roue_folle);
+}
+
+bool return_flag_asser_roue()
+{
+
+    if ((start_asservissement_roue_droite == false) && (start_asservissement_roue_gauche == false))
+    {
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+void lauch_flag_asser_roue(bool mode)
+{
+    start_asservissement_roue_droite = mode;
+    start_asservissement_roue_gauche = mode;
 }

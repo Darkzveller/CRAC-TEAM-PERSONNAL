@@ -2,6 +2,9 @@
 #include "ASSERVISSEMENT.h"
 #include "MOUVEMENT.h"
 #include "MOTEUR.h"
+#include <mat.h>
+#include "USE_FUNCTION.h"
+
 double somme_integral_correction_angle = 0;
 double integral_limit_correction_angle = 500;
 void rotation(int consigne, int vitesse, int sens)
@@ -67,8 +70,12 @@ void ligne_droite(int consigne, int vitesse, int sens)
     int consigne_droite = consigne * sens;
     consigne_gauche = (consigne_gauche + consigne_odo_gauche_prec);
     consigne_droite = (consigne_droite + consigne_odo_droite_prec);
-   
-   
+    // Serial.printf(" consigne_gauche %d ", consigne_gauche);
+    // Serial.printf(" consigne_droite %d ", consigne_droite);
+    // Serial.printf(" consigne_odo_droite_prec %f ", consigne_odo_droite_prec);
+    // Serial.printf(" consigne_odo_gauche_prec %f ", consigne_odo_gauche_prec);
+    // Serial.println();
+
     // Calcul initial des consignes de vitesse pour chaque roue
     consigne_regulation_vitesse_droite = regulation_vitesse_roue_folle_droite(consigne_droite, vitesse_croisiere_droit);
     consigne_regulation_vitesse_gauche = regulation_vitesse_roue_folle_gauche(consigne_gauche, vitesse_croisiere_gauche);
@@ -87,13 +94,100 @@ void ligne_droite(int consigne, int vitesse, int sens)
     }
     float correction = kp_angle_correction * erreur_angle_correction + coeff_I_correction_angle * somme_integral_correction_angle;
 
-    consigne_regulation_vitesse_droite -= correction;
-    consigne_regulation_vitesse_gauche += correction;
+    // consigne_regulation_vitesse_droite -= correction;
+    // consigne_regulation_vitesse_gauche += correction;
 
     // asservissement_correction_angle(0, degrees(theta_robot));
-    Serial.printf(" correction %f", correction);
-    Serial.printf(" erreur_angle_correction %f", erreur_angle_correction);
+    // Serial.printf(" correction %f", correction);
+    // Serial.printf(" erreur_angle_correction %f", erreur_angle_correction);
 
-    Serial.printf(" consigne_regulation_vitesse_droite %.2f ", consigne_regulation_vitesse_droite);
-    Serial.printf(" consigne_regulation_vitesse_gauche %.2f ", consigne_regulation_vitesse_gauche);
+    // Serial.printf(" consigne_regulation_vitesse_droite %.2f ", consigne_regulation_vitesse_droite);
+    // Serial.printf(" consigne_regulation_vitesse_gauche %.2f ", consigne_regulation_vitesse_gauche);
+}
+
+void x_y_theta(float coordonnee_x, float coordonnee_y, float theta_fin, int vitesse)
+{
+
+    float hypothenuse = sqrt(pow(coordonnee_x, 2) + pow(coordonnee_y, 2));
+    // TOA : Tangente = Opposé / Adjacent.
+    double theta_rotation = degrees(atan2(coordonnee_y, coordonnee_x));
+
+    double theta_rotation_final = theta_fin - theta_rotation;
+    Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
+
+    // Serial.printf(" coordonnee_x %.3f ", coordonnee_x);
+    // Serial.printf(" coordonnee_y %.3f ", coordonnee_y);
+    // Serial.printf(" theta_fin %.3f ", theta_fin);
+    // Serial.printf(" ce qui rentre dans atan %.3f ", atan2(coordonnee_y, coordonnee_x));
+    // Serial.printf(" hypothenuse %.3f ", hypothenuse);
+    // Serial.printf(" theta_rotation %.3f deg", theta_rotation);
+    // Serial.printf(" theta_rotation_final %.3f deg", theta_rotation_final);
+    int sens = 0;
+    int time = 2000;
+    switch (etat_x_y_theta)
+    {
+    case -1:
+        break;
+    case 0:
+        if (theta_rotation > 0)
+        {
+            sens = 1;
+        }
+        if (theta_rotation < 0)
+        {
+            sens = -1;
+        }
+
+        rotation(fabs(convert_angle_deg_to_tick(theta_rotation)), vitesse, sens);
+
+        if (return_flag_asser_roue())
+        {
+
+            stop_motors();
+            etat_x_y_theta = 1;
+            lauch_flag_asser_roue(true);
+        }
+        break;
+
+    case 1:
+        if (hypothenuse > 0)
+        {
+            sens = 1;
+        }
+        if (hypothenuse < 0)
+        {
+            sens = -1;
+        }
+
+        ligne_droite(fabs(convert_distance_mm_to_tick(hypothenuse)), vitesse, sens);
+
+        if (return_flag_asser_roue())
+        {
+            stop_motors();
+
+            etat_x_y_theta = 2;
+            lauch_flag_asser_roue(true);
+        }
+        break;
+    case 2:
+        if (theta_rotation_final > 0)
+        {
+            sens = 1;
+        }
+        if (theta_rotation_final < 0)
+        {
+            sens = -1;
+        }
+        rotation(fabs(convert_angle_deg_to_tick(theta_rotation_final)), vitesse, sens);
+        if (return_flag_asser_roue())
+        {
+            stop_motors();
+
+            etat_x_y_theta = -1;
+        }
+        break;
+
+    default:
+        break;
+    }
 }

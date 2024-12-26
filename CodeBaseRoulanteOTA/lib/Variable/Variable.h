@@ -28,7 +28,7 @@
 #define COEFF_ROUE_DROITE 1
 #define COEFF_ROUE_GAUCHE 1
 #define SIZE_WHEEL_DIAMETER_mm 50.0
-extern float perimetre_robot ;
+extern float perimetre_robot;
 
 extern double theta_robot_prec;
 extern double theta_robot;
@@ -149,14 +149,17 @@ extern float consigne_regulation_vitesse_droite;
 extern float consigne_regulation_vitesse_gauche;
 
 //************************Freinage */
-extern float coeff_P_freinage ;
+extern float coeff_P_freinage;
 extern float coeff_D_freinage;
-extern float coeff_I_freinage ;
-extern float integral_limit_freinage ;
-extern float somme_erreur_freinage_roue_folle_droite ;
+extern float coeff_I_freinage;
+extern float integral_limit_freinage;
+extern float somme_erreur_freinage_roue_folle_droite;
 extern float erreur_prec_freinage_roue_folle_droite;
 extern float somme_erreur_freinage_roue_folle_gauche;
-extern float erreur_prec_freinage_roue_folle_gauche ;
+extern float erreur_prec_freinage_roue_folle_gauche;
+//************************Mouvement */
+
+extern int etat_x_y_theta;
 
 //***********OTA******************* */
 

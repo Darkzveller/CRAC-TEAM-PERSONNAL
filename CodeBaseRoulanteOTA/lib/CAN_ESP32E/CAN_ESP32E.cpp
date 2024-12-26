@@ -68,7 +68,7 @@ void setupCAN(int baudrate)
     {
         Serial.println("Erreur lors du démarrage de TWAI.");
     }
-    delay(5000);
+    // delay(5000);
 }
 
 void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, int data2, int data3, int data4, int data5, int data6)

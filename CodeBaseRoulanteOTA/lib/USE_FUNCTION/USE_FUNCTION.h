@@ -1,0 +1,11 @@
+#include <Arduino.h>
+
+#ifndef _USE_FUNCTION_H
+#define _USE_FUNCTION_H
+
+int fusion_octet(int octet0, int octet1);
+int convert_angle_deg_to_tick(float angle);
+int convert_distance_mm_to_tick(float distance);
+#endif
+
+

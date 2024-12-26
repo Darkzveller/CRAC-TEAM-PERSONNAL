@@ -14,5 +14,6 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne);
 void asservissement_freinage_roue_folle_gauche(float consigne, float observation);
 
 void asservissement_freinage_roue_folle_droite(float consigne, float observation);
-
+bool return_flag_asser_roue();
+void lauch_flag_asser_roue(bool mode);
 #endif
