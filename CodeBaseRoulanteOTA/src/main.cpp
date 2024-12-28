@@ -125,7 +125,7 @@ void controle(void *parameters)
             // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
             // Serial.println(" " + toStringD(etat_actuel_vit_roue_folle_droite));
 
-            x_y_theta(100, 100, 90, 100);
+            x_y_theta(liste.x, liste.y, liste.theta, liste.vitesse_x_y_theta);
 
             if (etat_x_y_theta == -1)
             {
@@ -188,10 +188,7 @@ void bus_can(void *parameters)
         case ESP32_RESTART:
             Serial.println("ESP32_RESTART");
             liste.general_purpose = TYPE_VIDE;
-            for (int i = 0; i < 1000; i++)
-            {
-                stop_motors();
-            }
+            stop_motors();
             esp_restart();
 
             break;
@@ -324,4 +321,4 @@ void setup()
 // Boucle principale, exécutée en continu après le setup
 void loop()
 {
-}
+} 
