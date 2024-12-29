@@ -61,7 +61,7 @@ extern float consigne_theta_prec;
 extern double odo_dist_gauche;
 extern double odo_dist_droit;
 //************Asservissement ROUE FOLLE EN TICK */
-#define SPEED_TORTUE 35
+#define SPEED_TORTUE 25
 #define SPEED_NORMAL 60
 #define SPEED_ULTRA  100
 extern float coeff_P_roue_folle_tick_gauche;
@@ -146,6 +146,10 @@ enum Etat_vitesse_roue_folle_gauche
   ETAT_VIDE_Vitesse_ROUE_FOLLE_GAUCHE
 };
 extern Etat_vitesse_roue_folle_gauche etat_actuel_vit_roue_folle_gauche;
+
+// Déclaration des fonctions de conversion
+String toStringG(Etat_vitesse_roue_folle_gauche etat);
+String toStringD(Etat_vitesse_roue_folle_droite etat);
 
 //************************Convitesse de vitesse */
 extern float consigne_regulation_vitesse_droite;

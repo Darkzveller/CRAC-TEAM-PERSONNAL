@@ -99,8 +99,8 @@ void ligne_droite(int consigne, int vitesse, int sens)
     }
     float correction = kp_angle_correction * erreur_angle_correction + coeff_I_correction_angle * somme_integral_correction_angle;
 
-    consigne_regulation_vitesse_droite -= correction;
-    consigne_regulation_vitesse_gauche += correction;
+    // consigne_regulation_vitesse_droite -= correction;
+    // consigne_regulation_vitesse_gauche += correction;
 
     // asservissement_correction_angle(0, degrees(theta_robot));
     // Serial.printf(" correction %f", correction);
@@ -118,37 +118,44 @@ void x_y_theta(float coordonnee_x, float coordonnee_y, float theta_fin, int vite
     double theta_rotation = degrees(atan2(coordonnee_y, coordonnee_x));
 
     double theta_rotation_final = theta_fin - theta_rotation;
-    Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
+    // Serial.printf(" Odo x %.3f ", odo_x);
+    // Serial.printf(" odo_y %.3f ", odo_y);
+    // Serial.printf(" teheta %.3f ", degrees(theta_robot));
+    // Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
 
     // Serial.printf(" coordonnee_x %.3f ", coordonnee_x);
     // Serial.printf(" coordonnee_y %.3f ", coordonnee_y);
     // Serial.printf(" theta_fin %.3f ", theta_fin);
+    // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
+    // Serial.println(" " + toStringD(etat_actuel_vit_roue_folle_droite));
+
     // Serial.printf(" ce qui rentre dans atan %.3f ", atan2(coordonnee_y, coordonnee_x));
     // Serial.printf(" hypothenuse %.3f ", hypothenuse);
     // Serial.printf(" theta_rotation %.3f deg", theta_rotation);
     // Serial.printf(" theta_rotation_final %.3f deg", theta_rotation_final);
+    // Serial.println();
     int sens = 0;
-    int time = 2000;
+    int time = 100;
     switch (etat_x_y_theta)
     {
     case -1:
         break;
     case 0:
-        if (theta_rotation > 0)
+        if (theta_rotation >= 0)
         {
             sens = 1;
         }
-        if (theta_rotation < 0)
+        else if (theta_rotation < 0)
         {
             sens = -1;
         }
 
-        rotation(fabs(convert_angle_deg_to_tick(theta_rotation)), vitesse, sens);
+        rotation(convert_angle_deg_to_tick(fabs(theta_rotation)), vitesse, sens);
 
         if (return_flag_asser_roue())
         {
-
             stop_motors();
+            delay(time);
             etat_x_y_theta = 1;
             lauch_flag_asser_roue(true);
         }
@@ -169,7 +176,7 @@ void x_y_theta(float coordonnee_x, float coordonnee_y, float theta_fin, int vite
         if (return_flag_asser_roue())
         {
             stop_motors();
-
+            delay(time);
             etat_x_y_theta = 2;
             lauch_flag_asser_roue(true);
         }
@@ -187,9 +194,15 @@ void x_y_theta(float coordonnee_x, float coordonnee_y, float theta_fin, int vite
         if (return_flag_asser_roue())
         {
             stop_motors();
-
+            delay(time);
             etat_x_y_theta = -1;
         }
+        break;
+
+    case 3:
+
+        consigne_regulation_vitesse_droite = consigne_odo_droite_prec;
+        consigne_regulation_vitesse_gauche = consigne_odo_gauche_prec;
         break;
 
     default:

@@ -9,6 +9,10 @@ int etat = 0;
 int data[10] = {0};
 int id = 0;
 int vitesse = 90;
+int x_low_byte, x_high_byte;
+int y_low_byte, y_high_byte;
+int t_low_byte, t_high_byte;
+
 void setup()
 {
   Serial.begin(921600);
@@ -117,33 +121,45 @@ void reception(char ch)
       sendCANMessage(LIGNE_DROITE, 0, 0, 4, highByte, lowByte, sens, vitesse, 0, 0, 0);
     }
 
-     if (commande == "X")
+    if (commande == "x")
     {
-      int8_t sens = 0;
       cmd = valeur.toInt();
-      if (cmd > 0)
-      {
-        if (cmd >= 1)
-        {
-          sens = 1;
-        }
-      }
-      else if (cmd < 0)
-      {
-        if (cmd <= -1)
-        {
-          sens = -1;
-        }
-      }
-      cmd = fabs(cmd);
+
       uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
       uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
-
-      Serial.printf("Send command Ligne with cons");
+      x_low_byte = lowByte;
+      x_high_byte = highByte;
+      Serial.printf("Send command X with cons");
       Serial.printf(" cmd %d", cmd);
-      Serial.printf(" sens %d", sens);
       Serial.println();
-      sendCANMessage(XYT, 0, 0, 4, highByte, lowByte, sens, vitesse, 0, 0, 0);
+    }
+
+    if (commande == "y")
+    {
+      cmd = valeur.toInt();
+
+      uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
+      uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
+      y_low_byte = lowByte;
+      y_high_byte = highByte;
+
+      Serial.printf("Send command y with cons");
+      Serial.printf(" cmd %d", cmd);
+      Serial.println();
+    }
+    if (commande == "t")
+    {
+      cmd = valeur.toInt();
+
+      uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
+      uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
+      t_low_byte = lowByte;
+      t_high_byte = highByte;
+
+      Serial.printf("Send command t with cons");
+      Serial.printf(" cmd %d", cmd);
+      Serial.println();
+      sendCANMessage(XYTHETA, 0, 0, 4, x_high_byte, x_low_byte, y_high_byte, y_low_byte, t_high_byte, t_low_byte, 0);
     }
     if (commande == "RESTART")
     {

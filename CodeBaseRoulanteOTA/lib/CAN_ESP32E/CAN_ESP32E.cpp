@@ -175,7 +175,9 @@ bool messageCANForMe(uint16_t ID)
     case IMMOBILE:
         return true;
         break;
-
+    case XYTHETA:
+        return true;
+        break;
     case RECALAGE:
         return true;
         break;
@@ -184,5 +186,5 @@ bool messageCANForMe(uint16_t ID)
         return false;
         break;
     }
-return false;
+    return false;
 }

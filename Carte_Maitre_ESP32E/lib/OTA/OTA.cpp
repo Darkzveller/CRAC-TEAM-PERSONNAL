@@ -5,7 +5,9 @@
 // Je laisse le routeur choisir l'adresse IP et
 // je fixe le nom de mon réseau Wi-Fi, ce qui simplifie les démarches, notamment lors des débogages
 //  Informations de connexion WiFi
-
+extern int x_low_byte, x_high_byte;
+extern int y_low_byte, y_high_byte;
+extern int t_low_byte, t_high_byte;
 #define MON_TELEPHONE
 // #define MA_FREEBOX
 // #define MON_PC
@@ -273,6 +275,49 @@ void receptionWIFI(char ch)
       Serial.println();
 
       sendCANMessage(LIGNE_DROITE, 0, 0, 4, highByte, lowByte, sens, 0x7B, 0, 0, 0);
+    }
+    if (commande == "x")
+    {
+      cmd = valeur.toInt();
+
+      uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
+      uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
+      x_low_byte = lowByte;
+      x_high_byte = highByte;      TelnetStream.println();
+
+      TelnetStream.printf("Send command X with cons");
+      TelnetStream.printf(" cmd %d", cmd);
+      TelnetStream.println();
+    }
+
+    if (commande == "y")
+    {
+      cmd = valeur.toInt();
+
+      uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
+      uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
+      y_low_byte = lowByte;
+      y_high_byte = highByte;
+      TelnetStream.println();
+
+      TelnetStream.printf("Send command y with cons");
+      TelnetStream.printf(" cmd %d", cmd);
+      TelnetStream.println();
+    }
+    if (commande == "t")
+    {
+      cmd = valeur.toInt();
+
+      uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
+      uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
+      t_low_byte = lowByte;
+      t_high_byte = highByte;
+      TelnetStream.println();
+
+      TelnetStream.printf("Send command t with cons");
+      TelnetStream.printf(" cmd %d", cmd);
+      TelnetStream.println();
+      sendCANMessage(XYTHETA, 0, 0, 4, x_high_byte, x_low_byte, y_high_byte, y_low_byte, t_high_byte, t_low_byte, 0);
     }
     if (commande == "RESTART")
     {

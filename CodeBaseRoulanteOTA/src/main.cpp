@@ -19,49 +19,6 @@ int time_wait = 5000;
 bool inverter_mouv_order = 0;
 float seuil_recalage = 500;
 
-// Fonction pour convertir un état en texte
-String toStringG(Etat_vitesse_roue_folle_gauche etat)
-{
-    switch (etat)
-    {
-    case ETAT_ATTENTE_Vitesse_ROUE_FOLLE_GAUCHE:
-        return "ETAT_ATTENTE_Vitesse_ROUE_FOLLE_GAUCHE";
-
-    case ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_GAUCHE:
-        return "ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_GAUCHE";
-    case ETAT_CROISIERE_Vitesse_ROUE_FOLLE_GAUCHE:
-        return "ETAT_CROISIERE_Vitesse_ROUE_FOLLE_GAUCHE";
-    case ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE:
-        return "ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE";
-    case ETAT_ARRET_Vitesse_ROUE_FOLLE_GAUCHE:
-        return "ETAT_ARRET_Vitesse_ROUE_FOLLE_GAUCHE";
-    case ETAT_VIDE_Vitesse_ROUE_FOLLE_GAUCHE:
-        return "ETAT_VIDE_Vitesse_ROUE_FOLLE_GAUCHE";
-    default:
-        return "ETAT_INCONNU";
-    }
-}
-String toStringD(Etat_vitesse_roue_folle_droite etat)
-{
-    switch (etat)
-    {
-    case ETAT_ATTENTE_Vitesse_ROUE_FOLLE_DROITE:
-        return "ETAT_ATTENTE_Vitesse_ROUE_FOLLE_DROITE";
-    case ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE:
-        return "ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE";
-    case ETAT_CROISIERE_Vitesse_ROUE_FOLLE_DROITE:
-        return "ETAT_CROISIERE_Vitesse_ROUE_FOLLE_DROITE";
-    case ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE:
-        return "ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE";
-    case ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE:
-        return "ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE";
-    case ETAT_VIDE_Vitesse_ROUE_FOLLE_DROITE:
-        return "ETAT_VIDE_Vitesse_ROUE_FOLLE_DROITE";
-    default:
-        return "ETAT_INCONNU";
-    }
-}
-
 struct Ordre_deplacement
 {
     int general_purpose;
@@ -126,7 +83,7 @@ void controle(void *parameters)
             break;
         case TYPE_DEPLACEMENT_X_Y_THETA:
 
-            // x_y_theta(liste.x, liste.y, liste.theta, liste.vitesse_x_y_theta);
+            x_y_theta(liste.x, liste.y, liste.theta, SPEED_TORTUE);
 
             if (etat_x_y_theta == -1)
             {
@@ -204,12 +161,12 @@ void bus_can(void *parameters)
 
             lauch_flag_asser_roue(true);
             rxMsg.id = 0;
-            Serial.printf("ROTATION ");
-            Serial.printf(" angle %f ", (float)fusion_octet(rxMsg.data[0], rxMsg.data[1]));
-            Serial.printf(" liste.angle %f", (float)liste.angle);
-            Serial.println();
-            Serial.printf(" sens_rotation %d ", liste.sens_rotation);
-            Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
+            // Serial.printf("ROTATION ");
+            // Serial.printf(" angle %f ", (float)fusion_octet(rxMsg.data[0], rxMsg.data[1]));
+            // Serial.printf(" liste.angle %f", (float)liste.angle);
+            // Serial.println();
+            // Serial.printf(" sens_rotation %d ", liste.sens_rotation);
+            // Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
 
             break;
 
@@ -238,22 +195,22 @@ void bus_can(void *parameters)
 
             flag_fin_mvt = false;
 
-            // liste.general_purpose = TYPE_DEPLACEMENT_X_Y_THETA;
-            liste.x = convert_distance_mm_to_tick(fusion_octet(rxMsg.data[0], rxMsg.data[1]));
-            liste.y = convert_distance_mm_to_tick(fusion_octet(rxMsg.data[2], rxMsg.data[3]));
-            liste.theta = convert_angle_deg_to_tick(fusion_octet(rxMsg.data[3], rxMsg.data[4]));
+            liste.general_purpose = TYPE_DEPLACEMENT_X_Y_THETA;
+            liste.x = fusion_octet(rxMsg.data[0], rxMsg.data[1]);
+            liste.y = fusion_octet(rxMsg.data[2], rxMsg.data[3]);
+            liste.theta = fusion_octet(rxMsg.data[4], rxMsg.data[5]);
 
             // liste.vitesse_croisiere = rxMsg.data[3];
             lauch_flag_asser_roue(true);
 
             rxMsg.id = 0;
 
-            Serial.printf("LIGNE_DROITE ");
-            Serial.printf(" liste.x %d ", liste.x);
-            Serial.printf(" liste.y %d ", liste.y);
-            Serial.printf(" liste.theta %d ", liste.theta);
+            // Serial.printf(" XYTHETA ");
+            // Serial.printf(" liste.x %d ", liste.x);
+            // Serial.printf(" liste.y %d ", liste.y);
+            // Serial.printf(" liste.theta %d ", liste.theta);
 
-            Serial.println();
+            // Serial.println();
 
             break;
         case 0:
@@ -272,7 +229,7 @@ void setup()
 { // calcul coeff filtre
     // delay(10000);
     // Initialisation de la communication série à 115200 bauds
-    Serial.begin(921600);
+    Serial.begin(115200);
     // Serial.println("Booting with OTA"); // Message indiquant le démarrage avec OTA
     // Appel à la fonction de configuration OTA (non définie dans ce code, mais probablement ailleurs)
     // setupOTA();
@@ -330,17 +287,12 @@ void setup()
 // Boucle principale, exécutée en continu après le setup
 void loop()
 {
-    // Serial.printf(" consigne_dist_gauche %.3f ", consigne_dist_gauche);
+    Serial.printf(" Odo x %.3f ", odo_x);
+    Serial.printf(" odo_y %.3f ", odo_y);
+    Serial.printf(" teheta %.3f ", degrees(theta_robot));
+    Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
+    Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
+    Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
 
-    // Serial.printf(" consigne_dist_gauche %.3f ", consigne_dist_gauche);
-    // Serial.printf(" consigne_vit_droite %.3f ", consigne_vit_droite);
-
-    // Serial.printf(" consigne_dist_droite %.3f ", consigne_dist_droite);
-
-    // Serial.printf(" Odo x %.3f ", odo_x);
-    // Serial.printf(" odo_y %.3f ", odo_y);
-    // Serial.printf(" teheta %.3f ", degrees(theta_robot));
-    // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
-    // Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
-    // Serial.println();
+    Serial.println();
 }

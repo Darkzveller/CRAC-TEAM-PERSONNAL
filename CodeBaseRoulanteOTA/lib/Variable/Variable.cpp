@@ -49,7 +49,7 @@ float Vmax = 200;
 float Amax = 50;
 // float Dmax = 2.5;
 float Dmax =2.5;
-float limit_reprise_asser = 15;
+float limit_reprise_asser = 250;
 
 float acc_actuel_droite = 0;
 double consigne_vit_droite = 0;
@@ -91,6 +91,45 @@ bool start_asservissement_roue_droite = true;
 
 Etat_vitesse_roue_folle_droite etat_actuel_vit_roue_folle_droite = ETAT_ATTENTE_Vitesse_ROUE_FOLLE_DROITE;
 Etat_vitesse_roue_folle_gauche etat_actuel_vit_roue_folle_gauche = ETAT_ATTENTE_Vitesse_ROUE_FOLLE_GAUCHE;
+// Fonction pour convertir un état en texte (roue folle gauche)
+String toStringG(Etat_vitesse_roue_folle_gauche etat) {
+    switch (etat) {
+    case ETAT_ATTENTE_Vitesse_ROUE_FOLLE_GAUCHE:
+        return "ETAT_ATTENTE_Vitesse_ROUE_FOLLE_GAUCHE";
+    case ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_GAUCHE:
+        return "ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_GAUCHE";
+    case ETAT_CROISIERE_Vitesse_ROUE_FOLLE_GAUCHE:
+        return "ETAT_CROISIERE_Vitesse_ROUE_FOLLE_GAUCHE";
+    case ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE:
+        return "ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE";
+    case ETAT_ARRET_Vitesse_ROUE_FOLLE_GAUCHE:
+        return "ETAT_ARRET_Vitesse_ROUE_FOLLE_GAUCHE";
+    case ETAT_VIDE_Vitesse_ROUE_FOLLE_GAUCHE:
+        return "ETAT_VIDE_Vitesse_ROUE_FOLLE_GAUCHE";
+    default:
+        return "ETAT_INCONNU";
+    }
+}
+
+// Fonction pour convertir un état en texte (roue folle droite)
+String toStringD(Etat_vitesse_roue_folle_droite etat) {
+    switch (etat) {
+    case ETAT_ATTENTE_Vitesse_ROUE_FOLLE_DROITE:
+        return "ETAT_ATTENTE_Vitesse_ROUE_FOLLE_DROITE";
+    case ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE:
+        return "ETAT_ACCELERATION_Vitesse_ROUE_FOLLE_DROITE";
+    case ETAT_CROISIERE_Vitesse_ROUE_FOLLE_DROITE:
+        return "ETAT_CROISIERE_Vitesse_ROUE_FOLLE_DROITE";
+    case ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE:
+        return "ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE";
+    case ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE:
+        return "ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE";
+    case ETAT_VIDE_Vitesse_ROUE_FOLLE_DROITE:
+        return "ETAT_VIDE_Vitesse_ROUE_FOLLE_DROITE";
+    default:
+        return "ETAT_INCONNU";
+    }
+}
 
 //************************Consigne de vitesse */
 float consigne_regulation_vitesse_droite = 0;
