@@ -21,5 +21,11 @@ int convert_angle_deg_to_tick(float angle)
 int convert_distance_mm_to_tick(float distance)
 {
 
-    int consigne_roue_odo = distance * (TIC_PER_TOUR / (2 * M_PI * SIZE_WHEEL_DIAMETER_mm / 2.0)); return consigne_roue_odo;
+    int consigne_roue_odo = distance * (TIC_PER_TOUR / (2 * M_PI * SIZE_WHEEL_DIAMETER_mm / 2.0));
+    return consigne_roue_odo;
+}
+void pourcentage_erreur(float val_theorique, float valeur_experimentale)
+{
+    float pourcent_mes = 100*((val_theorique)-valeur_experimentale)/(val_theorique);
+    Serial.print(pourcent_mes);
 }

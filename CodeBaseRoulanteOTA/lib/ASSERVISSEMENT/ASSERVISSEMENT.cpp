@@ -139,7 +139,7 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
     float decc = Dmax;
 
     double Vrob = (delta_droit) / Te;
-
+    float distance_restante;
     float Ta = vit / accel;
     float Td = vit / decc;
     float Tc = (2.0 * cons - accel * (Ta * Ta + Td * Td)) / (2 * vit);
@@ -222,67 +222,38 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
         break;
 
     case ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE:
-        /* if (consigne_vit_droite > 0)
-         {
-             // Active le freinage dans le sens avant
-             freinage_moteur_droit(true, -1 * consigne_vit_droite);
+        distance_restante = cons - odo_tick_droit;
+        consigne_vit_droite = Vrob + acc_actuel_droite * Te;
+        consigne_dist_droite = odo_tick_droit + consigne_vit_droite * Te;
 
-             // Diminue progressivement la vitesse consigne
-             consigne_vit_droite -= decc * Te;
-
-             // Assure que la consigne de vitesse ne descend pas en dessous de zéro
-             if (consigne_vit_droite <= 0)
-             {
-                 consigne_vit_droite = 0;
-             }
-         }
-         else if (consigne_vit_droite < 0)
-         {
-             // Active le freinage dans le sens arrière
-             freinage_moteur_droit(true, -1 * consigne_vit_droite);
-
-             // Augmente progressivement la vitesse consigne vers zéro
-             consigne_vit_droite += decc * Te;
-
-             // Assure que la consigne de vitesse ne dépasse pas zéro
-             if (consigne_vit_droite >= 0)
-             {
-                 consigne_vit_droite = 0;
-             }
-         }
- */
-        /*acc_actuel_droite = acc_actuel_droite - commande_vit * Te;
-        if (decc > 0)
+        if (consigne_dist_droite > 0)
         {
-            if (acc_actuel_droite < 0)
+            // Diminue progressivement la vitesse consigne
+            consigne_dist_droite -= decc * Te;
+            // Active le freinage dans le sens avant
+            freinage_moteur_droit(true, consigne_dist_droite);
+
+            // Assure que la consigne de vitesse ne descend pas en dessous de zéro
+            if (consigne_dist_droite <= 0)
             {
-                acc_actuel_droite = 0;
+                consigne_dist_droite = 0;
             }
         }
-        else if (decc < 0)
+        else if (consigne_dist_droite < 0)
         {
 
-            if (acc_actuel_droite > 0)
+            // Augmente progressivement la vitesse consigne vers zéro
+            consigne_dist_droite += decc * Te;
+            // Active le freinage dans le sens arrière
+            freinage_moteur_droit(true, consigne_dist_droite);
+
+            // Assure que la consigne de vitesse ne dépasse pas zéro
+            if (consigne_dist_droite >= 0)
             {
-                acc_actuel_droite = 0;
+                consigne_dist_droite = 0;
             }
         }
 
-        consigne_vit_droite = Vrob - acc_actuel_droite * Te;
-
-        if (consigne_vit_droite > Vmax_consigne)
-        {
-            consigne_vit_droite = Vmax_consigne;
-        }
-        else if (consigne_vit_droite < -Vmax_consigne)
-        {
-            consigne_vit_droite = Vmax_consigne;
-        }
-        // Met à jour la consigne de distance
-        consigne_dist_droite = odo_tick_droit + consigne_vit_droite * Te;*/
-        // asservissement_freinage_roue_folle_droite(cons, odo_tick_droit);
-        stop_moteur_droit();
-        // Transition vers l'état d'arrêt si proche de la consigne
         if (((cons - odo_tick_droit) < limit_reprise_asser) && ((cons - odo_tick_droit) > -limit_reprise_asser))
         {
             etat_actuel_vit_roue_folle_droite = ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE;
@@ -330,13 +301,15 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
     float decc = Dmax;
 
     double Vrob = (delta_gauche) / Te;
+    float distance_restante;
+    float vitesse_cible;
 
     float Ta = vit / accel;
     float Td = vit / decc;
     float Tc = (2.0 * cons - accel * (Ta * Ta + Td * Td)) / (2 * vit);
     distance_accel_gauche = 0.5 * Ta * Ta * accel;
     distance_decl_gauche = 0.5 * Td * Td * decc;
-
+    // Serial.printf("distnace decc gauche %f ", distance_decl_gauche);
     erreur_vit = vit - (Vrob * Vmax);
     somme_erreur_vit_roue_folle_gauche += erreur_vit * Te;
 
@@ -418,42 +391,41 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
         break;
 
     case ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE:
-        /* if (consigne_vit_gauche > 0)
-         {
-             // Active le freinage dans le sens avant
-             freinage_moteur_gauche(true, -1 * consigne_vit_gauche);
 
-             // Diminue progressivement la vitesse consigne
-             consigne_vit_gauche -= (decc * Te);
+        distance_restante = cons - odo_tick_gauche;
+        // acc_actuel_gauche = acc_actuel_gauche - commande_vit * Te;
+        consigne_vit_gauche = Vrob - acc_actuel_gauche * Te;
+        consigne_dist_gauche = odo_tick_gauche + consigne_vit_gauche * Te;
 
-             // Assure que la consigne de vitesse ne descend pas en dessous de zéro
-             if (consigne_vit_gauche <= 0)
-             {
-                 consigne_vit_gauche = 0;
-             }
-         }
-         else if (consigne_vit_gauche < 0)
-         {
-             // Active le freinage dans le sens arrière
-             freinage_moteur_gauche(true, -1 * consigne_vit_gauche);
+        if (consigne_dist_gauche > 0)
+        {
 
-             // Augmente progressivement la vitesse consigne vers zéro
-             consigne_vit_gauche += (decc * Te);
+            // Diminue progressivement la vitesse consigne
+            consigne_dist_gauche -= decc * Te;
+            // Active le freinage dans le sens avant
+            freinage_moteur_droit(true, consigne_dist_gauche);
 
-             // Assure que la consigne de vitesse ne dépasse pas zéro
-             if (consigne_vit_gauche >= 0)
-             {
-                 consigne_vit_gauche = 0;
-             }
-         }
+            // Assure que la consigne de vitesse ne descend pas en dessous de zéro
+            if (consigne_dist_gauche <= 0)
+            {
+                consigne_dist_gauche = 0;
+            }
+        }
+        else if (consigne_dist_gauche < 0)
+        {
 
-         // Met à jour la consigne de distance
-         consigne_dist_gauche = odo_tick_gauche + consigne_vit_gauche * Te;
- */
-        // asservissement_freinage_roue_folle_gauche(cons, odo_tick_droit);
-        stop_moteur_gauche();
+            // Augmente progressivement la vitesse consigne vers zéro
+            consigne_dist_gauche += decc * Te;
+            // Active le freinage dans le sens arrière
+            freinage_moteur_droit(true, consigne_dist_gauche);
 
-        // Transition vers l'état d'arrêt si proche de la consigne
+            // Assure que la consigne de vitesse ne dépasse pas zéro
+            if (consigne_dist_gauche >= 0)
+            {
+                consigne_dist_gauche = 0;
+            }
+        }
+
         if (((cons - odo_tick_gauche) < limit_reprise_asser) && ((cons - odo_tick_gauche) > -limit_reprise_asser))
         {
             etat_actuel_vit_roue_folle_gauche = ETAT_ARRET_Vitesse_ROUE_FOLLE_GAUCHE;
@@ -555,6 +527,7 @@ void asservissement_freinage_roue_folle_gauche(float consigne, float observation
 
     double resolution_calculer = (pow(2, resolution_pwm) - 1) * POURCENT_MAX_PWM;
     double erreur = consigne - observation;
+    Serial.printf(" erreur %f ", erreur);
     double proportionnel = erreur * coeff_P_freinage;
 
     double deriver = coeff_D_freinage * (erreur - erreur_prec_roue_folle_gauche_tick) / Te;
@@ -601,6 +574,8 @@ void asservissement_freinage_roue_folle_gauche(float consigne, float observation
             sortie_roue_folle = -commande;
         }
     }
+    Serial.printf(" sortie_roue_folle %f ", sortie_roue_folle);
+
     freinage_moteur_gauche(true, sortie_roue_folle);
 }
 

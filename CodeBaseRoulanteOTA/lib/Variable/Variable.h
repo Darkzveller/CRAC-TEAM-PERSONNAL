@@ -2,6 +2,7 @@
 
 #ifndef Variable_H
 #define Variable_H
+extern float tension_bat ;
 // Parametre FreeRTOS
 #define Te 5
 #define Tcan 10
@@ -60,7 +61,9 @@ extern float consigne_theta_prec;
 extern double odo_dist_gauche;
 extern double odo_dist_droit;
 //************Asservissement ROUE FOLLE EN TICK */
-
+#define SPEED_TORTUE 35
+#define SPEED_NORMAL 60
+#define SPEED_ULTRA  100
 extern float coeff_P_roue_folle_tick_gauche;
 extern float coeff_D_roue_folle_tick_gauche;
 extern float coeff_I_roue_folle_tick_gauche;

@@ -15,7 +15,14 @@ void rotation(int consigne, int vitesse, int sens)
 
     // int consigne_gauche = consigne - consigne_odo_gauche_prec;
     // int consigne_droite = consigne - consigne_odo_droite_prec;
-
+    if (sens >= 1)
+    {
+        sens = 1;
+    }
+    else if (sens <= -1)
+    {
+        sens = -1;
+    }
     float vitesse_croisiere_gauche = vitesse * sens;
     float vitesse_croisiere_droit = vitesse * -sens;
 
@@ -23,8 +30,6 @@ void rotation(int consigne, int vitesse, int sens)
     int consigne_droite = consigne * -sens;
     consigne_gauche = (consigne_gauche + consigne_odo_gauche_prec);
     consigne_droite = (consigne_droite + consigne_odo_droite_prec);
-    // Serial.printf(" consigne_gauche %d ", consigne_gauche);
-    // Serial.printf(" consigne_droite %d ", consigne_droite);
 
     // Serial.printf(" vitesse_croisiere_gauche %.0f ", vitesse_croisiere_gauche);
     // Serial.printf(" vitesse_croisiere_droit %.0f ", vitesse_croisiere_droit);
@@ -94,8 +99,8 @@ void ligne_droite(int consigne, int vitesse, int sens)
     }
     float correction = kp_angle_correction * erreur_angle_correction + coeff_I_correction_angle * somme_integral_correction_angle;
 
-    // consigne_regulation_vitesse_droite -= correction;
-    // consigne_regulation_vitesse_gauche += correction;
+    consigne_regulation_vitesse_droite -= correction;
+    consigne_regulation_vitesse_gauche += correction;
 
     // asservissement_correction_angle(0, degrees(theta_robot));
     // Serial.printf(" correction %f", correction);

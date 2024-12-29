@@ -18,6 +18,7 @@ int vitesse_rot = 120;
 int time_wait = 5000;
 bool inverter_mouv_order = 0;
 float seuil_recalage = 500;
+
 // Fonction pour convertir un état en texte
 String toStringG(Etat_vitesse_roue_folle_gauche etat)
 {
@@ -77,7 +78,7 @@ struct Ordre_deplacement
     int theta;
     int vitesse_x_y_theta;
 };
-Ordre_deplacement liste = {TYPE_DEPLACEMENT_X_Y_THETA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+Ordre_deplacement liste = {TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 void controle(void *parameters)
 {
@@ -89,6 +90,7 @@ void controle(void *parameters)
         switch (liste.general_purpose)
         {
         case TYPE_DEPLACEMENT_LIGNE_DROITE:
+            liste.vitesse_croisiere = SPEED_TORTUE;
 
             ligne_droite(liste.distance, liste.vitesse_croisiere, liste.sens_ligne_droite);
             // Serial.printf("TYPE_DEPLACEMENT_LIGNE_DROITE");
@@ -103,6 +105,7 @@ void controle(void *parameters)
         case TYPE_DEPLACEMENT_ROTATION:
 
             // Serial.printf("TYPE_DEPLACEMENT_ROTATION");
+            liste.vitesse_croisiere = SPEED_TORTUE;
             rotation(liste.angle, liste.vitesse_croisiere, liste.sens_rotation);
 
             if (return_flag_asser_roue())
@@ -122,10 +125,8 @@ void controle(void *parameters)
 
             break;
         case TYPE_DEPLACEMENT_X_Y_THETA:
-            // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
-            // Serial.println(" " + toStringD(etat_actuel_vit_roue_folle_droite));
 
-            x_y_theta(liste.x, liste.y, liste.theta, liste.vitesse_x_y_theta);
+            // x_y_theta(liste.x, liste.y, liste.theta, liste.vitesse_x_y_theta);
 
             if (etat_x_y_theta == -1)
             {
@@ -143,10 +144,6 @@ void controle(void *parameters)
         }
         asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
         asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
-        Serial.printf(" Odo x %.3f ", odo_x);
-        Serial.printf(" odo_y %.3f ", odo_y);
-        Serial.printf(" teheta %.3f ", degrees(theta_robot));
-        Serial.println();
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
     }
 }
@@ -194,46 +191,36 @@ void bus_can(void *parameters)
             break;
 
         case ROTATION:
-        {
             flag_fin_mvt = false;
             // Pour se simplifier j'ai préférer décomposer les etapes quitte a prendre un peu plus de temps cpu
-            int16_t angle = fusion_octet(rxMsg.data[0], rxMsg.data[1]);
-            int8_t sens_rotation = rxMsg.data[2];
-            int8_t vitesse = rxMsg.data[3];
 
             liste.general_purpose = TYPE_DEPLACEMENT_ROTATION;
-            float distance_a_faire_en_mm = angle * perimetre_robot / 360;
-            float consigne_roue_odo = distance_a_faire_en_mm * (TIC_PER_TOUR / (2 * M_PI * SIZE_WHEEL_DIAMETER_mm / 2.0));
-            liste.angle = consigne_roue_odo;
+
             // liste.angle = TIC_PER_TOUR * angle / 80.0;
 
-            liste.sens_rotation = sens_rotation;
-            liste.vitesse_croisiere = vitesse;
+            liste.angle = convert_angle_deg_to_tick(fusion_octet(rxMsg.data[0], rxMsg.data[1]));
+            liste.sens_rotation = (int8_t)rxMsg.data[2];
+            liste.vitesse_croisiere = rxMsg.data[3];
+
             lauch_flag_asser_roue(true);
             rxMsg.id = 0;
-            // Serial.printf("ROTATION ");
-            // Serial.printf(" angle %f ", (float)angle);
-            // Serial.printf(" liste.angle %f", (float)liste.angle);
-            // Serial.println();
-            // Serial.printf(" sens_rotation %d ", liste.sens_rotation);
-            // Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
-            // Serial.println();
-        }
-        break;
+            Serial.printf("ROTATION ");
+            Serial.printf(" angle %f ", (float)fusion_octet(rxMsg.data[0], rxMsg.data[1]));
+            Serial.printf(" liste.angle %f", (float)liste.angle);
+            Serial.println();
+            Serial.printf(" sens_rotation %d ", liste.sens_rotation);
+            Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
+
+            break;
 
         case LIGNE_DROITE:
 
-        {
             flag_fin_mvt = false;
-            // Pour se simplifier j'ai préférer décomposer les etapes quitte a prendre un peu plus de temps cpu
-            double distance = fusion_octet(rxMsg.data[0], rxMsg.data[1]);
-            int8_t sens_ligne_droite = rxMsg.data[2];
-            int8_t vitesse = rxMsg.data[3];
 
             liste.general_purpose = TYPE_DEPLACEMENT_LIGNE_DROITE;
-            liste.distance = distance * (TIC_PER_TOUR / (2 * M_PI * SIZE_WHEEL_DIAMETER_mm / 2.0));
-            liste.sens_ligne_droite = sens_ligne_droite;
-            liste.vitesse_croisiere = vitesse;
+            liste.distance = convert_distance_mm_to_tick(fusion_octet(rxMsg.data[0], rxMsg.data[1]));
+            liste.sens_ligne_droite = (int8_t)rxMsg.data[2];
+            liste.vitesse_croisiere = rxMsg.data[3];
             lauch_flag_asser_roue(true);
 
             rxMsg.id = 0;
@@ -244,9 +231,31 @@ void bus_can(void *parameters)
             // Serial.printf(" liste.sens_ligne_droite %d ", liste.sens_ligne_droite);
             // Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
             // Serial.println();
-        }
 
-        break;
+            break;
+
+        case XYTHETA:
+
+            flag_fin_mvt = false;
+
+            // liste.general_purpose = TYPE_DEPLACEMENT_X_Y_THETA;
+            liste.x = convert_distance_mm_to_tick(fusion_octet(rxMsg.data[0], rxMsg.data[1]));
+            liste.y = convert_distance_mm_to_tick(fusion_octet(rxMsg.data[2], rxMsg.data[3]));
+            liste.theta = convert_angle_deg_to_tick(fusion_octet(rxMsg.data[3], rxMsg.data[4]));
+
+            // liste.vitesse_croisiere = rxMsg.data[3];
+            lauch_flag_asser_roue(true);
+
+            rxMsg.id = 0;
+
+            Serial.printf("LIGNE_DROITE ");
+            Serial.printf(" liste.x %d ", liste.x);
+            Serial.printf(" liste.y %d ", liste.y);
+            Serial.printf(" liste.theta %d ", liste.theta);
+
+            Serial.println();
+
+            break;
         case 0:
 
             break;
@@ -263,10 +272,10 @@ void setup()
 { // calcul coeff filtre
     // delay(10000);
     // Initialisation de la communication série à 115200 bauds
-    Serial.begin(115200);
+    Serial.begin(921600);
     // Serial.println("Booting with OTA"); // Message indiquant le démarrage avec OTA
     // Appel à la fonction de configuration OTA (non définie dans ce code, mais probablement ailleurs)
-    setupOTA();
+    // setupOTA();
     // Initialisation des moteurs
     setup_motors();
     stop_motors();
@@ -321,4 +330,17 @@ void setup()
 // Boucle principale, exécutée en continu après le setup
 void loop()
 {
-} 
+    // Serial.printf(" consigne_dist_gauche %.3f ", consigne_dist_gauche);
+
+    // Serial.printf(" consigne_dist_gauche %.3f ", consigne_dist_gauche);
+    // Serial.printf(" consigne_vit_droite %.3f ", consigne_vit_droite);
+
+    // Serial.printf(" consigne_dist_droite %.3f ", consigne_dist_droite);
+
+    // Serial.printf(" Odo x %.3f ", odo_x);
+    // Serial.printf(" odo_y %.3f ", odo_y);
+    // Serial.printf(" teheta %.3f ", degrees(theta_robot));
+    // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
+    // Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
+    // Serial.println();
+}

@@ -11,7 +11,7 @@ int id = 0;
 int vitesse = 90;
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(921600);
   Serial.printf("CACA");
   setupCAN(1000E3);
   setupOTA();
@@ -115,6 +115,35 @@ void reception(char ch)
       Serial.printf(" sens %d", sens);
       Serial.println();
       sendCANMessage(LIGNE_DROITE, 0, 0, 4, highByte, lowByte, sens, vitesse, 0, 0, 0);
+    }
+
+     if (commande == "X")
+    {
+      int8_t sens = 0;
+      cmd = valeur.toInt();
+      if (cmd > 0)
+      {
+        if (cmd >= 1)
+        {
+          sens = 1;
+        }
+      }
+      else if (cmd < 0)
+      {
+        if (cmd <= -1)
+        {
+          sens = -1;
+        }
+      }
+      cmd = fabs(cmd);
+      uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
+      uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
+
+      Serial.printf("Send command Ligne with cons");
+      Serial.printf(" cmd %d", cmd);
+      Serial.printf(" sens %d", sens);
+      Serial.println();
+      sendCANMessage(XYT, 0, 0, 4, highByte, lowByte, sens, vitesse, 0, 0, 0);
     }
     if (commande == "RESTART")
     {
