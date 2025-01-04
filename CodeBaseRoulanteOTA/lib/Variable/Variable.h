@@ -50,6 +50,9 @@ extern float consigne_odo_droite_prec;
 extern float consigne_odo_gauche_prec;
 extern float consigne_theta_prec;
 
+extern double consigne_odo_x_prec;
+extern double consigne_odo_y_prec;
+
 #define PIN_ENCODEUR_1 23
 #define PIN_ENCODEUR_2 22
 
@@ -167,6 +170,9 @@ extern float erreur_prec_freinage_roue_folle_gauche;
 //************************Mouvement */
 
 extern int etat_x_y_theta;
+extern double theta_premiere_rotation;
+extern double theta_deuxieme_rotation;
+extern float vitesse_moyenne ;
 
 //***********OTA******************* */
 

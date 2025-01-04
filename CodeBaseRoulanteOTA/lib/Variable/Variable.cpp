@@ -25,6 +25,8 @@ float consigne_odo_droite_prec = 0;
 float consigne_odo_gauche_prec = 0;
 float consigne_theta_prec = 0;
 
+double consigne_odo_x_prec =0;
+double consigne_odo_y_prec =0;
 // Variable asservissement
 //************Asservissement ROUE FOLLE EN TICK */
 
@@ -149,13 +151,17 @@ float erreur_prec_freinage_roue_folle_gauche = 0;
 
 int etat_x_y_theta = 0;
 
+double theta_premiere_rotation=0;
+double theta_deuxieme_rotation=0;
+float vitesse_moyenne = 0;
+
 //***********OTA******************* */
 
 bool flag_controle = false;
 
 //***********CAN******************* */
 
-CANMessage rxMsg; // data received by CAN to control the robot
+CANMessage rxMsg;
 int etat_lecture_can;
 unsigned char FIFO_ecriture = 0;
 signed char FIFO_lecture = 0;

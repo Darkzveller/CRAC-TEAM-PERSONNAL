@@ -254,7 +254,7 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
             }
         }
 
-        if (((cons - odo_tick_droit) < limit_reprise_asser) && ((cons - odo_tick_droit) > -limit_reprise_asser))
+        if (((cons - odo_tick_droit) < limit_reprise_asser) || ((cons - odo_tick_droit) > -limit_reprise_asser))
         {
             etat_actuel_vit_roue_folle_droite = ETAT_ARRET_Vitesse_ROUE_FOLLE_DROITE;
             stop_moteur_droit();
@@ -426,7 +426,7 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
             }
         }
 
-        if (((cons - odo_tick_gauche) < limit_reprise_asser) && ((cons - odo_tick_gauche) > -limit_reprise_asser))
+        if (((cons - odo_tick_gauche) < limit_reprise_asser) || ((cons - odo_tick_gauche) > -limit_reprise_asser))
         {
             etat_actuel_vit_roue_folle_gauche = ETAT_ARRET_Vitesse_ROUE_FOLLE_GAUCHE;
             stop_moteur_gauche();
@@ -443,10 +443,10 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
         start_asservissement_roue_gauche = false;
         consigne_odo_gauche_prec = odo_tick_gauche;
 
-        if ((delta_gauche < 100) || (delta_gauche > 100))
-        {
+        // if ((delta_gauche < 100) || (delta_gauche > 100))
+        // {
             etat_actuel_vit_roue_folle_gauche = ETAT_VIDE_Vitesse_ROUE_FOLLE_GAUCHE;
-        }
+        // }
 
         break;
 

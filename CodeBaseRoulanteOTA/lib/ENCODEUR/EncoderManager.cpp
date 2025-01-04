@@ -147,7 +147,7 @@ pour calculer ordo_x on ajoute à notre angle theta total notre nouvel angle afi
 pareil pour ordo_y
 
     */
-    theta_robot_prec = ((delta_droit - delta_gauche) * 0.5) / ENTRAXE;
+    theta_robot_prec = ((-delta_droit + delta_gauche) * 0.5) / ENTRAXE;
     theta_robot += theta_robot_prec;
     // Mise à jour des coordonnées x et y
     odo_x += cos(theta_robot) * distance_parcourue;

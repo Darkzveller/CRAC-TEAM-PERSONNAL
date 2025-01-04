@@ -32,6 +32,9 @@ void ota_handle(void *parameter)
   xLastWakeTime = xTaskGetTickCount();
   for (;;)
   {
+    TelnetStream.printf(" teheta %.3f ", degrees(theta_robot));
+    TelnetStream.println();
+
     // SerialWIFIActivites(); // Gestion des opérations OTA (vérifie si une mise à jour est en cours)
     ArduinoOTA.handle();
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(500));

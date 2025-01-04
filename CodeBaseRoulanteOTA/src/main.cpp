@@ -43,6 +43,8 @@ void controle(void *parameters)
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
+        read_x_y_theta();
+        // Serial.printf("%.0f %.0f %.0f\n", vitesse_moyenne,consigne_regulation_vitesse_gauche,consigne_regulation_vitesse_droite);
 
         switch (liste.general_purpose)
         {
@@ -67,6 +69,7 @@ void controle(void *parameters)
 
             if (return_flag_asser_roue())
             {
+                consigne_theta_prec = degrees(theta_robot);
                 flag_fin_mvt = true;
                 sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_ROTATION, 0, 0, 0, 0, 0);
                 liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
@@ -104,7 +107,7 @@ void controle(void *parameters)
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
     }
 }
-
+/*
 void odo(void *parameters)
 {
     TickType_t xLastWakeTime;
@@ -117,7 +120,7 @@ void odo(void *parameters)
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
     }
 }
-
+*/
 void bus_can(void *parameters)
 {
     TickType_t xLastWakeTime;
@@ -266,14 +269,14 @@ void setup()
         10,         // tres haut niveau de priorite
         NULL        // descripteur
     );
-    xTaskCreate(
-        odo,   // nom de la fonction
-        "odo", // nom de la tache que nous venons de vréer
-        10000, // taille de la pile en octet
-        NULL,  // parametre
-        11,    // tres haut niveau de priorite
-        NULL   // descripteur
-    );
+    // xTaskCreate(
+    //     odo,   // nom de la fonction
+    //     "odo", // nom de la tache que nous venons de vréer
+    //     10000, // taille de la pile en octet
+    //     NULL,  // parametre
+    //     11,    // tres haut niveau de priorite
+    //     NULL   // descripteur
+    // );
     xTaskCreate(
         bus_can,   // nom de la fonction
         "bus_can", // nom de la tache que nous venons de vréer
@@ -287,12 +290,19 @@ void setup()
 // Boucle principale, exécutée en continu après le setup
 void loop()
 {
+
+    Serial.printf(" vitesse_moyenne %.0f ", vitesse_moyenne);
+    // Serial.printf("BEGIN odo_tick_gauche %.0f ", odo_tick_gauche);
+    // Serial.printf(" odo_tick_droit %.0f ", odo_tick_droit);
+    Serial.printf(" consigne_regulation_vitesse_droite %.0f ", consigne_regulation_vitesse_droite);
+    Serial.printf(" consigne_regulation_vitesse_gauche %.0f ", consigne_regulation_vitesse_gauche);
+
     Serial.printf(" Odo x %.3f ", odo_x);
     Serial.printf(" odo_y %.3f ", odo_y);
     Serial.printf(" teheta %.3f ", degrees(theta_robot));
-    Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
-    Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
-    Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
+    // Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
+    // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
+    // Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
 
     Serial.println();
 }

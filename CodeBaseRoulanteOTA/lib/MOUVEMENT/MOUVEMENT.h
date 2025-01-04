@@ -5,7 +5,7 @@
 
 void rotation(int consigne, int vitesse, int sens);
 void ligne_droite(int consigne, int vitesse, int sens);
-void asservissement_correction_angle(double consigne, double observation);
+double asservissement_angle_correction(double consigne_angle, double observation_angle);
 void x_y_theta(float coordonnee_x, float coordonnee_y, float theta_fin, int vitesse);
 
 #endif
