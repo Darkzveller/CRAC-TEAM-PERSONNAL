@@ -21,6 +21,8 @@ double delta_gauche;
 
 double distance_parcourue;
 
+double vitesse_rob = 0;
+
 float consigne_odo_droite_prec = 0;
 float consigne_odo_gauche_prec = 0;
 float consigne_theta_prec = 0;
@@ -50,7 +52,7 @@ float somme_integral_roue_folle_gauche_tick = 0;
 float Vmax = 200;
 float Amax = 50;
 // float Dmax = 2.5;
-float Dmax =2.5;
+float Dmax =10;
 float limit_reprise_asser = 250;
 
 float acc_actuel_droite = 0;
@@ -133,6 +135,9 @@ String toStringD(Etat_vitesse_roue_folle_droite etat) {
     }
 }
 
+/*************************Mouvement */
+int sens =0;
+
 //************************Consigne de vitesse */
 float consigne_regulation_vitesse_droite = 0;
 float consigne_regulation_vitesse_gauche = 0;
@@ -153,7 +158,7 @@ int etat_x_y_theta = 0;
 
 double theta_premiere_rotation=0;
 double theta_deuxieme_rotation=0;
-float vitesse_moyenne = 0;
+float consigne_regulation_moyenne = 0;
 
 //***********OTA******************* */
 

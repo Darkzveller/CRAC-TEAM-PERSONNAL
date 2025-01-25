@@ -10,21 +10,12 @@
 #include "CAN_ESP32E.h"
 #include "USE_FUNCTION.h"
 
-int etat_mouvement = 0;
-int cons_distance_ticks = 5000;
-int cons_rotation_ticks = 2250;
-int vitesse_ligne_droite = 70;
-int vitesse_rot = 120;
-int time_wait = 5000;
-bool inverter_mouv_order = 0;
-float seuil_recalage = 500;
-
 struct Ordre_deplacement
 {
     int general_purpose;
     int angle;
     int sens_rotation;
-    double distance;
+    int16_t distance;
     int vitesse_croisiere;
     int sens_ligne_droite;
     int consigne_distance_recalage;
@@ -44,15 +35,15 @@ void controle(void *parameters)
     while (1)
     {
         read_x_y_theta();
-        // Serial.printf("%.0f %.0f %.0f\n", vitesse_moyenne,consigne_regulation_vitesse_gauche,consigne_regulation_vitesse_droite);
+        // Serial.printf("%.0f %.0f %.0f\n", consigne_regulation_moyenne,consigne_regulation_vitesse_gauche,consigne_regulation_vitesse_droite);
 
         switch (liste.general_purpose)
         {
         case TYPE_DEPLACEMENT_LIGNE_DROITE:
-            liste.vitesse_croisiere = SPEED_TORTUE;
 
-            ligne_droite(liste.distance, liste.vitesse_croisiere, liste.sens_ligne_droite);
+            liste.vitesse_croisiere = SPEED_TORTUE;
             // Serial.printf("TYPE_DEPLACEMENT_LIGNE_DROITE");
+            ligne_droite(liste.distance, liste.vitesse_croisiere);
 
             if (return_flag_asser_roue())
             {
@@ -60,12 +51,14 @@ void controle(void *parameters)
                 sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_LIGNE_DROITE, 0, 0, 0, 0, 0);
                 liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
             }
+
             break;
         case TYPE_DEPLACEMENT_ROTATION:
 
-            // Serial.printf("TYPE_DEPLACEMENT_ROTATION");
+            // // Serial.printf("TYPE_DEPLACEMENT_ROTATION");
+
             liste.vitesse_croisiere = SPEED_TORTUE;
-            rotation(liste.angle, liste.vitesse_croisiere, liste.sens_rotation);
+            rotation(liste.angle, liste.vitesse_croisiere);
 
             if (return_flag_asser_roue())
             {
@@ -104,6 +97,7 @@ void controle(void *parameters)
         }
         asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
         asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
+        flag_controle = 1;
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
     }
 }
@@ -183,8 +177,11 @@ void bus_can(void *parameters)
             rxMsg.id = 0;
 
             Serial.printf("LIGNE_DROITE ");
-            Serial.printf(" distance %f ", (float)fusion_octet(rxMsg.data[0], rxMsg.data[1]));
-            Serial.printf(" liste.distance %f ", liste.distance);
+            Serial.printf(" rxMsg.data[0] %d ", rxMsg.data[0]);
+            Serial.printf(" rxMsg.data[1] %d ", rxMsg.data[1]);
+
+            Serial.printf(" distance %d ", fusion_octet(rxMsg.data[0], rxMsg.data[1]));
+            Serial.printf(" liste.distance %d ", liste.distance);
             Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
             Serial.println();
 
@@ -286,19 +283,23 @@ void setup()
 // Boucle principale, exécutée en continu après le setup
 void loop()
 {
+    if (flag_controle)
+    {
 
-    // Serial.printf(" vitesse_moyenne %.0f ", vitesse_moyenne);
-    // // Serial.printf("BEGIN odo_tick_gauche %.0f ", odo_tick_gauche);
-    // // Serial.printf(" odo_tick_droit %.0f ", odo_tick_droit);
-    // Serial.printf(" consigne_regulation_vitesse_droite %.0f ", consigne_regulation_vitesse_droite);
-    // Serial.printf(" consigne_regulation_vitesse_gauche %.0f ", consigne_regulation_vitesse_gauche);
+        // // Serial.printf(" consigne_regulation_moyenne %.0f ", consigne_regulation_moyenne);
+        // Serial.printf(" odo_tick_gauche %.0f ", odo_tick_gauche);
+        // Serial.printf(" odo_tick_droit %.0f ", odo_tick_droit);
+        // // // Serial.printf(" vitesse robo %f ", vitesse_rob);
 
-    // Serial.printf(" Odo x %.3f ", odo_x);
-    // Serial.printf(" odo_y %.3f ", odo_y);
-    // Serial.printf(" teheta %.3f ", degrees(theta_robot));
-    // Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
-    // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
-    // Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
+        // // Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
+        // // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
+        // // Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
+        // Serial.printf(" Odo x %.3f ", odo_x);
+        // Serial.printf(" odo_y %.3f ", odo_y);
+        // Serial.printf(" teheta %.3f ", degrees(theta_robot));
 
-    // Serial.println();
+
+        // Serial.println();
+        flag_controle = 0;
+    }
 }

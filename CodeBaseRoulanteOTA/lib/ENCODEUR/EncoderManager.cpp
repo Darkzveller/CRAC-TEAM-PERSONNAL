@@ -152,6 +152,9 @@ pareil pour ordo_y
     // Mise à jour des coordonnées x et y
     odo_x += cos(theta_robot) * distance_parcourue;
     odo_y += sin(theta_robot) * distance_parcourue;
+
+    vitesse_rob = distance_parcourue / Te;
+
     /*
         if (theta_robot > (2 * PI))
         {

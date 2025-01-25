@@ -4,7 +4,7 @@
 #define Variable_H
 extern float tension_bat ;
 // Parametre FreeRTOS
-#define Te 5
+#define Te 2.5
 #define Tcan 10
 
 // Déclaration des variables externes
@@ -46,6 +46,8 @@ extern double delta_gauche;
 
 extern double distance_parcourue;
 
+extern double vitesse_rob ;
+
 extern float consigne_odo_droite_prec;
 extern float consigne_odo_gauche_prec;
 extern float consigne_theta_prec;
@@ -64,7 +66,7 @@ extern double consigne_odo_y_prec;
 extern double odo_dist_gauche;
 extern double odo_dist_droit;
 //************Asservissement ROUE FOLLE EN TICK */
-#define SPEED_TORTUE 25
+#define SPEED_TORTUE 35
 #define SPEED_NORMAL 60
 #define SPEED_ULTRA  100
 extern float coeff_P_roue_folle_tick_gauche;
@@ -153,6 +155,8 @@ extern Etat_vitesse_roue_folle_gauche etat_actuel_vit_roue_folle_gauche;
 // Déclaration des fonctions de conversion
 String toStringG(Etat_vitesse_roue_folle_gauche etat);
 String toStringD(Etat_vitesse_roue_folle_droite etat);
+/*************************Mouvement */
+extern int sens ;
 
 //************************Convitesse de vitesse */
 extern float consigne_regulation_vitesse_droite;
@@ -172,7 +176,7 @@ extern float erreur_prec_freinage_roue_folle_gauche;
 extern int etat_x_y_theta;
 extern double theta_premiere_rotation;
 extern double theta_deuxieme_rotation;
-extern float vitesse_moyenne ;
+extern float consigne_regulation_moyenne ;
 
 //***********OTA******************* */
 
