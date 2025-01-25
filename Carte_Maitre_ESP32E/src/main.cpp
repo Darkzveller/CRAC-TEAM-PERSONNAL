@@ -82,7 +82,9 @@ void reception(char ch)
           sens = -1;
         }
       }
-      cmd = fabs(cmd);
+      // cmd = fabs(cmd);
+      cmd = cmd;
+
       uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
       uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
 
@@ -90,7 +92,7 @@ void reception(char ch)
       Serial.printf(" cmd %d", cmd);
       Serial.printf(" sens %d", sens);
       Serial.println();
-      sendCANMessage(ROTATION, 0, 0, 4, highByte, lowByte, sens, vitesse, 0, 0, 0);
+      sendCANMessage(ROTATION, 0, 0, 4, highByte, lowByte, vitesse,0, 0, 0, 0);
     }
     if (commande == "LIGNE")
     {
@@ -110,7 +112,8 @@ void reception(char ch)
           sens = -1;
         }
       }
-      cmd = fabs(cmd);
+      // cmd = fabs(cmd);
+      cmd = cmd;
       uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
       uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
 
@@ -118,7 +121,7 @@ void reception(char ch)
       Serial.printf(" cmd %d", cmd);
       Serial.printf(" sens %d", sens);
       Serial.println();
-      sendCANMessage(LIGNE_DROITE, 0, 0, 4, highByte, lowByte, sens, vitesse, 0, 0, 0);
+      sendCANMessage(LIGNE_DROITE, 0, 0, 4, highByte, lowByte, vitesse,0, 0, 0, 0);
     }
 
     if (commande == "x")

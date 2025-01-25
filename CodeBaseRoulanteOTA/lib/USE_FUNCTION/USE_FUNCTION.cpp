@@ -3,7 +3,7 @@
 
 #include <mat.h>
 
-int fusion_octet(int octet0, int octet1)
+int fusion_octet(int8_t octet0, int8_t octet1)
 {
 
     int16_t octet16 = (octet0 << 8) | octet1;

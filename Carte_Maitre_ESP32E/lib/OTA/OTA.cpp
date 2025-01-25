@@ -225,8 +225,9 @@ void receptionWIFI(char ch)
         {
           sens = -1;
         }
-      }
-      cmd = fabs(cmd);
+      }     
+      // cmd = fabs(cmd);
+      cmd = cmd;
       uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
       uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
 
@@ -241,7 +242,7 @@ void receptionWIFI(char ch)
       Serial.printf(" sens %d", sens);
       Serial.println();
 
-      sendCANMessage(ROTATION, 0, 0, 4, highByte, lowByte, sens, 0x7B, 0, 0, 0);
+      sendCANMessage(ROTATION, 0, 0, 4, highByte, lowByte, 0x7B,0, 0, 0, 0);
     }
     if (commande == "LIGNE")
     {
@@ -261,7 +262,8 @@ void receptionWIFI(char ch)
           sens = -1;
         }
       }
-      cmd = fabs(cmd);
+      // cmd = fabs(cmd);
+      cmd = cmd;
       uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
       uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
       TelnetStream.println();
@@ -274,7 +276,7 @@ void receptionWIFI(char ch)
       Serial.printf(" sens %d", sens);
       Serial.println();
 
-      sendCANMessage(LIGNE_DROITE, 0, 0, 4, highByte, lowByte, sens, 0x7B, 0, 0, 0);
+      sendCANMessage(LIGNE_DROITE, 0, 0, 4, highByte, lowByte, 0x7B,0, 0, 0, 0);
     }
     if (commande == "x")
     {

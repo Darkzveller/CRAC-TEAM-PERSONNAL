@@ -159,17 +159,15 @@ void bus_can(void *parameters)
             // liste.angle = TIC_PER_TOUR * angle / 80.0;
 
             liste.angle = convert_angle_deg_to_tick(fusion_octet(rxMsg.data[0], rxMsg.data[1]));
-            liste.sens_rotation = (int8_t)rxMsg.data[2];
-            liste.vitesse_croisiere = rxMsg.data[3];
+            liste.vitesse_croisiere = rxMsg.data[2];
 
             lauch_flag_asser_roue(true);
             rxMsg.id = 0;
-            // Serial.printf("ROTATION ");
-            // Serial.printf(" angle %f ", (float)fusion_octet(rxMsg.data[0], rxMsg.data[1]));
-            // Serial.printf(" liste.angle %f", (float)liste.angle);
-            // Serial.println();
-            // Serial.printf(" sens_rotation %d ", liste.sens_rotation);
-            // Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
+            Serial.printf("ROTATION ");
+            Serial.printf(" angle %f ", (float)fusion_octet(rxMsg.data[0], rxMsg.data[1]));
+            Serial.printf(" liste.angle %f", (float)liste.angle);
+            Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
+            Serial.println();
 
             break;
 
@@ -179,18 +177,16 @@ void bus_can(void *parameters)
 
             liste.general_purpose = TYPE_DEPLACEMENT_LIGNE_DROITE;
             liste.distance = convert_distance_mm_to_tick(fusion_octet(rxMsg.data[0], rxMsg.data[1]));
-            liste.sens_ligne_droite = (int8_t)rxMsg.data[2];
-            liste.vitesse_croisiere = rxMsg.data[3];
+            liste.vitesse_croisiere = rxMsg.data[2];
             lauch_flag_asser_roue(true);
 
             rxMsg.id = 0;
 
-            // Serial.printf("LIGNE_DROITE ");
-            // Serial.printf(" distance %f ", distance);
-            // Serial.printf(" liste.distance %f ", liste.distance);
-            // Serial.printf(" liste.sens_ligne_droite %d ", liste.sens_ligne_droite);
-            // Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
-            // Serial.println();
+            Serial.printf("LIGNE_DROITE ");
+            Serial.printf(" distance %f ", (float)fusion_octet(rxMsg.data[0], rxMsg.data[1]));
+            Serial.printf(" liste.distance %f ", liste.distance);
+            Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
+            Serial.println();
 
             break;
 
@@ -291,18 +287,18 @@ void setup()
 void loop()
 {
 
-    Serial.printf(" vitesse_moyenne %.0f ", vitesse_moyenne);
-    // Serial.printf("BEGIN odo_tick_gauche %.0f ", odo_tick_gauche);
-    // Serial.printf(" odo_tick_droit %.0f ", odo_tick_droit);
-    Serial.printf(" consigne_regulation_vitesse_droite %.0f ", consigne_regulation_vitesse_droite);
-    Serial.printf(" consigne_regulation_vitesse_gauche %.0f ", consigne_regulation_vitesse_gauche);
+    // Serial.printf(" vitesse_moyenne %.0f ", vitesse_moyenne);
+    // // Serial.printf("BEGIN odo_tick_gauche %.0f ", odo_tick_gauche);
+    // // Serial.printf(" odo_tick_droit %.0f ", odo_tick_droit);
+    // Serial.printf(" consigne_regulation_vitesse_droite %.0f ", consigne_regulation_vitesse_droite);
+    // Serial.printf(" consigne_regulation_vitesse_gauche %.0f ", consigne_regulation_vitesse_gauche);
 
-    Serial.printf(" Odo x %.3f ", odo_x);
-    Serial.printf(" odo_y %.3f ", odo_y);
-    Serial.printf(" teheta %.3f ", degrees(theta_robot));
+    // Serial.printf(" Odo x %.3f ", odo_x);
+    // Serial.printf(" odo_y %.3f ", odo_y);
+    // Serial.printf(" teheta %.3f ", degrees(theta_robot));
     // Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
     // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
     // Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
 
-    Serial.println();
+    // Serial.println();
 }
