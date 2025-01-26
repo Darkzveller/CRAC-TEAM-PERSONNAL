@@ -21,25 +21,17 @@ void rotation(int consigne, int vitesse)
     int consigne_droite = consigne * -1.0;
     consigne_gauche = (consigne_gauche + consigne_odo_gauche_prec);
     consigne_droite = (consigne_droite + consigne_odo_droite_prec);
+
     consigne_regulation_vitesse_droite = regulation_vitesse_roue_folle_droite(consigne_droite, vitesse_croisiere_droit);
     consigne_regulation_vitesse_gauche = regulation_vitesse_roue_folle_gauche(consigne_gauche, vitesse_croisiere_gauche);
-
-    // // Imposer une symétrie des consignes de vitesse
-    consigne_regulation_moyenne = (fabs(consigne_regulation_vitesse_gauche) + fabs(consigne_regulation_vitesse_droite)) / 2;
-    // consigne_regulation_moyenne = ((consigne_regulation_vitesse_gauche) - (consigne_regulation_vitesse_droite));
-    Serial.printf(" consigne_regulation_vitesse_gauche %.3f ", consigne_regulation_vitesse_gauche);
-    Serial.printf(" consigne_regulation_vitesse_droite %.3f ", consigne_regulation_vitesse_droite);
-    Serial.printf(" consigne_regulation_moyenne %.3f ", consigne_regulation_moyenne);
-
-   
-
-    // // On force les consignes à être égales et opposées
-    // consigne_regulation_vitesse_droite = -sens * consigne_regulation_moyenne;
-    // consigne_regulation_vitesse_gauche = sens * consigne_regulation_moyenne;
-    Serial.printf(" consigne_regulation_vitesse_gauche %.3f ", consigne_regulation_vitesse_gauche);
-    Serial.printf(" consigne_regulation_vitesse_droite %.3f ", consigne_regulation_vitesse_droite);
-
-    Serial.println();
+    if ((etat_actuel_vit_roue_folle_gauche != ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE) || (etat_actuel_vit_roue_folle_droite != ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE))
+    {
+        float ecart = consigne_odo_gauche_prec + consigne_odo_droite_prec;
+        consigne_regulation_vitesse_gauche = -consigne_regulation_vitesse_droite+ecart;
+    }
+    // // // On force les consignes à être égales et opposées
+    // consigne_regulation_vitesse_droite = sens * consigne_regulation_moyenne;
+    // consigne_regulation_vitesse_gauche = -sens * consigne_regulation_moyenne;
 }
 
 void ligne_droite(int consigne, int vitesse)

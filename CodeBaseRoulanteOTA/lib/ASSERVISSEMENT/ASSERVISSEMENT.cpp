@@ -137,7 +137,7 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
     float vit = Vmax_consigne;
     float accel = Amax;
     float decc = Dmax;
-    double Vrob = delta_droit / Te;
+
     float distance_restante;
     float Ta = vit / accel;
     float Td = vit / decc;
@@ -146,7 +146,7 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
     distance_decl_droite = 0.5 * Td * Td * decc;
 
     // erreur_vit = vit - (vitesse_rob * Vmax);
-    erreur_vit = vitesse_rob - Vrob;
+    erreur_vit = vitesse_rob - vitesse_rob_roue_droite;
 
     somme_erreur_vit_roue_folle_droite += erreur_vit * Te;
 
@@ -182,7 +182,7 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
             acc_actuel_droite = -accel;
         }
 
-        consigne_vit_droite = Vrob + acc_actuel_droite * Te;
+        consigne_vit_droite = vitesse_rob_roue_droite + acc_actuel_droite * Te;
 
         if (consigne_vit_droite > Vmax_consigne)
         {
@@ -302,7 +302,6 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
     float accel = Amax;
     float decc = Dmax;
 
-    double Vrob = (delta_gauche) / Te;
     float distance_restante;
     float vitesse_cible;
 
@@ -312,7 +311,7 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
     distance_accel_gauche = 0.5 * Ta * Ta * accel;
     distance_decl_gauche = 0.5 * Td * Td * decc;
     // Serial.printf("distnace decc gauche %f ", distance_decl_gauche);
-    erreur_vit = vitesse_rob - Vrob;
+    erreur_vit = vitesse_rob - vitesse_rob_roue_gauche;
     somme_erreur_vit_roue_folle_gauche += erreur_vit * Te;
 
     if (somme_erreur_vit_roue_folle_gauche > integral_limit)
@@ -347,7 +346,7 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
             acc_actuel_gauche = -accel;
         }
 
-        consigne_vit_gauche = Vrob + acc_actuel_gauche * Te;
+        consigne_vit_gauche = vitesse_rob_roue_gauche + acc_actuel_gauche * Te;
 
         if (consigne_vit_gauche > Vmax_consigne)
         {

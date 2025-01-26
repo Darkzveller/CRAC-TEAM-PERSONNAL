@@ -297,9 +297,13 @@ void loop()
         // Serial.printf(" Odo x %.3f ", odo_x);
         // Serial.printf(" odo_y %.3f ", odo_y);
         // Serial.printf(" teheta %.3f ", degrees(theta_robot));
+    Serial.printf(" Odo x %.3f ", odo_x);
+    Serial.printf(" odo_y %.3f ", odo_y);
+    Serial.printf(" teheta %.3f ", degrees(theta_robot));
+
+    Serial.println();
 
 
-        // Serial.println();
         flag_controle = 0;
     }
 }

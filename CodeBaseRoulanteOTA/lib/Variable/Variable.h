@@ -40,6 +40,8 @@ extern double odo_last_g;
 
 extern double odo_tick_droit;
 extern double odo_tick_gauche;
+extern double odo_tick_droit_last;
+extern double odo_tick_gauche_last;
 
 extern double delta_droit;
 extern double delta_gauche;
@@ -47,6 +49,8 @@ extern double delta_gauche;
 extern double distance_parcourue;
 
 extern double vitesse_rob ;
+extern double vitesse_rob_roue_droite;
+extern double vitesse_rob_roue_gauche;
 
 extern float consigne_odo_droite_prec;
 extern float consigne_odo_gauche_prec;
@@ -66,7 +70,7 @@ extern double consigne_odo_y_prec;
 extern double odo_dist_gauche;
 extern double odo_dist_droit;
 //************Asservissement ROUE FOLLE EN TICK */
-#define SPEED_TORTUE 35
+#define SPEED_TORTUE 45
 #define SPEED_NORMAL 60
 #define SPEED_ULTRA  100
 extern float coeff_P_roue_folle_tick_gauche;
