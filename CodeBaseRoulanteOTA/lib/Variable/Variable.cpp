@@ -143,8 +143,6 @@ String toStringD(Etat_vitesse_roue_folle_droite etat)
     }
 }
 
-/*************************Mouvement */
-int sens = 0;
 
 //************************Consigne de vitesse */
 float consigne_regulation_vitesse_droite = 0;
@@ -161,6 +159,7 @@ float somme_erreur_freinage_roue_folle_gauche = 0;
 float erreur_prec_freinage_roue_folle_gauche = 0;
 
 //************************Mouvement */
+int sens = 0;
 
 int etat_x_y_theta = 0;
 
@@ -168,7 +167,7 @@ double theta_premiere_rotation = 0;
 double theta_deuxieme_rotation = 0;
 float consigne_regulation_moyenne = 0;
 
-//***********OTA******************* */
+//***********Loop******************* */
 
 bool flag_controle = false;
 

@@ -213,7 +213,7 @@ double regulation_vitesse_roue_folle_droite(float cons, float Vmax_consigne)
         {
             consigne_vit_droite = Vmax_consigne;
         }
-
+    
         consigne_dist_droite = odo_tick_droit + consigne_vit_droite * Te;
 
         if (fabs(cons - odo_tick_droit) < fabs(distance_decl_droite))

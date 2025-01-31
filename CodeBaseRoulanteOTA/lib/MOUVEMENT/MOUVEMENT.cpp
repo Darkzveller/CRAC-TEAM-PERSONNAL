@@ -27,7 +27,7 @@ void rotation(int consigne, int vitesse)
     if ((etat_actuel_vit_roue_folle_gauche != ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE) || (etat_actuel_vit_roue_folle_droite != ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE))
     {
         float ecart = consigne_odo_gauche_prec + consigne_odo_droite_prec;
-        consigne_regulation_vitesse_gauche = -consigne_regulation_vitesse_droite+ecart;
+        consigne_regulation_vitesse_gauche = -consigne_regulation_vitesse_droite + ecart;
     }
     // // // On force les consignes à être égales et opposées
     // consigne_regulation_vitesse_droite = sens * consigne_regulation_moyenne;
@@ -123,8 +123,8 @@ void x_y_theta(float coordonnee_x, float coordonnee_y, float theta_fin, int vite
         break;
     }
 }
-double coeff_P_angle = 1.9;         // Coefficient proportionnel
-double coeff_I_angle = 0.25;        // Coefficient intégral
+double coeff_P_angle = 2;           // Coefficient proportionnel
+double coeff_I_angle = 0.1;         // Coefficient intégral
 double coeff_D_angle = 0;           // Coefficient dérivé
 double integral_limit_angle = 50.0; // Limite de la somme intégrale pour éviter le dépassement
 // Variables globales pour le PID
@@ -132,7 +132,7 @@ double erreur_prec_angle = 0.0;    // Erreur précédente
 double somme_integral_angle = 0.0; // Somme des erreurs pour le calcul intégral
 double asservissement_angle_correction(double consigne_angle, double observation_angle)
 {
-    static double erreur_prec_angle = 0.0;
+
     static double somme_integral_angle = 0.0;
     double erreur = consigne_angle - observation_angle;
 

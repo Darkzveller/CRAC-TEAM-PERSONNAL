@@ -26,8 +26,8 @@ extern float tension_bat ;
 #define LARGEUR_ROBOT_mm 225.0
 #define TIC_PER_TOUR 2048.0
 #define RESOLUTION_ROUE_CODEUSE 10.0
-#define COEFF_ROUE_DROITE 1
-#define COEFF_ROUE_GAUCHE 1
+#define COEFF_ROUE_DROITE 1.0
+#define COEFF_ROUE_GAUCHE 1.0
 #define SIZE_WHEEL_DIAMETER_mm 50.0
 extern float perimetre_robot;
 
@@ -182,7 +182,7 @@ extern double theta_premiere_rotation;
 extern double theta_deuxieme_rotation;
 extern float consigne_regulation_moyenne ;
 
-//***********OTA******************* */
+//***********LOOP******************* */
 
 extern bool flag_controle;
 
