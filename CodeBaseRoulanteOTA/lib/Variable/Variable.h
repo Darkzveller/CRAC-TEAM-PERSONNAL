@@ -159,8 +159,6 @@ extern Etat_vitesse_roue_folle_gauche etat_actuel_vit_roue_folle_gauche;
 // Déclaration des fonctions de conversion
 String toStringG(Etat_vitesse_roue_folle_gauche etat);
 String toStringD(Etat_vitesse_roue_folle_droite etat);
-/*************************Mouvement */
-extern int sens ;
 
 //************************Convitesse de vitesse */
 extern float consigne_regulation_vitesse_droite;
@@ -176,6 +174,7 @@ extern float erreur_prec_freinage_roue_folle_droite;
 extern float somme_erreur_freinage_roue_folle_gauche;
 extern float erreur_prec_freinage_roue_folle_gauche;
 //************************Mouvement */
+extern int sens ;
 
 extern int etat_x_y_theta;
 extern double theta_premiere_rotation;
