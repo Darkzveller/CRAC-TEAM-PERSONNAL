@@ -148,7 +148,7 @@ String toStringD(Etat_vitesse_roue_folle_droite etat)
 float consigne_regulation_vitesse_droite = 0;
 float consigne_regulation_vitesse_gauche = 0;
 
-//************************Freinage */
+//************************Asser Freinage */
 float coeff_P_freinage = 10;
 float coeff_D_freinage = 0;
 float coeff_I_freinage = 0.0;
@@ -157,10 +157,19 @@ float somme_erreur_freinage_roue_folle_droite = 0;
 float erreur_prec_freinage_roue_folle_droite = 0;
 float somme_erreur_freinage_roue_folle_gauche = 0;
 float erreur_prec_freinage_roue_folle_gauche = 0;
+//************************Asser Correction d'angle */
+
+double coeff_P_angle = 2;           
+double coeff_I_angle = 0.1;         
+double coeff_D_angle = 0;           
+double integral_limit_angle = 50.0; 
+// Variables globales pour le PID
+double erreur_prec_angle = 0.0;    // Erreur précédente
+double somme_integral_angle = 0.0; // Somme des erreurs pour le calcul intégral
+
 
 //************************Mouvement */
 int sens = 0;
-
 int etat_x_y_theta = 0;
 
 double theta_premiere_rotation = 0;

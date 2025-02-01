@@ -173,6 +173,16 @@ extern float somme_erreur_freinage_roue_folle_droite;
 extern float erreur_prec_freinage_roue_folle_droite;
 extern float somme_erreur_freinage_roue_folle_gauche;
 extern float erreur_prec_freinage_roue_folle_gauche;
+//************************Asser Correction d'angle */
+
+extern double coeff_P_angle ;           
+extern double coeff_I_angle ;         
+extern double coeff_D_angle ;           
+extern double integral_limit_angle ; 
+// Variables globales pour le PID
+extern double erreur_prec_angle ;    // Erreur précédente
+extern double somme_integral_angle; // Somme des erreurs pour le calcul intégral
+
 //************************Mouvement */
 extern int sens ;
 

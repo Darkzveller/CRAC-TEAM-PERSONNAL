@@ -35,68 +35,70 @@ void controle(void *parameters)
     while (1)
     {
         read_x_y_theta();
-        // Serial.printf("%.0f %.0f %.0f\n", consigne_regulation_moyenne,consigne_regulation_vitesse_gauche,consigne_regulation_vitesse_droite);
 
-        switch (liste.general_purpose)
-        {
-        case TYPE_DEPLACEMENT_LIGNE_DROITE:
+        asser_polaire(100, 100, 0);
+        /*
+                switch (liste.general_purpose)
+                {
+                case TYPE_DEPLACEMENT_LIGNE_DROITE:
 
-            liste.vitesse_croisiere = SPEED_TORTUE;
-            // Serial.printf("TYPE_DEPLACEMENT_LIGNE_DROITE");
-            ligne_droite(liste.distance, liste.vitesse_croisiere);
+                    liste.vitesse_croisiere = SPEED_TORTUE;
+                    // Serial.printf("TYPE_DEPLACEMENT_LIGNE_DROITE");
+                    ligne_droite(liste.distance, liste.vitesse_croisiere);
 
-            if (return_flag_asser_roue())
-            {
-                flag_fin_mvt = true;
-                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_LIGNE_DROITE, 0, 0, 0, 0, 0);
-                liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
-            }
+                    if (return_flag_asser_roue())
+                    {
+                        flag_fin_mvt = true;
+                        sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_LIGNE_DROITE, 0, 0, 0, 0, 0);
+                        liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
+                    }
 
-            break;
-        case TYPE_DEPLACEMENT_ROTATION:
+                    break;
+                case TYPE_DEPLACEMENT_ROTATION:
 
-            // // Serial.printf("TYPE_DEPLACEMENT_ROTATION");
+                    // // Serial.printf("TYPE_DEPLACEMENT_ROTATION");
 
-            liste.vitesse_croisiere = SPEED_TORTUE;
-            rotation(liste.angle, liste.vitesse_croisiere);
+                    liste.vitesse_croisiere = SPEED_TORTUE;
+                    rotation(liste.angle, liste.vitesse_croisiere);
 
-            if (return_flag_asser_roue())
-            {
-                consigne_theta_prec = degrees(theta_robot);
-                flag_fin_mvt = true;
-                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_ROTATION, 0, 0, 0, 0, 0);
-                liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
-            }
-            break;
-        case TYPE_DEPLACEMENT_IMMOBILE:
-            consigne_regulation_vitesse_droite = consigne_odo_droite_prec;
-            consigne_regulation_vitesse_gauche = consigne_odo_gauche_prec;
-            // Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE ");
-            liste.general_purpose = TYPE_VIDE;
-            flag_fin_mvt = true;
-            sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0);
+                    if (return_flag_asser_roue())
+                    {
+                        consigne_theta_prec = degrees(theta_robot);
+                        flag_fin_mvt = true;
+                        sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_ROTATION, 0, 0, 0, 0, 0);
+                        liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
+                    }
+                    break;
+                case TYPE_DEPLACEMENT_IMMOBILE:
+                    consigne_regulation_vitesse_droite = consigne_odo_droite_prec;
+                    consigne_regulation_vitesse_gauche = consigne_odo_gauche_prec;
+                    // Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE ");
+                    liste.general_purpose = TYPE_VIDE;
+                    flag_fin_mvt = true;
+                    sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0);
 
-            break;
-        case TYPE_DEPLACEMENT_X_Y_THETA:
+                    break;
+                case TYPE_DEPLACEMENT_X_Y_THETA:
 
-            x_y_theta(liste.x, liste.y, liste.theta, SPEED_TORTUE);
+                    x_y_theta(liste.x, liste.y, liste.theta, SPEED_TORTUE);
 
-            if (etat_x_y_theta == -1)
-            {
-                flag_fin_mvt = true;
-                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_X_Y_THETA, 0, 0, 0, 0, 0);
-                liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
-            }
-            break;
-        case TYPE_VIDE:
-            // Serial.printf(" TYPE_VIDE \n");
-            break;
+                    if (etat_x_y_theta == -1)
+                    {
+                        flag_fin_mvt = true;
+                        sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_X_Y_THETA, 0, 0, 0, 0, 0);
+                        liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
+                    }
+                    break;
+                case TYPE_VIDE:
+                    // Serial.printf(" TYPE_VIDE \n");
+                    break;
 
-        default:
-            break;
-        }
-        asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
-        asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
+                default:
+                    break;
+                }
+                asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
+                asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
+                */
         flag_controle = 1;
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
     }
@@ -297,12 +299,6 @@ void loop()
         // Serial.printf(" Odo x %.3f ", odo_x);
         // Serial.printf(" odo_y %.3f ", odo_y);
         // Serial.printf(" teheta %.3f ", degrees(theta_robot));
-    Serial.printf(" Odo x %.3f ", odo_x);
-    Serial.printf(" odo_y %.3f ", odo_y);
-    Serial.printf(" teheta %.3f ", degrees(theta_robot));
-
-    Serial.println();
-
 
         flag_controle = 0;
     }
