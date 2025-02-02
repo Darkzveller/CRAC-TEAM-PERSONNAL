@@ -369,8 +369,8 @@ void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
     //     somme_erreur_w_polaire = 0;
     // }
 
-    v_gauche = (commande_v_polaire + commande_w_polaire); // vitesse de notre moteur gauche
-    v_droite = (commande_v_polaire - commande_w_polaire); // vitesse de notre moteur droit
+    v_gauche = (commande_v_polaire + commande_w_polaire)*Te; // vitesse de notre moteur gauche
+    v_droite = (commande_v_polaire - commande_w_polaire)*Te; // vitesse de notre moteur droit
     consigne_regulation_vitesse_droite = regulation_vitesse_roue_folle_droite(convert_distance_mm_to_tick(cons_hypothenuse), v_droite);
     consigne_regulation_vitesse_gauche = regulation_vitesse_roue_folle_gauche(convert_distance_mm_to_tick(cons_hypothenuse), v_gauche);
 
