@@ -14,5 +14,4 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne);
 bool return_flag_asser_roue();
 void lauch_flag_asser_roue(bool mode);
 double asservissement_angle_correction(double consigne_angle, double observation_angle);
-
 #endif

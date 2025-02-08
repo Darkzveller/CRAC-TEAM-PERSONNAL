@@ -36,7 +36,7 @@ void controle(void *parameters)
     {
         read_x_y_theta();
 
-        asser_polaire(100, 100, 0);
+        asser_polaire(100, 100, 45);
         /*
                 switch (liste.general_purpose)
                 {
@@ -253,7 +253,7 @@ void setup()
     // Serial.printf("avncement_droite enter : %.0f\n", avncement_droite);
 
     reset_encodeur();
-    // delay(1000);
+    delay(1000);
     reset_encodeur();
 
     xTaskCreate(

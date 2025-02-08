@@ -127,19 +127,19 @@ void x_y_theta(float coordonnee_x, float coordonnee_y, float theta_fin, int vite
 float hypothenuse_prec = 0;
 float theta_parcourir_prec = 0;
 
-float coeff_P_vit_polaire = 1;
-float coeff_D_vit_polaire = 0;
-float coeff_I_vit_polaire = 0;
-float integral_limit_vit_polaire_limit = 500;
+float coeff_P_vit_polaire = 6.5;
+float coeff_D_vit_polaire = 0.5;
+float coeff_I_vit_polaire = 0.3;
+float integral_limit_vit_polaire_limit = 50;
 float somme_erreur_vit_polaire = 0;
 
-float coeff_P_w_polaire = 150;
+float coeff_P_w_polaire = 1300;
 float coeff_D_w_polaire = 0;
-float coeff_I_w_polaire = 0;
+float coeff_I_w_polaire = 0.8;
 float integral_limit_w_polaire_limit = 500;
 float somme_erreur_w_polaire = 0;
-float limit_commande_vit = 15;
-float limit_commande_w = 30;
+float limit_commande_vit = 1000;
+float limit_commande_w = 2000;
 float v_gauche = 0;
 float v_droite = 0;
 float seuil_arret_distance = 2;       // En unités de position (cm, mm...)
@@ -304,14 +304,16 @@ void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
     Serial.println();
 }
 */
-
+float hypothenuse;
+float cons_hypothenuse;
+float theta_parcourir;
 void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
 {
-    float hypothenuse = sqrt(pow(coordonnee_x - odo_x, 2) + pow(coordonnee_y - odo_y, 2));
+    hypothenuse = sqrt(pow(coordonnee_x - odo_x, 2) + pow(coordonnee_y - odo_y, 2));
     // verif_non_depassement = hypothenuse_prec - hypothenuse;
-    float cons_hypothenuse = sqrt(pow(coordonnee_x, 2) + pow(coordonnee_y, 2));
+    cons_hypothenuse = sqrt(pow(coordonnee_x, 2) + pow(coordonnee_y, 2));
 
-    float theta_parcourir = atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot;
+     theta_parcourir = atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot;
 
     somme_erreur_vit_polaire += hypothenuse * Te;
 
@@ -361,25 +363,24 @@ void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
     }
 
     theta_parcourir_prec = theta_parcourir;
-    // if (verif_non_depassement < 0)
-    // {
-    //     commande_v_polaire = 0;
-    //     commande_w_polaire = 0;
-    //     somme_erreur_vit_polaire = 0; // Réinitialisation de l'intégrale pour éviter des effets d’accumulation
-    //     somme_erreur_w_polaire = 0;
-    // }
+    v_gauche = (commande_v_polaire + commande_w_polaire); // vitesse de notre moteur gauche
+    v_droite = (commande_v_polaire - commande_w_polaire); // vitesse de notre moteur droit
+    Serial.printf(" v_droite %.3f ", v_droite);
+    Serial.printf(" v_gauche %.3f ", v_gauche);
 
-    v_gauche = (commande_v_polaire + commande_w_polaire)*Te; // vitesse de notre moteur gauche
-    v_droite = (commande_v_polaire - commande_w_polaire)*Te; // vitesse de notre moteur droit
-    consigne_regulation_vitesse_droite = regulation_vitesse_roue_folle_droite(convert_distance_mm_to_tick(cons_hypothenuse), v_droite);
-    consigne_regulation_vitesse_gauche = regulation_vitesse_roue_folle_gauche(convert_distance_mm_to_tick(cons_hypothenuse), v_gauche);
+    // asservissement_roue_folle_droite_tick(v_droite, odo_tick_droit);
+    // asservissement_roue_folle_gauche_tick(v_gauche, odo_tick_gauche);
 
-    asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
-    asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
+    moteur_gauche_polaire(-v_gauche);
+    moteur_droit_polaire(-v_droite);
 
+    // moteur_droit_polaire(-v_droite);
+    // moteur_gauche_polaire(-v_gauche);
     Serial.printf(" Odo x %.3f ", odo_x);
     Serial.printf(" odo_y %.3f ", odo_y);
     Serial.printf(" teheta %.3f ", degrees(theta_robot));
+    Serial.printf(" hypothenuse %.3f ", cons_hypothenuse);
+
     Serial.printf(" hypothenuse %.3f ", hypothenuse);
     Serial.printf(" theta_parcourir %.3f ", degrees(theta_parcourir));
 
@@ -388,9 +389,12 @@ void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
     Serial.printf(" commande_v_polaire %.3f ", commande_v_polaire);
     Serial.printf(" commande_w_polaire %.3f ", commande_w_polaire);
     Serial.printf(" v_gauche %.3f ", v_gauche);
-    Serial.printf(" odo_tick_gauche %.3f ", odo_tick_gauche);
     Serial.printf(" v_droite %.3f ", v_droite);
+    Serial.printf(" odo_tick_gauche %.3f ", odo_tick_gauche);
+
     Serial.printf(" odo_tick_droit %.3f ", odo_tick_droit);
+    // Serial.printf(" consigne_regulation_vitesse_gauche %.3f ", consigne_regulation_vitesse_gauche);
+    // Serial.printf(" consigne_regulation_vitesse_droite %.3f ", consigne_regulation_vitesse_droite);
 
     Serial.println();
 }
