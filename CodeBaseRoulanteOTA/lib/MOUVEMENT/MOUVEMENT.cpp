@@ -129,16 +129,16 @@ float theta_parcourir_prec = 0;
 
 float coeff_P_vit_polaire = 6.5;
 float coeff_D_vit_polaire = 0.5;
-float coeff_I_vit_polaire = 0.3;
-float integral_limit_vit_polaire_limit = 50;
+float coeff_I_vit_polaire = 0;
+float integral_limit_vit_polaire_limit = 55;
 float somme_erreur_vit_polaire = 0;
 
-float coeff_P_w_polaire = 1300;
+float coeff_P_w_polaire = 1100;
 float coeff_D_w_polaire = 0;
-float coeff_I_w_polaire = 0.8;
-float integral_limit_w_polaire_limit = 500;
+float coeff_I_w_polaire = 0;
+float integral_limit_w_polaire_limit = 100;
 float somme_erreur_w_polaire = 0;
-float limit_commande_vit = 1000;
+float limit_commande_vit = 1200;
 float limit_commande_w = 2000;
 float v_gauche = 0;
 float v_droite = 0;
@@ -370,6 +370,11 @@ void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
 
     // asservissement_roue_folle_droite_tick(v_droite, odo_tick_droit);
     // asservissement_roue_folle_gauche_tick(v_gauche, odo_tick_gauche);
+
+    if(hypothenuse <= 10) v_droite = 0, v_gauche = 0, somme_erreur_vit_polaire = 0,somme_erreur_w_polaire = 0;
+
+
+    // if(theta_parcourir <= radians(2)) somme_erreur_w_polaire = 0;
 
     moteur_gauche_polaire(-v_gauche);
     moteur_droit_polaire(-v_droite);
