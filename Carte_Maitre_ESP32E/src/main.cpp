@@ -15,10 +15,10 @@ int t_low_byte, t_high_byte;
 
 void setup()
 {
-  Serial.begin(921600);
+  Serial.begin(115200);
   Serial.printf("CACA");
   setupCAN(1000E3);
-  setupOTA();
+  // setupOTA();
   int i = 0;
   // while (!TelnetStream.available())
   // {
@@ -36,6 +36,18 @@ void setup()
 void loop()
 {
   readCANMessage();
+  // Serial.printf("Send command ON ALL Bat ");
+  // Serial.printf("Send command Rotation with cons");
+  // Serial.println();
+
+      // sendCANMessage(ROTATION, 0, 0, 4, 22, 22, 0x7B, 0, 0, 0, 0);
+
+  // sendCANMessage(INTERRUPTEUR_BATT1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
+  // sendCANMessage(INTERRUPTEUR_BATT2, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
+  // sendCANMessage(INTERRUPTEUR_BATT3, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
+
+  // Serial.println();
+  // delay(150);
   // sendCANMessage(ROTATION, 0, 0, 4, 0, 0x5C, 0x1, 0x7B, 0, 0, 0);
 }
 
@@ -92,7 +104,7 @@ void reception(char ch)
       Serial.printf(" cmd %d", cmd);
       Serial.printf(" sens %d", sens);
       Serial.println();
-      sendCANMessage(ROTATION, 0, 0, 4, highByte, lowByte, vitesse,0, 0, 0, 0);
+      sendCANMessage(ROTATION, 0, 0, 4, highByte, lowByte, vitesse, 0, 0, 0, 0);
     }
     if (commande == "LIGNE")
     {
@@ -121,7 +133,7 @@ void reception(char ch)
       Serial.printf(" cmd %d", cmd);
       Serial.printf(" sens %d", sens);
       Serial.println();
-      sendCANMessage(LIGNE_DROITE, 0, 0, 4, highByte, lowByte, vitesse,0, 0, 0, 0);
+      sendCANMessage(LIGNE_DROITE, 0, 0, 4, highByte, lowByte, vitesse, 0, 0, 0, 0);
     }
 
     if (commande == "x")
@@ -183,6 +195,7 @@ void serialEvent()
 {
   while (Serial.available() > 0) // tant qu'il y a des caractères à lire
   {
-    reception(Serial.read());
+    // reception(Serial.read());
+    receptionWIFI(Serial.read());
   }
 }

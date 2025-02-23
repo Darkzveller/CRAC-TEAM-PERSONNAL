@@ -10,6 +10,7 @@
 #include "CAN_ESP32E.h"
 #include "USE_FUNCTION.h"
 
+float rectificateur_coeeff = 0;
 struct Ordre_deplacement
 {
     int general_purpose;
@@ -35,8 +36,13 @@ void controle(void *parameters)
     while (1)
     {
         read_x_y_theta();
+        // Serial.printf("Open interrupt all bat \n");
+        // sendCANMessage(INTERRUPTEUR_BATT1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
+        // sendCANMessage(INTERRUPTEUR_BATT2, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
+        // sendCANMessage(INTERRUPTEUR_BATT3, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
+        // sendCANMessage(0x12, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
 
-        asser_polaire(100, 100, 45);
+        // asser_polaire(200.0, 200, 45.0);
         /*
                 switch (liste.general_purpose)
                 {
@@ -211,6 +217,83 @@ void bus_can(void *parameters)
             // Serial.println();
 
             break;
+        case CELLULE_BAT:
+            // Ne sert a rien
+            break;
+        case BATT_1:
+        {
+            float tension = conversion_4char_to_float(&rxMsg.data[0]);
+            float courant = conversion_4char_to_float(&rxMsg.data[4]);
+
+            if (tension > 9.5)
+            {
+                rectificateur_coeeff = 13.0/tension;
+                Serial.printf("BATT_1 ");
+                Serial.printf(" tension %.2f V", tension);
+                Serial.printf(" courant %.2f mA", courant);
+                Serial.println();
+            }
+            rxMsg.id = 0;
+        }
+        break;
+        case BATT_2:
+        {
+            float tension = conversion_4char_to_float(&rxMsg.data[0]);
+            float courant = conversion_4char_to_float(&rxMsg.data[4]);
+
+            if (tension > 9.5)
+            {
+                rectificateur_coeeff = 13.0/tension;
+                Serial.printf(" BATT_2 ");
+                Serial.printf(" tension %.2f V", tension);
+                Serial.printf(" courant %.2f mA", courant);
+                Serial.println();
+            }
+
+            // Serial.println();
+            rxMsg.id = 0;
+        }
+        break;
+        case BATT_3:
+        {
+            float tension = conversion_4char_to_float(&rxMsg.data[0]);
+            float courant = conversion_4char_to_float(&rxMsg.data[4]);
+
+            if (tension > 9.5)
+            {
+                rectificateur_coeeff = 13.0/tension;
+                Serial.printf(" BATT_3 ");
+                Serial.printf(" tension %.2f V", tension);
+                Serial.printf(" courant %.2f mA", courant);
+                Serial.println();
+            }
+
+            rxMsg.id = 0;
+        }
+        break;
+
+        case INTERRUPTEUR_BATT1:
+
+            Serial.printf(" INTERRUPTEUR_BATT1 ");
+            Serial.println();
+            rxMsg.id = 0;
+
+            break;
+        case INTERRUPTEUR_BATT2:
+
+            Serial.printf(" INTERRUPTEUR_BATT2 ");
+            Serial.println();
+            rxMsg.id = 0;
+
+            break;
+        case INTERRUPTEUR_BATT3:
+
+            Serial.printf("  INTERRUPTEUR_BATT3 ");
+            Serial.println();
+            rxMsg.id = 0;
+
+            break;
+
         case 0:
 
             break;
@@ -253,7 +336,7 @@ void setup()
     // Serial.printf("avncement_droite enter : %.0f\n", avncement_droite);
 
     reset_encodeur();
-    delay(1000);
+    delay(500);
     reset_encodeur();
 
     xTaskCreate(

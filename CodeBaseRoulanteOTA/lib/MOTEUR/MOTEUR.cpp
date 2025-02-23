@@ -107,7 +107,7 @@ void freinage_moteur_droit(bool on_off, int Vmax_consigne)
         }
     }
 }
-
+float mini = 1.5;
 void moteur_droit_polaire(int pwm)
 {
     // Serial.printf("Pwm MotorD %4d ", pwm);
@@ -122,7 +122,11 @@ void moteur_droit_polaire(int pwm)
         digitalWrite(M1_INA, 0);
         digitalWrite(M1_INB, 1);
     }
-    ledcWrite(channel_1,  fabs(pwm));
+    if (fabs(pwm) < mini)
+    {
+        pwm = mini;
+    }
+    ledcWrite(channel_1, fabs(pwm));
 }
 
 void moteur_gauche_polaire(int pwm)
@@ -138,6 +142,10 @@ void moteur_gauche_polaire(int pwm)
     {
         digitalWrite(M2_INA, 0);
         digitalWrite(M2_INB, 1);
+    }
+    if (fabs(pwm) < mini)
+    {
+        pwm = mini;
     }
     ledcWrite(channel_2, fabs(pwm));
 }

@@ -76,8 +76,8 @@ void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, 
     // Exemple : Envoi d'un message CAN
     twai_message_t message;
     message.identifier = id; // ID CAN
-    message.extd = rtr;
-    message.rtr = ext;            // Active le mode identifiant étendu (29 bits)
+    message.extd = ext;
+    message.rtr = rtr;            // Active le mode identifiant étendu (29 bits)
     message.data_length_code = 7; // DLC : Nombre d'octets dans le message
     message.data[0] = data0;      // Données a envoyés
     message.data[1] = data1;
@@ -88,14 +88,14 @@ void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, 
     message.data[6] = data6;
     //   message.data[7] = 0x03;
     // Envoi du message avec un délai d'attente de 1000 ms
-    // if (twai_transmit(&message, pdMS_TO_TICKS(10)) == ESP_OK)
-    // {
-    //     // Serial.println("Message envoyé avec succès.");
-    // }
-    // else
-    // {
-    //     // Serial.println("Erreur lors de l'envoi du message.");
-    // }
+    if (twai_transmit(&message, pdMS_TO_TICKS(10)) == ESP_OK)
+    {
+        Serial.println("Message envoyé avec succès.");
+    }
+    else
+    {
+        Serial.println("Erreur lors de l'envoi du message.");
+    }
 }
 
 void readCANMessage()
@@ -181,10 +181,39 @@ bool messageCANForMe(uint16_t ID)
     case RECALAGE:
         return true;
         break;
+    case BATT_1:
+        return true;
+        break;
+    case BATT_2:
+        return true;
+        break;
+    case BATT_3:
+        return true;
+        break;
+    case CELLULE_BAT:
+        return true;
+        break;
+    case INTERRUPTEUR_BATT1:
+        return true;
+        break;
+    case INTERRUPTEUR_BATT2:
+        return true;
+        break;
+    case INTERRUPTEUR_BATT3:
+        return true;
+        break;
 
     default:
         return false;
         break;
     }
     return false;
+}
+
+float conversion_4char_to_float(unsigned char *adresse_tableau)
+{
+    float nombre, *ptr;
+    ptr = (float *)adresse_tableau; // donne l'adresse du tableau au pointeur qui pointe vers un float
+    nombre = *ptr;                  // met dans le nombre le contenu à l'adresse du pointeur, le nombre réel codé en binaire
+    return nombre;
 }

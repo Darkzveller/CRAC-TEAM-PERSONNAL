@@ -36,7 +36,7 @@ void ota_handle(void *parameter)
   {
     SerialWIFIActivites(); // Gestion des opérations OTA (vérifie si une mise à jour est en cours)
     ArduinoOTA.handle();
-    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(500));
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(250));
   }
 }
 
@@ -225,7 +225,7 @@ void receptionWIFI(char ch)
         {
           sens = -1;
         }
-      }     
+      }
       // cmd = fabs(cmd);
       cmd = cmd;
       uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
@@ -242,7 +242,7 @@ void receptionWIFI(char ch)
       Serial.printf(" sens %d", sens);
       Serial.println();
 
-      sendCANMessage(ROTATION, 0, 0, 4, highByte, lowByte, 0x7B,0, 0, 0, 0);
+      sendCANMessage(ROTATION, 0, 0, 4, highByte, lowByte, 0x7B, 0, 0, 0, 0);
     }
     if (commande == "LIGNE")
     {
@@ -269,7 +269,7 @@ void receptionWIFI(char ch)
       TelnetStream.println();
       TelnetStream.printf("Send command LIGNE with cons");
       TelnetStream.printf(" cmd %d", cmd);
-      TelnetStream.printf(" lowByte %d", lowByte);      
+      TelnetStream.printf(" lowByte %d", lowByte);
       TelnetStream.printf(" highByte %d", highByte);
 
       TelnetStream.println();
@@ -278,7 +278,7 @@ void receptionWIFI(char ch)
       Serial.printf(" sens %d", sens);
       Serial.println();
 
-      sendCANMessage(LIGNE_DROITE, 0, 0, 4, highByte, lowByte, 0x7B,0, 0, 0, 0);
+      sendCANMessage(LIGNE_DROITE, 0, 0, 4, highByte, lowByte, 0x7B, 0, 0, 0, 0);
     }
     if (commande == "x")
     {
@@ -287,7 +287,8 @@ void receptionWIFI(char ch)
       uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
       uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
       x_low_byte = lowByte;
-      x_high_byte = highByte;      TelnetStream.println();
+      x_high_byte = highByte;
+      TelnetStream.println();
 
       TelnetStream.printf("Send command X with cons");
       TelnetStream.printf(" cmd %d", cmd);
@@ -329,12 +330,85 @@ void receptionWIFI(char ch)
 
       TelnetStream.printf("Send command RESTART");
       TelnetStream.println();
-      Serial.printf("Send command RESTART");
+      Serial.printf("Send command RESTART ");
+      Serial.printf("Send command OFF_1 Bat_1 ");
+      Serial.printf("Send command OFF_2 Bat_2 ");Serial.printf("Send command OFF_3 Bat_3 ");
       Serial.println();
 
       sendCANMessage(ESP32_RESTART, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+      sendCANMessage(INTERRUPTEUR_BATT1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
+      sendCANMessage(INTERRUPTEUR_BATT2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
+      sendCANMessage(INTERRUPTEUR_BATT3, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
     }
 
+    if (commande == "ON1")
+    {
+      TelnetStream.println();
+
+      TelnetStream.printf("Send command ON_1 Bat_1 ");
+      TelnetStream.println();
+      Serial.printf("Send command ON_1 Bat_1");
+      Serial.println();
+
+      sendCANMessage(INTERRUPTEUR_BATT1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
+    }
+    if (commande == "OFF1")
+    {
+      TelnetStream.println();
+
+      TelnetStream.printf("Send command OFF_1 Bat_1 ");
+      TelnetStream.println();
+      Serial.printf("Send command OFF_1 Bat_1");
+      Serial.println();
+
+      sendCANMessage(INTERRUPTEUR_BATT1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
+    }
+    if (commande == "ON2")
+    {
+      TelnetStream.println();
+
+      TelnetStream.printf("Send command ON_2 Bat_2 ");
+      TelnetStream.println();
+      Serial.printf("Send command ON_2 Bat_2");
+      Serial.println();
+
+      sendCANMessage(INTERRUPTEUR_BATT2, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
+    }
+    if (commande == "OFF2")
+    {
+      TelnetStream.println();
+
+      TelnetStream.printf("Send command OFF_2 Bat_2 ");
+      TelnetStream.println();
+      Serial.printf("Send command OFF_2 Bat_2");
+      Serial.println();
+
+      sendCANMessage(INTERRUPTEUR_BATT2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
+    }
+    if (commande == "ON3")
+    {
+      TelnetStream.println();
+
+      TelnetStream.printf("Send command ON_3 Bat_3 ");
+      TelnetStream.println();
+      Serial.printf("Send command ON_3 Bat_3");
+      Serial.println();
+
+      sendCANMessage(INTERRUPTEUR_BATT3, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
+    }
+    if (commande == "OFF3")
+    {
+      TelnetStream.println();
+
+      TelnetStream.printf("Send command OFF_3 Bat_3 ");
+      TelnetStream.println();
+      Serial.printf("Send command OFF_3 Bat_3");
+      Serial.println();
+
+      sendCANMessage(INTERRUPTEUR_BATT3, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
+    }
+
+    
     chaine = "";
   }
   else

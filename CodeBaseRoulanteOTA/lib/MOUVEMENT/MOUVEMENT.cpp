@@ -129,22 +129,19 @@ float theta_parcourir_prec = 0;
 
 float coeff_P_vit_polaire = 6.5;
 float coeff_D_vit_polaire = 0.5;
-float coeff_I_vit_polaire = 0;
-float integral_limit_vit_polaire_limit = 55;
+float coeff_I_vit_polaire = 0.1;
+float integral_limit_vit_polaire_limit = 1000;
 float somme_erreur_vit_polaire = 0;
 
-float coeff_P_w_polaire = 1100;
+float coeff_P_w_polaire = 2000.0;//1100 1750 2000
 float coeff_D_w_polaire = 0;
-float coeff_I_w_polaire = 0;
-float integral_limit_w_polaire_limit = 100;
+float coeff_I_w_polaire = 2.5;
+float integral_limit_w_polaire_limit = 1000.0;
 float somme_erreur_w_polaire = 0;
-float limit_commande_vit = 1200;
-float limit_commande_w = 2000;
+float limit_commande_vit = 1500;//1200
+float limit_commande_w = 1525-19;//2000
 float v_gauche = 0;
 float v_droite = 0;
-float seuil_arret_distance = 2;       // En unités de position (cm, mm...)
-float seuil_arret_angle = radians(2); // En radians
-float verif_non_depassement = 0;
 float vitesse_cible = 0;
 
 int etat_polaire = 0;
@@ -307,13 +304,19 @@ void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
 float hypothenuse;
 float cons_hypothenuse;
 float theta_parcourir;
+
+float limit_stop_v = 72 / 1.0;
+float limit_stop_w = radians(0.1);
+
 void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
 {
     hypothenuse = sqrt(pow(coordonnee_x - odo_x, 2) + pow(coordonnee_y - odo_y, 2));
     // verif_non_depassement = hypothenuse_prec - hypothenuse;
     cons_hypothenuse = sqrt(pow(coordonnee_x, 2) + pow(coordonnee_y, 2));
 
-     theta_parcourir = atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot;
+    // theta_parcourir = atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot;
+    // theta_parcourir =radians( theta_cons) - theta_robot;
+    theta_parcourir = atan2(coordonnee_y, coordonnee_x)- theta_robot;
 
     somme_erreur_vit_polaire += hypothenuse * Te;
 
@@ -324,6 +327,10 @@ void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
     else if (somme_erreur_vit_polaire < -integral_limit_vit_polaire_limit)
     {
         somme_erreur_vit_polaire = -integral_limit_vit_polaire_limit;
+    }
+    if ((hypothenuse <= limit_stop_v))
+    {
+        somme_erreur_vit_polaire = 0;
     }
 
     float commande_v_polaire = coeff_P_vit_polaire * hypothenuse + (coeff_D_vit_polaire * (hypothenuse - hypothenuse_prec)) / Te + coeff_I_vit_polaire * somme_erreur_vit_polaire;
@@ -346,9 +353,14 @@ void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
     {
         somme_erreur_w_polaire = integral_limit_w_polaire_limit;
     }
-    if (somme_erreur_w_polaire < -integral_limit_w_polaire_limit)
+    else if (somme_erreur_w_polaire < -integral_limit_w_polaire_limit)
     {
         somme_erreur_w_polaire = -integral_limit_w_polaire_limit;
+    }
+    if ((fabs(theta_parcourir) <= limit_stop_w))
+    {
+        somme_erreur_w_polaire = 0;
+        // Serial.printf("Sw 0 ");
     }
 
     float commande_w_polaire = coeff_P_w_polaire * theta_parcourir + (coeff_D_w_polaire * (theta_parcourir - theta_parcourir_prec)) / Te + coeff_I_w_polaire * somme_erreur_w_polaire;
@@ -363,28 +375,47 @@ void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
     }
 
     theta_parcourir_prec = theta_parcourir;
+
+    if ((hypothenuse <= limit_stop_v))
+    {
+        commande_v_polaire = 0;
+
+        // somme_erreur_vit_polaire = 0;
+    }
+    if ((fabs(theta_parcourir) <= limit_stop_w))
+    {
+        commande_w_polaire = 0;
+        // somme_erreur_w_polaire = 0;
+    }
     v_gauche = (commande_v_polaire + commande_w_polaire); // vitesse de notre moteur gauche
     v_droite = (commande_v_polaire - commande_w_polaire); // vitesse de notre moteur droit
-    Serial.printf(" v_droite %.3f ", v_droite);
-    Serial.printf(" v_gauche %.3f ", v_gauche);
+    // Serial.printf(" v_droite %.3f ", v_droite);
+    // Serial.printf(" v_gauche %.3f ", v_gauche);
 
     // asservissement_roue_folle_droite_tick(v_droite, odo_tick_droit);
     // asservissement_roue_folle_gauche_tick(v_gauche, odo_tick_gauche);
 
-    if(hypothenuse <= 10) v_droite = 0, v_gauche = 0, somme_erreur_vit_polaire = 0,somme_erreur_w_polaire = 0;
+    // if ((hypothenuse <= 10))
+    // {
+    //     v_droite = 0;
+    //     v_gauche = 0;
+    //     somme_erreur_vit_polaire = 0;
+    // }
 
+    // if (theta_parcourir <= radians(2))
+    // {
+    //     somme_erreur_w_polaire = 0;
+    // }
 
-    // if(theta_parcourir <= radians(2)) somme_erreur_w_polaire = 0;
-
-    moteur_gauche_polaire(-v_gauche);
-    moteur_droit_polaire(-v_droite);
+    moteur_gauche_polaire(-round(v_gauche));
+    moteur_droit_polaire(-round(v_droite));
 
     // moteur_droit_polaire(-v_droite);
     // moteur_gauche_polaire(-v_gauche);
-    Serial.printf(" Odo x %.3f ", odo_x);
-    Serial.printf(" odo_y %.3f ", odo_y);
+    Serial.printf(" Odo x %.1f ", odo_x);
+    Serial.printf(" odo_y %.1f ", odo_y);
     Serial.printf(" teheta %.3f ", degrees(theta_robot));
-    Serial.printf(" hypothenuse %.3f ", cons_hypothenuse);
+    // Serial.printf(" cons_hypothenuse %.3f ", cons_hypothenuse);
 
     Serial.printf(" hypothenuse %.3f ", hypothenuse);
     Serial.printf(" theta_parcourir %.3f ", degrees(theta_parcourir));
@@ -393,13 +424,90 @@ void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
     // Serial.printf(" coordonnee_y %.3f ", coordonnee_y);
     Serial.printf(" commande_v_polaire %.3f ", commande_v_polaire);
     Serial.printf(" commande_w_polaire %.3f ", commande_w_polaire);
-    Serial.printf(" v_gauche %.3f ", v_gauche);
-    Serial.printf(" v_droite %.3f ", v_droite);
-    Serial.printf(" odo_tick_gauche %.3f ", odo_tick_gauche);
+    Serial.printf(" v_g %.1f ", v_gauche);
+    Serial.printf(" v_d %.1f ", v_droite);
 
-    Serial.printf(" odo_tick_droit %.3f ", odo_tick_droit);
+    // Serial.printf(" odo_tick_gauche %.3f ", odo_tick_gauche);
+    // Serial.printf(" odo_tick_droit %.3f ", odo_tick_droit);
+    Serial.printf(" somme_err_v %.3f ", somme_erreur_vit_polaire);
+    Serial.printf(" C+somme_err_w %.3f ", coeff_I_w_polaire * somme_erreur_w_polaire    );
+
     // Serial.printf(" consigne_regulation_vitesse_gauche %.3f ", consigne_regulation_vitesse_gauche);
     // Serial.printf(" consigne_regulation_vitesse_droite %.3f ", consigne_regulation_vitesse_droite);
 
     Serial.println();
 }
+
+// float erreur_dist;
+// float somme_erreur_dist;
+// float delta_erreur_dist;
+// float erreur_prec_dist;
+// float erreur_orient;
+// float somme_erreur_orient;
+// float delta_erreur_orient;
+// float erreur_prec_orient;
+// float kp_dist;
+// float ki_dist;
+// float kd_dist;
+// float kp_orient;
+// float ki_orient;
+// float kd_orient;
+// void pid(float ConsigneDist, float ConsigneOrient)
+// {
+//     float compteurD;
+//     float compteurG;
+//     float mesure_dist;
+//     float mesure_orient;
+//     float cmd_dist;
+//     float cmd_orient;
+
+//     // affectation des compteurs de PID et reset des compteurs sur interruption
+//     // compteurD = tickD;
+//     // compteurG = tickG;
+//     // tickD = 0;
+//     // tickG = 0;
+
+//     // mesure distance et orientation
+//     mesure_dist = (odo_tick_droit + odo_tick_gauche) / 2;
+//     mesure_orient = odo_tick_droit - odo_tick_gauche;
+
+//     // Calcul des erreurs de distance
+//     erreur_dist = ConsigneDist - mesure_dist;
+//     somme_erreur_dist += erreur_dist;
+//     delta_erreur_dist = erreur_dist - erreur_prec_dist;
+//     // mise à jour de l'erreur précédente
+//     erreur_prec_dist = erreur_dist;
+
+//     // Calcul des erreurs d'orientation
+//     erreur_orient = ConsigneOrient - mesure_orient;
+//     somme_erreur_orient += erreur_orient;
+//     delta_erreur_orient = erreur_orient - erreur_prec_orient;
+//     // mise à jour de l'erreur précédente
+//     erreur_prec_orient = erreur_orient;
+
+//     // calcul des commandes
+//     cmd_dist = ((kp_dist * erreur_dist) + (ki_dist * somme_erreur_dist) + (kd_dist * delta_erreur_dist));               // PID distance
+//     cmd_orient = ((kp_orient * erreur_orient) + (ki_orient * somme_erreur_orient) + (kd_orient * delta_erreur_orient)); // PID orientation
+
+//     // appliquer les commandes aux moteur
+//     float PWMG = cmd_dist - cmd_orient; // ça ne doit surement pas fonctionner de cette façon
+//     float PWMD = cmd_dist + cmd_orient;
+
+//     // Normalisation des commandes PWM de sortie (le moteur ne bouge pas avec un pwm < 240)
+//     if (PWMD < 600)
+//     {
+//         PWMD = 600;
+//     }
+//     else if (PWMD > 3075)
+//     {
+//         PWMD = 3075;
+//     }
+//     if (PWMG < 600)
+//     {
+//         PWMG = 600;
+//     }
+//     else if (PWMG > 3075)
+//     {
+//         PWMG = 3075;
+//     }
+// }

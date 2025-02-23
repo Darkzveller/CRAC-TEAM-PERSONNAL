@@ -79,14 +79,13 @@ void setupCAN(int baudrate)
         Serial.println("Erreur lors du démarrage de TWAI.");
     }
 }
-
 void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, int data2, int data3, int data4, int data5, int data6)
 {
     // Exemple : Envoi d'un message CAN
     twai_message_t message;
     message.identifier = id; // ID CAN
-    message.extd = rtr;
-    message.rtr = ext;            // Active le mode identifiant étendu (29 bits)
+    message.extd = ext;
+    message.rtr = rtr;            // Active le mode identifiant étendu (29 bits)
     message.data_length_code = 7; // DLC : Nombre d'octets dans le message
     message.data[0] = data0;      // Données a envoyés
     message.data[1] = data1;
@@ -99,14 +98,13 @@ void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, 
     // Envoi du message avec un délai d'attente de 1000 ms
     if (twai_transmit(&message, pdMS_TO_TICKS(10)) == ESP_OK)
     {
-        // Serial.println("Message envoyé avec succès.");
+        Serial.println("Message envoyé avec succès.");
     }
     else
     {
-        // Serial.println("Erreur lors de l'envoi du message.");
+        Serial.println("Erreur lors de l'envoi du message.");
     }
 }
-
 void readCANMessage()
 {
     // Exemple : Réception d'un message CAN
@@ -127,19 +125,19 @@ void readCANMessage()
          Serial.println();
     */
 
-        /*
+        
         // Si l'ID est valide, traitement du message
         Serial.print(" Message reçu : ID=");
         Serial.print(rx_message.identifier, HEX); // Affiche l'ID du message en hexadécimal
-        Serial.print(" EXT=");
-        Serial.print(rx_message.extd); // Affiche le Data Length Code (DLC)
-        Serial.print(" RTR=");
-        Serial.print(rx_message.rtr); // Affiche le Data Length Code (DLC)
+        // Serial.print(" EXT=");
+        // Serial.print(rx_message.extd); // Affiche le Data Length Code (DLC)
+        // Serial.print(" RTR=");
+        // Serial.print(rx_message.rtr); // Affiche le Data Length Code (DLC)
 
-        Serial.print(" DLC=");
-        Serial.print(rx_message.data_length_code); // Affiche le Data Length Code (DLC)
+        // Serial.print(" DLC=");
+        // Serial.print(rx_message.data_length_code); // Affiche le Data Length Code (DLC)
         Serial.print(" Data=");
-*/
+
         id = rx_message.identifier;
         // rxMsg.extd = rx_message.extd;
         // rxMsg.rtr = rx_message.rtr;
@@ -148,18 +146,19 @@ void readCANMessage()
         for (int i = 0; i < rx_message.data_length_code; i++)
         {
             data[i] = rx_message.data[i];
-            // Serial.print(data[i], HEX); // Affiche chaque octet de données en hexadécimal
-            // Serial.print(" ");
+            Serial.print(data[i], HEX); // Affiche chaque octet de données en hexadécimal
+            Serial.print(" ");
         }
-        verificateur_acquitement(id, data[1]);
-        {
-            /*
+     Serial.println();
+
+       /* {
+            
              else
              {
                  // Si l'ID n'est pas pris en compte, on l'ignore
                  Serial.print(" Message reçu avec ID non pris en compte : ");
                  Serial.print(rx_message.identifier, HEX);
-             }*/
+             }
         } /*
          else
          {
@@ -169,33 +168,3 @@ void readCANMessage()
     }
 }
 
-void verificateur_acquitement(int id, int data)
-{
-    if (id == ACKNOWLEDGE_BASE_ROULANTE)
-    {
-        String affichage_type = "";
-        switch (data)
-        {
-        case TYPE_DEPLACEMENT_IMMOBILE:
-            affichage_type = "TYPE_DEPLACEMENT_IMMOBILE";
-            break;
-        case TYPE_DEPLACEMENT_LIGNE_DROITE:
-            affichage_type = "TYPE_DEPLACEMENT_LIGNE_DROITE";
-            break;
-        case TYPE_DEPLACEMENT_ROTATION:
-            affichage_type = "TYPE_DEPLACEMENT_ROTATION";
-            break;
-        case TYPE_DEPLACEMENT_X_Y_THETA:
-            affichage_type = "TYPE_DEPLACEMENT_X_Y_THETA";
-            break;
-        case TYPE_DEPLACEMENT_RECALAGE:
-            affichage_type = "TYPE_DEPLACEMENT_RECALAGE";
-            break;
-        default:
-            affichage_type = "ETAT_INCONNU";
-            break;
-        }
-        Serial.println(" " + affichage_type);
-        TelnetStream.println(" " + affichage_type);
-    }
-}
