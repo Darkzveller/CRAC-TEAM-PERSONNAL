@@ -127,19 +127,19 @@ void x_y_theta(float coordonnee_x, float coordonnee_y, float theta_fin, int vite
 float hypothenuse_prec = 0;
 float theta_parcourir_prec = 0;
 
-float coeff_P_vit_polaire = 6.5;
-float coeff_D_vit_polaire = 0.5;
-float coeff_I_vit_polaire = 0.1;
-float integral_limit_vit_polaire_limit = 1000;
-float somme_erreur_vit_polaire = 0;
+float coeff_P_dist_polaire = 6.5;
+float coeff_D_dist_polaire = 0.5;
+float coeff_I_dist_polaire = 0.1;
+float integral_limit_dist_polaire_limit = 1000;
+float somme_erreur_dist_polaire = 0;
 
-float coeff_P_w_polaire = 2000.0;//1100 1750 2000
-float coeff_D_w_polaire = 0;
-float coeff_I_w_polaire = 2.5;
-float integral_limit_w_polaire_limit = 1000.0;
-float somme_erreur_w_polaire = 0;
-float limit_commande_vit = 1500;//1200
-float limit_commande_w = 1525-19;//2000
+float coeff_P_orient_polaire = 2000.0; // 1100 1750 2000
+float coeff_D_orient_polaire = 0;
+float coeff_I_orient_polaire = 2.5;
+float integral_limit_orient_polaire_limit = 1000.0;
+float somme_erreur_orient_polaire = 0;
+float limit_commande_dist = 1500;        // 1200
+float limit_commande_orient = 1525 - 19; // 2000
 float v_gauche = 0;
 float v_droite = 0;
 float vitesse_cible = 0;
@@ -305,8 +305,8 @@ float hypothenuse;
 float cons_hypothenuse;
 float theta_parcourir;
 
-float limit_stop_v = 72 / 1.0;
-float limit_stop_w = radians(0.1);
+float limit_stop_dist = 72 / 1.0;
+float limit_stop_orient = radians(0.1);
 
 void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
 {
@@ -316,79 +316,79 @@ void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
 
     // theta_parcourir = atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot;
     // theta_parcourir =radians( theta_cons) - theta_robot;
-    theta_parcourir = atan2(coordonnee_y, coordonnee_x)- theta_robot;
+    theta_parcourir = atan2(coordonnee_y, coordonnee_x) - theta_robot;
 
-    somme_erreur_vit_polaire += hypothenuse * Te;
+    somme_erreur_dist_polaire += hypothenuse * Te;
 
-    if (somme_erreur_vit_polaire > integral_limit_vit_polaire_limit)
+    if (somme_erreur_dist_polaire > integral_limit_dist_polaire_limit)
     {
-        somme_erreur_vit_polaire = integral_limit_vit_polaire_limit;
+        somme_erreur_dist_polaire = integral_limit_dist_polaire_limit;
     }
-    else if (somme_erreur_vit_polaire < -integral_limit_vit_polaire_limit)
+    else if (somme_erreur_dist_polaire < -integral_limit_dist_polaire_limit)
     {
-        somme_erreur_vit_polaire = -integral_limit_vit_polaire_limit;
+        somme_erreur_dist_polaire = -integral_limit_dist_polaire_limit;
     }
-    if ((hypothenuse <= limit_stop_v))
+    if ((hypothenuse <= limit_stop_dist))
     {
-        somme_erreur_vit_polaire = 0;
+        somme_erreur_dist_polaire = 0;
     }
 
-    float commande_v_polaire = coeff_P_vit_polaire * hypothenuse + (coeff_D_vit_polaire * (hypothenuse - hypothenuse_prec)) / Te + coeff_I_vit_polaire * somme_erreur_vit_polaire;
+    float commande_dist_polaire = coeff_P_dist_polaire * hypothenuse + (coeff_D_dist_polaire * (hypothenuse - hypothenuse_prec)) / Te + coeff_I_dist_polaire * somme_erreur_dist_polaire;
 
-    if (commande_v_polaire > limit_commande_vit)
+    if (commande_dist_polaire > limit_commande_dist)
     {
-        commande_v_polaire = limit_commande_vit;
+        commande_dist_polaire = limit_commande_dist;
     }
-    else if (commande_v_polaire < -limit_commande_vit)
+    else if (commande_dist_polaire < -limit_commande_dist)
     {
-        commande_v_polaire = -limit_commande_vit;
+        commande_dist_polaire = -limit_commande_dist;
     }
 
     hypothenuse_prec = hypothenuse;
     // on a donc la vitesse "en ligne droite" que notre robot doit avoir
 
-    somme_erreur_w_polaire += theta_parcourir * Te;
+    somme_erreur_orient_polaire += theta_parcourir * Te;
 
-    if (somme_erreur_w_polaire > integral_limit_w_polaire_limit)
+    if (somme_erreur_orient_polaire > integral_limit_orient_polaire_limit)
     {
-        somme_erreur_w_polaire = integral_limit_w_polaire_limit;
+        somme_erreur_orient_polaire = integral_limit_orient_polaire_limit;
     }
-    else if (somme_erreur_w_polaire < -integral_limit_w_polaire_limit)
+    else if (somme_erreur_orient_polaire < -integral_limit_orient_polaire_limit)
     {
-        somme_erreur_w_polaire = -integral_limit_w_polaire_limit;
+        somme_erreur_orient_polaire = -integral_limit_orient_polaire_limit;
     }
-    if ((fabs(theta_parcourir) <= limit_stop_w))
+    if ((fabs(theta_parcourir) <= limit_stop_orient))
     {
-        somme_erreur_w_polaire = 0;
+        somme_erreur_orient_polaire = 0;
         // Serial.printf("Sw 0 ");
     }
 
-    float commande_w_polaire = coeff_P_w_polaire * theta_parcourir + (coeff_D_w_polaire * (theta_parcourir - theta_parcourir_prec)) / Te + coeff_I_w_polaire * somme_erreur_w_polaire;
+    float commande_orient_polaire = coeff_P_orient_polaire * theta_parcourir + (coeff_D_orient_polaire * (theta_parcourir - theta_parcourir_prec)) / Te + coeff_I_orient_polaire * somme_erreur_orient_polaire;
 
-    if (commande_w_polaire > limit_commande_w)
+    if (commande_orient_polaire > limit_commande_orient)
     {
-        commande_w_polaire = limit_commande_w;
+        commande_orient_polaire = limit_commande_orient;
     }
-    else if (commande_w_polaire < -limit_commande_w)
+    else if (commande_orient_polaire < -limit_commande_orient)
     {
-        commande_w_polaire = -limit_commande_w;
+        commande_orient_polaire = -limit_commande_orient;
     }
 
     theta_parcourir_prec = theta_parcourir;
 
-    if ((hypothenuse <= limit_stop_v))
+    if ((hypothenuse <= limit_stop_dist))
     {
-        commande_v_polaire = 0;
+        commande_dist_polaire = 0;
 
         // somme_erreur_vit_polaire = 0;
     }
-    if ((fabs(theta_parcourir) <= limit_stop_w))
+    if ((fabs(theta_parcourir) <= limit_stop_orient))
     {
-        commande_w_polaire = 0;
+        commande_orient_polaire = 0;
         // somme_erreur_w_polaire = 0;
     }
-    v_gauche = (commande_v_polaire + commande_w_polaire); // vitesse de notre moteur gauche
-    v_droite = (commande_v_polaire - commande_w_polaire); // vitesse de notre moteur droit
+    v_gauche = (commande_dist_polaire + commande_orient_polaire); // vitesse de notre moteur gauche
+    v_droite = (commande_dist_polaire - commande_orient_polaire); // vitesse de notre moteur droit
     // Serial.printf(" v_droite %.3f ", v_droite);
     // Serial.printf(" v_gauche %.3f ", v_gauche);
 
@@ -422,15 +422,15 @@ void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
 
     // Serial.printf(" coordonnee_x %.3f ", coordonnee_x);
     // Serial.printf(" coordonnee_y %.3f ", coordonnee_y);
-    Serial.printf(" commande_v_polaire %.3f ", commande_v_polaire);
-    Serial.printf(" commande_w_polaire %.3f ", commande_w_polaire);
+    Serial.printf(" commande_dist_polaire %.3f ", commande_dist_polaire);
+    Serial.printf(" commande_orient_polaire %.3f ", commande_orient_polaire);
     Serial.printf(" v_g %.1f ", v_gauche);
     Serial.printf(" v_d %.1f ", v_droite);
 
     // Serial.printf(" odo_tick_gauche %.3f ", odo_tick_gauche);
     // Serial.printf(" odo_tick_droit %.3f ", odo_tick_droit);
-    Serial.printf(" somme_err_v %.3f ", somme_erreur_vit_polaire);
-    Serial.printf(" C+somme_err_w %.3f ", coeff_I_w_polaire * somme_erreur_w_polaire    );
+    Serial.printf(" somme_err_dist %.3f ", somme_erreur_dist_polaire);
+    Serial.printf(" C+somme_err_orient %.3f ", coeff_I_orient_polaire * somme_erreur_orient_polaire);
 
     // Serial.printf(" consigne_regulation_vitesse_gauche %.3f ", consigne_regulation_vitesse_gauche);
     // Serial.printf(" consigne_regulation_vitesse_droite %.3f ", consigne_regulation_vitesse_droite);
