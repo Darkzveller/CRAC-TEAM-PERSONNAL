@@ -79,14 +79,14 @@ void setupCAN(int baudrate)
         Serial.println("Erreur lors du démarrage de TWAI.");
     }
 }
-void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, int data2, int data3, int data4, int data5, int data6)
+void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, int data2, int data3, int data4, int data5, int data6,int data7)
 {
     // Exemple : Envoi d'un message CAN
     twai_message_t message;
     message.identifier = id; // ID CAN
     message.extd = ext;
     message.rtr = rtr;            // Active le mode identifiant étendu (29 bits)
-    message.data_length_code = 7; // DLC : Nombre d'octets dans le message
+    message.data_length_code = length; // DLC : Nombre d'octets dans le message
     message.data[0] = data0;      // Données a envoyés
     message.data[1] = data1;
     message.data[2] = data2;
@@ -94,7 +94,7 @@ void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, 
     message.data[4] = data4;
     message.data[5] = data5;
     message.data[6] = data6;
-    //   message.data[7] = 0x03;
+      message.data[7] = data7;
     // Envoi du message avec un délai d'attente de 1000 ms
     if (twai_transmit(&message, pdMS_TO_TICKS(10)) == ESP_OK)
     {

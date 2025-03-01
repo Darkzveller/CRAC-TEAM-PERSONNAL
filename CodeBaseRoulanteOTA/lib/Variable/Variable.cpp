@@ -94,8 +94,8 @@ float somme_erreur_vit_roue_folle_droite = 0;
 float somme_erreur_vit_roue_folle_gauche = 0;
 float erreur_vit_precedente_roue_folle_gauche = 0;
 
-bool start_asservissement_roue_gauche = true;
-bool start_asservissement_roue_droite = true;
+bool start_asservissement_roue_gauche = false;
+bool start_asservissement_roue_droite = false;
 
 Etat_vitesse_roue_folle_droite etat_actuel_vit_roue_folle_droite = ETAT_ATTENTE_Vitesse_ROUE_FOLLE_DROITE;
 Etat_vitesse_roue_folle_gauche etat_actuel_vit_roue_folle_gauche = ETAT_ATTENTE_Vitesse_ROUE_FOLLE_GAUCHE;
@@ -190,3 +190,6 @@ signed char FIFO_occupation = 0;
 signed char FIFO_max_occupation = 0;
 //***********Ordre de déplacement******************* */
 bool flag_fin_mvt = true;
+//*********** Qu'est ce qu'on voit au borne de la batterie******************* */
+float courant=0;
+float tension =0;

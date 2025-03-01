@@ -14,21 +14,23 @@ float rectificateur_coeeff = 0;
 struct Ordre_deplacement
 {
     int general_purpose;
-    int angle;
+    float angle;
     int sens_rotation;
     int16_t distance;
     int vitesse_croisiere;
     int sens_ligne_droite;
-    int consigne_distance_recalage;
+    float consigne_distance_recalage;
     int vitesse_recalage;
     int sens_recalage;
-    int x;
-    int y;
-    int theta;
-    int vitesse_x_y_theta;
+    float x;
+    float y;
+    float theta;
+    float vitesse_x_y_theta;
+    float x_polaire;
+    float y_polaire;
 };
-Ordre_deplacement liste = {TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
+Ordre_deplacement liste = {TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static bool polaire_true_or_false = false;
 void controle(void *parameters)
 {
     TickType_t xLastWakeTime;
@@ -36,75 +38,85 @@ void controle(void *parameters)
     while (1)
     {
         read_x_y_theta();
-        // Serial.printf("Open interrupt all bat \n");
-        // sendCANMessage(INTERRUPTEUR_BATT1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
-        // sendCANMessage(INTERRUPTEUR_BATT2, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
-        // sendCANMessage(INTERRUPTEUR_BATT3, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
-        // sendCANMessage(0x12, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
 
-        // asser_polaire(200.0, 200, 45.0);
-        /*
-                switch (liste.general_purpose)
-                {
-                case TYPE_DEPLACEMENT_LIGNE_DROITE:
+        switch (liste.general_purpose)
+        {
+        case TYPE_DEPLACEMENT_LIGNE_DROITE:
 
-                    liste.vitesse_croisiere = SPEED_TORTUE;
-                    // Serial.printf("TYPE_DEPLACEMENT_LIGNE_DROITE");
-                    ligne_droite(liste.distance, liste.vitesse_croisiere);
+            liste.vitesse_croisiere = SPEED_TORTUE;
+            Serial.printf("TYPE_DEPLACEMENT_LIGNE_DROITE ");
+            ligne_droite(liste.distance, liste.vitesse_croisiere);
 
-                    if (return_flag_asser_roue())
-                    {
-                        flag_fin_mvt = true;
-                        sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_LIGNE_DROITE, 0, 0, 0, 0, 0);
-                        liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
-                    }
+            if (return_flag_asser_roue())
+            {
+                flag_fin_mvt = true;
+                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 2, flag_fin_mvt, TYPE_DEPLACEMENT_LIGNE_DROITE, 0, 0, 0, 0, 0, 0);
+                liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
+            }
 
-                    break;
-                case TYPE_DEPLACEMENT_ROTATION:
+            break;
+        case TYPE_DEPLACEMENT_ROTATION:
 
-                    // // Serial.printf("TYPE_DEPLACEMENT_ROTATION");
+            Serial.printf("TYPE_DEPLACEMENT_ROTATION ");
 
-                    liste.vitesse_croisiere = SPEED_TORTUE;
-                    rotation(liste.angle, liste.vitesse_croisiere);
+            liste.vitesse_croisiere = SPEED_TORTUE;
+            rotation(liste.angle, liste.vitesse_croisiere);
 
-                    if (return_flag_asser_roue())
-                    {
-                        consigne_theta_prec = degrees(theta_robot);
-                        flag_fin_mvt = true;
-                        sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_ROTATION, 0, 0, 0, 0, 0);
-                        liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
-                    }
-                    break;
-                case TYPE_DEPLACEMENT_IMMOBILE:
-                    consigne_regulation_vitesse_droite = consigne_odo_droite_prec;
-                    consigne_regulation_vitesse_gauche = consigne_odo_gauche_prec;
-                    // Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE ");
-                    liste.general_purpose = TYPE_VIDE;
-                    flag_fin_mvt = true;
-                    sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0);
+            if (return_flag_asser_roue())
+            {
+                consigne_theta_prec = degrees(theta_robot);
+                flag_fin_mvt = true;
+                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 2, flag_fin_mvt, TYPE_DEPLACEMENT_ROTATION, 0, 0, 0, 0, 0, 0);
+                liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
+            }
+            break;
+        case TYPE_DEPLACEMENT_IMMOBILE:
+            consigne_regulation_vitesse_droite = consigne_odo_droite_prec;
+            consigne_regulation_vitesse_gauche = consigne_odo_gauche_prec;
+            Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE");
+            liste.general_purpose = TYPE_VIDE;
+            flag_fin_mvt = true;
+            polaire_true_or_false = false;
+            sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 2, flag_fin_mvt, TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0, 0);
 
-                    break;
-                case TYPE_DEPLACEMENT_X_Y_THETA:
+            break;
+        case TYPE_DEPLACEMENT_X_Y_THETA:
+            Serial.printf(" TYPE_DEPLACEMENT_X_Y_THETA ");
 
-                    x_y_theta(liste.x, liste.y, liste.theta, SPEED_TORTUE);
+            x_y_theta(liste.x, liste.y, liste.theta, SPEED_TORTUE);
 
-                    if (etat_x_y_theta == -1)
-                    {
-                        flag_fin_mvt = true;
-                        sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 1, flag_fin_mvt, TYPE_DEPLACEMENT_X_Y_THETA, 0, 0, 0, 0, 0);
-                        liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
-                    }
-                    break;
-                case TYPE_VIDE:
-                    // Serial.printf(" TYPE_VIDE \n");
-                    break;
+            if (etat_x_y_theta == -1)
+            {
+                flag_fin_mvt = true;
+                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 2, flag_fin_mvt, TYPE_DEPLACEMENT_X_Y_THETA, 0, 0, 0, 0, 0, 0);
+                liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
+            }
+            break;
+        case TYPE_DEPLACEMENT_X_Y_POLAIRE:
+            Serial.printf(" TYPE_DEPLACEMENT_X_Y_POLAIRE ");
+            polaire_true_or_false = true;
+            asser_polaire(liste.x_polaire, liste.y_polaire, 0);
 
-                default:
-                    break;
-                }
-                asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
-                asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
-                */
+            if (flag_fin_mvt)
+            {
+
+                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 2, flag_fin_mvt, TYPE_DEPLACEMENT_X_Y_POLAIRE, 0, 0, 0, 0, 0, 0);
+                liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
+            }
+            break;
+
+        case TYPE_VIDE:
+            // Serial.printf(" TYPE_VIDE \n");
+            break;
+
+        default:
+            break;
+        }
+        if (!polaire_true_or_false)
+        {
+            asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
+            asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
+        }
         flag_controle = 1;
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
     }
@@ -210,9 +222,30 @@ void bus_can(void *parameters)
             rxMsg.id = 0;
 
             // Serial.printf(" XYTHETA ");
-            // Serial.printf(" liste.x %d ", liste.x);
-            // Serial.printf(" liste.y %d ", liste.y);
-            // Serial.printf(" liste.theta %d ", liste.theta);
+            // Serial.printf(" liste.x %f ", liste.x);
+            // Serial.printf(" liste.y %f ", liste.y);
+            // Serial.printf(" liste.theta %f ", liste.theta);
+
+            // Serial.println();
+
+            break;
+
+        case POLAIRE:
+
+            flag_fin_mvt = false;
+
+            liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
+            liste.x_polaire = fusion_octet(rxMsg.data[0], rxMsg.data[1]);
+            liste.y_polaire = fusion_octet(rxMsg.data[2], rxMsg.data[3]);
+
+            // liste.vitesse_croisiere = rxMsg.data[3];
+            lauch_flag_asser_roue(true);
+
+            rxMsg.id = 0;
+
+            // Serial.printf(" POLAIRE ");
+            // Serial.printf(" liste.x_polaire %f ", liste.x_polaire);
+            // Serial.printf(" liste.y_polaire %f ", liste.y_polaire);
 
             // Serial.println();
 
@@ -220,30 +253,38 @@ void bus_can(void *parameters)
         case CELLULE_BAT:
             // Ne sert a rien
             break;
+        case BATT_MAIN:
+
+            Serial.printf("BATT_Main ");
+            Serial.printf(" tension %.2f V", conversion_4char_to_float(&rxMsg.data[0]));
+            Serial.printf(" courant %.2f mA", conversion_4char_to_float(&rxMsg.data[4]));
+            Serial.println();
+
+            rxMsg.id = 0;
+
+            break;
         case BATT_1:
-        {
-            float tension = conversion_4char_to_float(&rxMsg.data[0]);
-            float courant = conversion_4char_to_float(&rxMsg.data[4]);
+            tension = conversion_4char_to_float(&rxMsg.data[0]);
+            courant = conversion_4char_to_float(&rxMsg.data[4]);
 
             if (tension > 9.5)
             {
-                rectificateur_coeeff = 13.0/tension;
+                rectificateur_coeeff = 13.0 / tension;
                 Serial.printf("BATT_1 ");
                 Serial.printf(" tension %.2f V", tension);
                 Serial.printf(" courant %.2f mA", courant);
                 Serial.println();
             }
             rxMsg.id = 0;
-        }
-        break;
+
+            break;
         case BATT_2:
-        {
-            float tension = conversion_4char_to_float(&rxMsg.data[0]);
-            float courant = conversion_4char_to_float(&rxMsg.data[4]);
+            tension = conversion_4char_to_float(&rxMsg.data[0]);
+            courant = conversion_4char_to_float(&rxMsg.data[4]);
 
             if (tension > 9.5)
             {
-                rectificateur_coeeff = 13.0/tension;
+                rectificateur_coeeff = 13.0 / tension;
                 Serial.printf(" BATT_2 ");
                 Serial.printf(" tension %.2f V", tension);
                 Serial.printf(" courant %.2f mA", courant);
@@ -252,16 +293,16 @@ void bus_can(void *parameters)
 
             // Serial.println();
             rxMsg.id = 0;
-        }
-        break;
+
+            break;
         case BATT_3:
-        {
-            float tension = conversion_4char_to_float(&rxMsg.data[0]);
-            float courant = conversion_4char_to_float(&rxMsg.data[4]);
+
+            tension = conversion_4char_to_float(&rxMsg.data[0]);
+            courant = conversion_4char_to_float(&rxMsg.data[4]);
 
             if (tension > 9.5)
             {
-                rectificateur_coeeff = 13.0/tension;
+                rectificateur_coeeff = 13.0 / tension;
                 Serial.printf(" BATT_3 ");
                 Serial.printf(" tension %.2f V", tension);
                 Serial.printf(" courant %.2f mA", courant);
@@ -269,8 +310,8 @@ void bus_can(void *parameters)
             }
 
             rxMsg.id = 0;
-        }
-        break;
+
+            break;
 
         case INTERRUPTEUR_BATT1:
 

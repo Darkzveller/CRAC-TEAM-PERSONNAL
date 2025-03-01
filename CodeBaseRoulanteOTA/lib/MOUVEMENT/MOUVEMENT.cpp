@@ -127,19 +127,21 @@ void x_y_theta(float coordonnee_x, float coordonnee_y, float theta_fin, int vite
 float hypothenuse_prec = 0;
 float theta_parcourir_prec = 0;
 
-float coeff_P_dist_polaire = 6.5;
-float coeff_D_dist_polaire = 0.5;
-float coeff_I_dist_polaire = 0.1;
+float commande_dist_polaire = 0;
+float coeff_P_dist_polaire = 0.95; // 6.5
+float coeff_D_dist_polaire = 0;    // 0.5
+float coeff_I_dist_polaire = 0;    // 0.1
 float integral_limit_dist_polaire_limit = 1000;
 float somme_erreur_dist_polaire = 0;
 
-float coeff_P_orient_polaire = 2000.0; // 1100 1750 2000
+float commande_orient_polaire = 0;
+float coeff_P_orient_polaire = 650; // 1100 1750 2000 1250
 float coeff_D_orient_polaire = 0;
-float coeff_I_orient_polaire = 2.5;
+float coeff_I_orient_polaire = 0; // 2.5
 float integral_limit_orient_polaire_limit = 1000.0;
 float somme_erreur_orient_polaire = 0;
-float limit_commande_dist = 1500;        // 1200
-float limit_commande_orient = 1525 - 19; // 2000
+float limit_commande_dist = 1500;                  // 1200
+float limit_commande_orient = limit_commande_dist; // 1525 - 19
 float v_gauche = 0;
 float v_droite = 0;
 float vitesse_cible = 0;
@@ -305,136 +307,184 @@ float hypothenuse;
 float cons_hypothenuse;
 float theta_parcourir;
 
-float limit_stop_dist = 72 / 1.0;
-float limit_stop_orient = radians(0.1);
+// float limit_stop_dist = 72 / 1.0;
+float limit_stop_dist = 25;
 
+float limit_stop_orient = radians(10);
+
+enum ETAT_PROFIL_TRAPEZE_POLAIRE
+{
+    ETAT_ACCELERATION_PROFIL_TRAPEZE_POLAIRE,
+    ETAT_CROISIERE_PROFIL_TRAPEZE_POLAIRE,
+    ETAT_DECELERATION_PROFIL_TRAPEZE_POLAIRE,
+    ETAT_ARRET_PROFIL_TRAPEZE_POLAIRE
+};
+
+ETAT_PROFIL_TRAPEZE_POLAIRE etat_profil_trapeze_polaire;
+String toStringPolaire(ETAT_PROFIL_TRAPEZE_POLAIRE etat)
+{
+    switch (etat)
+    {
+    case ETAT_ACCELERATION_PROFIL_TRAPEZE_POLAIRE:
+        return "ETAT_ACCELERATION_PROFIL_TRAPEZE_POLAIRE";
+    case ETAT_CROISIERE_PROFIL_TRAPEZE_POLAIRE:
+        return "ETAT_CROISIERE_PROFIL_TRAPEZE_POLAIRE";
+    case ETAT_DECELERATION_PROFIL_TRAPEZE_POLAIRE:
+        return "ETAT_DECELERATION_PROFIL_TRAPEZE_POLAIRE";
+    case ETAT_ARRET_PROFIL_TRAPEZE_POLAIRE:
+        return "ETAT_ARRET_PROFIL_TRAPEZE_POLAIRE";
+    default:
+        return "ETAT_INCONNU";
+    }
+}
+
+float Vmax_polaire = limit_commande_dist; // 6.5
+float Amax_polaire = 0.65;                 // 0.65
+float Dmax_polaire =0.25;
+float acc_actuel_polaire = 0;
+float Ta_counter_polaire = 0;
+
+float distance_accel_polaire = 0;
+float distance_decl_polaire = 0;
+
+float tension_reference_test = 12.5;
 void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
 {
-    hypothenuse = sqrt(pow(coordonnee_x - odo_x, 2) + pow(coordonnee_y - odo_y, 2));
-    // verif_non_depassement = hypothenuse_prec - hypothenuse;
-    cons_hypothenuse = sqrt(pow(coordonnee_x, 2) + pow(coordonnee_y, 2));
+    static int i = 0;
+    if (i == 0)
+    {
+        etat_profil_trapeze_polaire = ETAT_ACCELERATION_PROFIL_TRAPEZE_POLAIRE;
+        i = 1;
+    }
 
-    // theta_parcourir = atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot;
+    coeff_P_dist_polaire = 8; // 5.01
+    coeff_D_dist_polaire = 0;
+    coeff_I_dist_polaire = 0;
+
+    coeff_P_orient_polaire = 2400;
+    coeff_D_orient_polaire = 0;
+    coeff_I_orient_polaire = 0;
+
+    hypothenuse = sqrt(pow(coordonnee_x - odo_x, 2) + pow(coordonnee_y - odo_y, 2));
+    cons_hypothenuse = sqrt(pow(coordonnee_x, 2) + pow(coordonnee_y, 2));
+    theta_parcourir = atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot;
     // theta_parcourir =radians( theta_cons) - theta_robot;
-    theta_parcourir = atan2(coordonnee_y, coordonnee_x) - theta_robot;
+    // theta_parcourir = atan2(coordonnee_y, coordonnee_x) - theta_robot;
+    float vit = Vmax_polaire;
+    float accel = Amax_polaire;
+    float decc = Dmax_polaire;
+
+    float distance_restante;
+    float Ta = vit / accel;
+    float Td = vit / decc;
+    float Tc = (2.0 * cons_hypothenuse - accel * (Ta * Ta + Td * Td)) / (2 * vit);
+    distance_accel_polaire = 0.5 * Ta * Ta * accel;
+    distance_decl_polaire = 0.5 * Td * Td * decc;
 
     somme_erreur_dist_polaire += hypothenuse * Te;
 
-    if (somme_erreur_dist_polaire > integral_limit_dist_polaire_limit)
-    {
-        somme_erreur_dist_polaire = integral_limit_dist_polaire_limit;
-    }
-    else if (somme_erreur_dist_polaire < -integral_limit_dist_polaire_limit)
-    {
-        somme_erreur_dist_polaire = -integral_limit_dist_polaire_limit;
-    }
-    if ((hypothenuse <= limit_stop_dist))
-    {
-        somme_erreur_dist_polaire = 0;
-    }
+    somme_erreur_dist_polaire += hypothenuse * Te;
+    somme_erreur_dist_polaire = constrain(somme_erreur_dist_polaire, -integral_limit_dist_polaire_limit, integral_limit_dist_polaire_limit);
 
-    float commande_dist_polaire = coeff_P_dist_polaire * hypothenuse + (coeff_D_dist_polaire * (hypothenuse - hypothenuse_prec)) / Te + coeff_I_dist_polaire * somme_erreur_dist_polaire;
-
-    if (commande_dist_polaire > limit_commande_dist)
-    {
-        commande_dist_polaire = limit_commande_dist;
-    }
-    else if (commande_dist_polaire < -limit_commande_dist)
-    {
-        commande_dist_polaire = -limit_commande_dist;
-    }
+    commande_dist_polaire = coeff_P_dist_polaire * hypothenuse + (coeff_D_dist_polaire * (hypothenuse - hypothenuse_prec)) / Te + coeff_I_dist_polaire * somme_erreur_dist_polaire;
+    commande_dist_polaire = constrain(commande_dist_polaire, -limit_commande_dist, limit_commande_dist);
 
     hypothenuse_prec = hypothenuse;
     // on a donc la vitesse "en ligne droite" que notre robot doit avoir
 
     somme_erreur_orient_polaire += theta_parcourir * Te;
 
-    if (somme_erreur_orient_polaire > integral_limit_orient_polaire_limit)
-    {
-        somme_erreur_orient_polaire = integral_limit_orient_polaire_limit;
-    }
-    else if (somme_erreur_orient_polaire < -integral_limit_orient_polaire_limit)
-    {
-        somme_erreur_orient_polaire = -integral_limit_orient_polaire_limit;
-    }
-    if ((fabs(theta_parcourir) <= limit_stop_orient))
-    {
-        somme_erreur_orient_polaire = 0;
-        // Serial.printf("Sw 0 ");
-    }
+    somme_erreur_orient_polaire = constrain(somme_erreur_orient_polaire, -integral_limit_orient_polaire_limit, integral_limit_orient_polaire_limit);
 
-    float commande_orient_polaire = coeff_P_orient_polaire * theta_parcourir + (coeff_D_orient_polaire * (theta_parcourir - theta_parcourir_prec)) / Te + coeff_I_orient_polaire * somme_erreur_orient_polaire;
+    commande_orient_polaire = coeff_P_orient_polaire * theta_parcourir + (coeff_D_orient_polaire * (theta_parcourir - theta_parcourir_prec)) / Te + coeff_I_orient_polaire * somme_erreur_orient_polaire;
 
-    if (commande_orient_polaire > limit_commande_orient)
-    {
-        commande_orient_polaire = limit_commande_orient;
-    }
-    else if (commande_orient_polaire < -limit_commande_orient)
-    {
-        commande_orient_polaire = -limit_commande_orient;
-    }
+    commande_orient_polaire = constrain(commande_orient_polaire, -limit_commande_orient, limit_commande_orient);
 
     theta_parcourir_prec = theta_parcourir;
-
-    if ((hypothenuse <= limit_stop_dist))
+    // Globalement le switch case suivant est censé effectuer un profil trapézoidal mais en fin de compte il ne serta pas a grand chose
+    switch (etat_profil_trapeze_polaire)
     {
+
+    case ETAT_ACCELERATION_PROFIL_TRAPEZE_POLAIRE:
+        Serial.printf(" ETAT_ACCELERATION_PROFIL_TRAPEZE_POLAIRE ");
+        acc_actuel_polaire = acc_actuel_polaire + vitesse_rob * Te;
+        commande_dist_polaire = vitesse_rob + acc_actuel_polaire * Te;
+
+        acc_actuel_polaire = constrain(acc_actuel_polaire, -accel, accel);
+        commande_dist_polaire = constrain(commande_dist_polaire, -Vmax_polaire, Vmax_polaire);
+
+        Ta_counter_polaire++;
+        if (Ta_counter_polaire > Ta)
+        {
+            etat_profil_trapeze_polaire = ETAT_CROISIERE_PROFIL_TRAPEZE_POLAIRE;
+        }
+        break;
+
+    case ETAT_CROISIERE_PROFIL_TRAPEZE_POLAIRE:
+        // commande_dist_polaire = 1200; // Je sais pas trop quoi faire avec lui j'ai l'impression que ca fonctionne mieux avec lui
+        if (hypothenuse < fabs(distance_decl_polaire))
+        {
+            etat_profil_trapeze_polaire = ETAT_DECELERATION_PROFIL_TRAPEZE_POLAIRE;
+        }
+        Serial.printf(" ETAT_CROISIERE_PROFIL_TRAPEZE_POLAIRE ");
+
+        break;
+
+    case ETAT_DECELERATION_PROFIL_TRAPEZE_POLAIRE:
+
+        if (commande_dist_polaire < 600) // Inférieur a 600, car en dessous de cette valeur le moteur n'a pas la force de faire avancer le robot
+        {
+            etat_profil_trapeze_polaire = ETAT_ARRET_PROFIL_TRAPEZE_POLAIRE;
+        }
+        else
+        {
+            commande_dist_polaire = commande_dist_polaire - decc * Te;
+        }
+        Serial.printf(" ETAT_DECELERATION_PROFIL_TRAPEZE_POLAIRE ");
+
+        break;
+
+    case ETAT_ARRET_PROFIL_TRAPEZE_POLAIRE:
         commande_dist_polaire = 0;
+        Serial.printf(" ETAT_ARRET_PROFIL_TRAPEZE_POLAIRE ");
 
-        // somme_erreur_vit_polaire = 0;
+        break;
     }
-    if ((fabs(theta_parcourir) <= limit_stop_orient))
-    {
-        commande_orient_polaire = 0;
-        // somme_erreur_w_polaire = 0;
-    }
+
     v_gauche = (commande_dist_polaire + commande_orient_polaire); // vitesse de notre moteur gauche
     v_droite = (commande_dist_polaire - commande_orient_polaire); // vitesse de notre moteur droit
-    // Serial.printf(" v_droite %.3f ", v_droite);
-    // Serial.printf(" v_gauche %.3f ", v_gauche);
-
-    // asservissement_roue_folle_droite_tick(v_droite, odo_tick_droit);
-    // asservissement_roue_folle_gauche_tick(v_gauche, odo_tick_gauche);
-
-    // if ((hypothenuse <= 10))
-    // {
-    //     v_droite = 0;
-    //     v_gauche = 0;
-    //     somme_erreur_vit_polaire = 0;
-    // }
-
-    // if (theta_parcourir <= radians(2))
-    // {
-    //     somme_erreur_w_polaire = 0;
-    // }
 
     moteur_gauche_polaire(-round(v_gauche));
     moteur_droit_polaire(-round(v_droite));
 
-    // moteur_droit_polaire(-v_droite);
-    // moteur_gauche_polaire(-v_gauche);
+    // Pour effectuer une sauvegarde pour les autres fonctions car oui ca fonctionne et non c'est pas le centre du monde
+    consigne_odo_gauche_prec = odo_tick_gauche;
+    consigne_odo_droite_prec = odo_tick_droit;
+    consigne_odo_x_prec = odo_x;
+    consigne_odo_y_prec = odo_y;
+    consigne_theta_prec = degrees(theta_robot);
+    consigne_regulation_vitesse_droite = odo_tick_droit;
+    consigne_regulation_vitesse_gauche = odo_tick_gauche;
+
+    if (hypothenuse < 20)
+    {
+        flag_fin_mvt = true;
+        Serial.printf(" Vrai ");
+    }
     Serial.printf(" Odo x %.1f ", odo_x);
     Serial.printf(" odo_y %.1f ", odo_y);
     Serial.printf(" teheta %.3f ", degrees(theta_robot));
-    // Serial.printf(" cons_hypothenuse %.3f ", cons_hypothenuse);
-
     Serial.printf(" hypothenuse %.3f ", hypothenuse);
+    Serial.printf(" cons_hypothenuse %.3f ", cons_hypothenuse);
     Serial.printf(" theta_parcourir %.3f ", degrees(theta_parcourir));
+    Serial.printf(" cmd_d_p %.3f ", commande_dist_polaire);
+    Serial.printf(" cmd_w_p %.3f ", commande_orient_polaire);
 
-    // Serial.printf(" coordonnee_x %.3f ", coordonnee_x);
-    // Serial.printf(" coordonnee_y %.3f ", coordonnee_y);
-    Serial.printf(" commande_dist_polaire %.3f ", commande_dist_polaire);
-    Serial.printf(" commande_orient_polaire %.3f ", commande_orient_polaire);
-    Serial.printf(" v_g %.1f ", v_gauche);
-    Serial.printf(" v_d %.1f ", v_droite);
-
-    // Serial.printf(" odo_tick_gauche %.3f ", odo_tick_gauche);
-    // Serial.printf(" odo_tick_droit %.3f ", odo_tick_droit);
-    Serial.printf(" somme_err_dist %.3f ", somme_erreur_dist_polaire);
-    Serial.printf(" C+somme_err_orient %.3f ", coeff_I_orient_polaire * somme_erreur_orient_polaire);
-
-    // Serial.printf(" consigne_regulation_vitesse_gauche %.3f ", consigne_regulation_vitesse_gauche);
-    // Serial.printf(" consigne_regulation_vitesse_droite %.3f ", consigne_regulation_vitesse_droite);
-
+    // // Serial.printf(" distance_accel_polaire %.3f ", distance_accel_polaire);
+    Serial.printf(" distance_decl_polaire %.3f ", distance_decl_polaire);
+    // Serial.printf(" Ta %.3f ", Ta);
+    // Serial.printf(" Td %.3f ", Td);
+    // Serial.printf(" Tc %.3f ", Tc);
     Serial.println();
 }
 

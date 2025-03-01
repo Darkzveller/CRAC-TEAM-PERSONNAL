@@ -63,7 +63,7 @@ void setupOTA()
     Serial.println("Connection Failed! Rebooting...");
     delay(1000);
     // Redémarrage si la connexion échoue (commenté pour l'instant)
-    ESP.restart();
+    // ESP.restart();
   }
 
   // Affiche le succès de la connexion
@@ -242,7 +242,7 @@ void receptionWIFI(char ch)
       Serial.printf(" sens %d", sens);
       Serial.println();
 
-      sendCANMessage(ROTATION, 0, 0, 4, highByte, lowByte, 0x7B, 0, 0, 0, 0);
+      sendCANMessage(ROTATION, 0, 0, 8, highByte, lowByte, 0x7B, 0, 0, 0, 0, 0);
     }
     if (commande == "LIGNE")
     {
@@ -278,7 +278,7 @@ void receptionWIFI(char ch)
       Serial.printf(" sens %d", sens);
       Serial.println();
 
-      sendCANMessage(LIGNE_DROITE, 0, 0, 4, highByte, lowByte, 0x7B, 0, 0, 0, 0);
+      sendCANMessage(LIGNE_DROITE, 0, 0, 8, highByte, lowByte, 0x7B, 0, 0, 0, 0, 0);
     }
     if (commande == "x")
     {
@@ -289,10 +289,14 @@ void receptionWIFI(char ch)
       x_low_byte = lowByte;
       x_high_byte = highByte;
       TelnetStream.println();
-
       TelnetStream.printf("Send command X with cons");
       TelnetStream.printf(" cmd %d", cmd);
       TelnetStream.println();
+
+      Serial.println();
+      Serial.printf("Send command X with cons");
+      Serial.printf(" cmd %d", cmd);
+      Serial.println();
     }
 
     if (commande == "y")
@@ -308,6 +312,10 @@ void receptionWIFI(char ch)
       TelnetStream.printf("Send command y with cons");
       TelnetStream.printf(" cmd %d", cmd);
       TelnetStream.println();
+      Serial.println();
+      Serial.printf("Send command X with cons");
+      Serial.printf(" cmd %d", cmd);
+      Serial.println();
     }
     if (commande == "t")
     {
@@ -322,26 +330,32 @@ void receptionWIFI(char ch)
       TelnetStream.printf("Send command t with cons");
       TelnetStream.printf(" cmd %d", cmd);
       TelnetStream.println();
-      sendCANMessage(XYTHETA, 0, 0, 4, x_high_byte, x_low_byte, y_high_byte, y_low_byte, t_high_byte, t_low_byte, 0);
+
+      Serial.println();
+      Serial.printf("Send command X with cons");
+      Serial.printf(" cmd %d", cmd);
+      Serial.println();
+
+      sendCANMessage(XYTHETA, 0, 0, 8, x_high_byte, x_low_byte, y_high_byte, y_low_byte, t_high_byte, t_low_byte, 0, 0);
     }
-    if (commande == "RESTART")
+    if ((commande == "RESTART") || (commande == "restart"))
     {
       TelnetStream.println();
 
       TelnetStream.printf("Send command RESTART");
       TelnetStream.println();
-      Serial.printf("Send command RESTART ");
+      Serial.printf("Send command RESTART \n");
       Serial.printf("Send command OFF_1 Bat_1 ");
-      Serial.printf("Send command OFF_2 Bat_2 ");Serial.printf("Send command OFF_3 Bat_3 ");
+      Serial.printf("Send command OFF_2 Bat_2 ");
+      Serial.printf("Send command OFF_3 Bat_3 ");
       Serial.println();
 
-      sendCANMessage(ESP32_RESTART, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-      sendCANMessage(INTERRUPTEUR_BATT1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
-      sendCANMessage(INTERRUPTEUR_BATT2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
-      sendCANMessage(INTERRUPTEUR_BATT3, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
+      sendCANMessage(ESP32_RESTART, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+      sendCANMessage(INTERRUPTEUR_BATT1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0);
+      sendCANMessage(INTERRUPTEUR_BATT2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0);
+      sendCANMessage(INTERRUPTEUR_BATT3, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0);
     }
-
-    if (commande == "ON1")
+    if ((commande == "ON1") || (commande == "on1"))
     {
       TelnetStream.println();
 
@@ -350,9 +364,9 @@ void receptionWIFI(char ch)
       Serial.printf("Send command ON_1 Bat_1");
       Serial.println();
 
-      sendCANMessage(INTERRUPTEUR_BATT1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
+      sendCANMessage(INTERRUPTEUR_BATT1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0);
     }
-    if (commande == "OFF1")
+    if ((commande == "OFF1") || (commande == "off1"))
     {
       TelnetStream.println();
 
@@ -361,9 +375,9 @@ void receptionWIFI(char ch)
       Serial.printf("Send command OFF_1 Bat_1");
       Serial.println();
 
-      sendCANMessage(INTERRUPTEUR_BATT1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
+      sendCANMessage(INTERRUPTEUR_BATT1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0);
     }
-    if (commande == "ON2")
+    if ((commande == "ON2") || (commande == "on2"))
     {
       TelnetStream.println();
 
@@ -372,9 +386,9 @@ void receptionWIFI(char ch)
       Serial.printf("Send command ON_2 Bat_2");
       Serial.println();
 
-      sendCANMessage(INTERRUPTEUR_BATT2, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
+      sendCANMessage(INTERRUPTEUR_BATT2, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0);
     }
-    if (commande == "OFF2")
+    if ((commande == "OFF2") || (commande == "off2"))
     {
       TelnetStream.println();
 
@@ -383,9 +397,9 @@ void receptionWIFI(char ch)
       Serial.printf("Send command OFF_2 Bat_2");
       Serial.println();
 
-      sendCANMessage(INTERRUPTEUR_BATT2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
+      sendCANMessage(INTERRUPTEUR_BATT2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0);
     }
-    if (commande == "ON3")
+    if ((commande == "ON3") || (commande == "on3"))
     {
       TelnetStream.println();
 
@@ -394,9 +408,9 @@ void receptionWIFI(char ch)
       Serial.printf("Send command ON_3 Bat_3");
       Serial.println();
 
-      sendCANMessage(INTERRUPTEUR_BATT3, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
+      sendCANMessage(INTERRUPTEUR_BATT3, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0);
     }
-    if (commande == "OFF3")
+    if ((commande == "OFF3") || (commande == "off3"))
     {
       TelnetStream.println();
 
@@ -405,10 +419,48 @@ void receptionWIFI(char ch)
       Serial.printf("Send command OFF_3 Bat_3");
       Serial.println();
 
-      sendCANMessage(INTERRUPTEUR_BATT3, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0);
+      sendCANMessage(INTERRUPTEUR_BATT3, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
-    
+    if (commande == "xp")
+    {
+      cmd = valeur.toInt();
+
+      uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
+      uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
+      x_low_byte = lowByte;
+      x_high_byte = highByte;
+      TelnetStream.println();
+      TelnetStream.printf("Send command xp with cons");
+      TelnetStream.printf(" cmd %d", cmd);
+      TelnetStream.println();
+      Serial.println();
+      Serial.printf("Send command xp with cons");
+      Serial.printf(" cmd %d", cmd);
+      Serial.println();
+    }
+    if (commande == "yp")
+    {
+      cmd = valeur.toInt();
+
+      uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
+      uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
+      y_low_byte = lowByte;
+      y_high_byte = highByte;
+      TelnetStream.println();
+
+      TelnetStream.printf("Send command yp with cons");
+      TelnetStream.printf(" cmd %d", cmd);
+      TelnetStream.println();
+
+      Serial.println();
+      Serial.printf("Send command yp with cons");
+      Serial.printf(" cmd %d", cmd);
+      Serial.println();
+
+      sendCANMessage(POLAIRE, 0, 0, 8, x_high_byte, x_low_byte, y_high_byte, y_low_byte, 0, 0, 0, 0);
+    }
+
     chaine = "";
   }
   else

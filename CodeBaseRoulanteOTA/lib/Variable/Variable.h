@@ -221,7 +221,11 @@ extern signed char FIFO_max_occupation;
 #define TYPE_DEPLACEMENT_X_Y_THETA 4
 #define TYPE_DEPLACEMENT_RECALAGE 5
 #define TYPE_VIDE 6
+#define TYPE_DEPLACEMENT_X_Y_POLAIRE 7 
 
 extern bool flag_fin_mvt;
 
+//*********** Qu'est ce qu'on voit au borne de la batterie******************* */
+extern float courant;
+extern float tension;
 #endif
