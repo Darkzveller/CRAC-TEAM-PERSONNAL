@@ -38,85 +38,89 @@ void controle(void *parameters)
     while (1)
     {
         read_x_y_theta();
+        int x = 200;
+        int y = x;
+        asser_polaire_tick(x, y, 0);
 
-        switch (liste.general_purpose)
-        {
-        case TYPE_DEPLACEMENT_LIGNE_DROITE:
+        /*
+                switch (liste.general_purpose)
+                {
+                case TYPE_DEPLACEMENT_LIGNE_DROITE:
 
-            liste.vitesse_croisiere = SPEED_TORTUE;
-            Serial.printf("TYPE_DEPLACEMENT_LIGNE_DROITE ");
-            ligne_droite(liste.distance, liste.vitesse_croisiere);
+                    liste.vitesse_croisiere = SPEED_TORTUE;
+                    Serial.printf("TYPE_DEPLACEMENT_LIGNE_DROITE ");
+                    ligne_droite(liste.distance, liste.vitesse_croisiere);
 
-            if (return_flag_asser_roue())
-            {
-                flag_fin_mvt = true;
-                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 2, flag_fin_mvt, TYPE_DEPLACEMENT_LIGNE_DROITE, 0, 0, 0, 0, 0, 0);
-                liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
-            }
+                    if (return_flag_asser_roue())
+                    {
+                        flag_fin_mvt = true;
+                        sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 2, flag_fin_mvt, TYPE_DEPLACEMENT_LIGNE_DROITE, 0, 0, 0, 0, 0, 0);
+                        liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
+                    }
 
-            break;
-        case TYPE_DEPLACEMENT_ROTATION:
+                    break;
+                case TYPE_DEPLACEMENT_ROTATION:
 
-            Serial.printf("TYPE_DEPLACEMENT_ROTATION ");
+                    Serial.printf("TYPE_DEPLACEMENT_ROTATION ");
 
-            liste.vitesse_croisiere = SPEED_TORTUE;
-            rotation(liste.angle, liste.vitesse_croisiere);
+                    liste.vitesse_croisiere = SPEED_TORTUE;
+                    rotation(liste.angle, liste.vitesse_croisiere);
 
-            if (return_flag_asser_roue())
-            {
-                consigne_theta_prec = degrees(theta_robot);
-                flag_fin_mvt = true;
-                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 2, flag_fin_mvt, TYPE_DEPLACEMENT_ROTATION, 0, 0, 0, 0, 0, 0);
-                liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
-            }
-            break;
-        case TYPE_DEPLACEMENT_IMMOBILE:
-            consigne_regulation_vitesse_droite = consigne_odo_droite_prec;
-            consigne_regulation_vitesse_gauche = consigne_odo_gauche_prec;
-            Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE");
-            liste.general_purpose = TYPE_VIDE;
-            flag_fin_mvt = true;
-            polaire_true_or_false = false;
-            sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 2, flag_fin_mvt, TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0, 0);
+                    if (return_flag_asser_roue())
+                    {
+                        consigne_theta_prec = degrees(theta_robot);
+                        flag_fin_mvt = true;
+                        sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 2, flag_fin_mvt, TYPE_DEPLACEMENT_ROTATION, 0, 0, 0, 0, 0, 0);
+                        liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
+                    }
+                    break;
+                case TYPE_DEPLACEMENT_IMMOBILE:
+                    consigne_regulation_vitesse_droite = consigne_odo_droite_prec;
+                    consigne_regulation_vitesse_gauche = consigne_odo_gauche_prec;
+                    Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE");
+                    liste.general_purpose = TYPE_VIDE;
+                    flag_fin_mvt = true;
+                    polaire_true_or_false = false;
+                    sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 2, flag_fin_mvt, TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0, 0);
 
-            break;
-        case TYPE_DEPLACEMENT_X_Y_THETA:
-            Serial.printf(" TYPE_DEPLACEMENT_X_Y_THETA ");
+                    break;
+                case TYPE_DEPLACEMENT_X_Y_THETA:
+                    Serial.printf(" TYPE_DEPLACEMENT_X_Y_THETA ");
 
-            x_y_theta(liste.x, liste.y, liste.theta, SPEED_TORTUE);
+                    x_y_theta(liste.x, liste.y, liste.theta, SPEED_TORTUE);
 
-            if (etat_x_y_theta == -1)
-            {
-                flag_fin_mvt = true;
-                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 2, flag_fin_mvt, TYPE_DEPLACEMENT_X_Y_THETA, 0, 0, 0, 0, 0, 0);
-                liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
-            }
-            break;
-        case TYPE_DEPLACEMENT_X_Y_POLAIRE:
-            Serial.printf(" TYPE_DEPLACEMENT_X_Y_POLAIRE ");
-            polaire_true_or_false = true;
-            asser_polaire(liste.x_polaire, liste.y_polaire, 0);
+                    if (etat_x_y_theta == -1)
+                    {
+                        flag_fin_mvt = true;
+                        sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 2, flag_fin_mvt, TYPE_DEPLACEMENT_X_Y_THETA, 0, 0, 0, 0, 0, 0);
+                        liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
+                    }
+                    break;
+                case TYPE_DEPLACEMENT_X_Y_POLAIRE:
+                    Serial.printf(" TYPE_DEPLACEMENT_X_Y_POLAIRE ");
+                    polaire_true_or_false = true;
+                    asser_polaire(liste.x_polaire, liste.y_polaire, 0);
 
-            if (flag_fin_mvt)
-            {
+                    if (flag_fin_mvt)
+                    {
 
-                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 2, flag_fin_mvt, TYPE_DEPLACEMENT_X_Y_POLAIRE, 0, 0, 0, 0, 0, 0);
-                liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
-            }
-            break;
+                        sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 2, flag_fin_mvt, TYPE_DEPLACEMENT_X_Y_POLAIRE, 0, 0, 0, 0, 0, 0);
+                        liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
+                    }
+                    break;
 
-        case TYPE_VIDE:
-            // Serial.printf(" TYPE_VIDE \n");
-            break;
+                case TYPE_VIDE:
+                    // Serial.printf(" TYPE_VIDE \n");
+                    break;
 
-        default:
-            break;
-        }
-        if (!polaire_true_or_false)
-        {
-            asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
-            asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
-        }
+                default:
+                    break;
+                }
+                if (!polaire_true_or_false)
+                {
+                    asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
+                    asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
+                }*/
         flag_controle = 1;
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
     }

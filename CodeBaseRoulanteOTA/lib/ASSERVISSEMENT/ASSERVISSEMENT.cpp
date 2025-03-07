@@ -516,4 +516,3 @@ double asservissement_angle_correction(double consigne_angle, double observation
 
     return correction; // Retourne la correction à appliquer
 }
-
