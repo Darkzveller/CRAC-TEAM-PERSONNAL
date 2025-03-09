@@ -38,10 +38,10 @@ void controle(void *parameters)
     while (1)
     {
         read_x_y_theta();
-        // int x = 200;
-        // int y = x;
-        // asser_polaire_tick(x, y, 0);
-
+        int x = 400;
+   
+        asser_polaire_tick(x, x, 0);
+/*
         switch (liste.general_purpose)
         {
         case TYPE_DEPLACEMENT_LIGNE_DROITE:
@@ -119,7 +119,7 @@ void controle(void *parameters)
         {
             asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
             asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
-        }
+        }*/
         flag_controle = 1;
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
     }
@@ -339,16 +339,16 @@ void bus_can(void *parameters)
             break;
 
         case 0:
-        {
-            int16_t odo_x_int = static_cast<int16_t>(odo_x * 10);
-            int16_t odo_y_int = static_cast<int16_t>(odo_y * 10);
+        // {
+        //     int16_t odo_x_int = static_cast<int16_t>(odo_x * 10);
+        //     int16_t odo_y_int = static_cast<int16_t>(odo_y * 10);
 
-            uint8_t lowByte_x = odo_x_int & 0xFF;
-            uint8_t highByte_x = (odo_x_int >> 8) & 0xFF;
-            uint8_t lowByte_y = odo_y_int & 0xFF;
-            uint8_t highByte_y = (odo_y_int >> 8) & 0xFF;
-            // sendCANMessage(ODO_SEND, 0, 0, 8, highByte_x, lowByte_x, highByte_y, lowByte_y, 0, 0, 0, 0);
-        }
+        //     uint8_t lowByte_x = odo_x_int & 0xFF;
+        //     uint8_t highByte_x = (odo_x_int >> 8) & 0xFF;
+        //     uint8_t lowByte_y = odo_y_int & 0xFF;
+        //     uint8_t highByte_y = (odo_y_int >> 8) & 0xFF;
+        //     // sendCANMessage(ODO_SEND, 0, 0, 8, highByte_x, lowByte_x, highByte_y, lowByte_y, 0, 0, 0, 0);
+        // }
 
         break;
 
