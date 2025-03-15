@@ -192,7 +192,7 @@ float Ta_counter_polaire = 0;
 float distance_accel_polaire = 0;
 float distance_decl_polaire = 0;
 
-float tension_reference_test = 12.5;
+float tension_reference_test = 12.3;
 void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
 {
     static int i = 0;
@@ -285,73 +285,37 @@ void asser_polaire(float coordonnee_x, float coordonnee_y, float theta_cons)
     Serial.println();
 }
 
+float erreur_distance = 0;
+float erreur_orient = 0;
 void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons)
 {
-    static int i = 0;
-    if (i == 0)
+    coordonnee_x = 200;
+    coordonnee_y = coordonnee_x;
+    erreur_distance = convert_distance_mm_to_tick(sqrt(pow(coordonnee_x - odo_x, 2) + pow(coordonnee_y - odo_y, 2))); // On détermine la distance restante a parcourir
+    erreur_orient = convert_angle_radian_to_tick((atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot));  // On détermine l'angle a parcour pour arriver a destination
+
+    float consigne_dist_gauche = 100;
+    float consigne_dist_droite = consigne_dist_gauche;
+
+    float consigne_rot_gauche = erreur_orient;
+    float consigne_rot_droite = erreur_orient;
+    if (erreur_distance < convert_distance_mm_to_tick(50))
     {
-        etat_profil_trapeze_polaire = ETAT_ACCELERATION_PROFIL_TRAPEZE_POLAIRE;
-        i = 1;
+        consigne_dist_gauche = 0;
+        consigne_dist_droite = 0;        consigne_rot_gauche = 0;
+        consigne_rot_droite = 0;
+
     }
+    float coeff_rot = 0.075;
+    float coeff_dist = 0.5;
 
-    hypothenuse = convert_distance_mm_to_tick(sqrt(pow(coordonnee_x - odo_x, 2) + pow(coordonnee_y - odo_y, 2))); // On détermine la distance restante a parcourir
+    float commande_gauche = odo_tick_gauche + coeff_dist * consigne_dist_gauche + coeff_rot * consigne_rot_gauche; // commande en tick qu'on souhaite atteindre
+    float commande_droite = odo_tick_droit + coeff_dist * consigne_dist_droite - coeff_rot * consigne_rot_droite;  // commande en tick qu'on souhaite atteindre
 
-    cons_hypothenuse = convert_distance_mm_to_tick(sqrt(pow(coordonnee_x, 2) + pow(coordonnee_y, 2)));
-    theta_parcourir = convert_angle_radian_to_tick(degrees((atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot))); // On détermine l'angle a parcour pour arriver a destination
-   float cons_theta  = atan2(coordonnee_y, coordonnee_x ) - theta_robot;
-
-    // limit_commande_dist = 1500000;                  // 1200
-    // limit_commande_orient = 1500; // 1525 - 19
-    coeff_P_dist_polaire = 0.05*0; // 5.01
-    coeff_D_dist_polaire = 0   *0;
-    coeff_I_dist_polaire = 1   *0;
-    integral_limit_dist_polaire_limit = cons_hypothenuse;
-
-    coeff_P_orient_polaire = 0.3;
-    coeff_D_orient_polaire = 3;
-    coeff_I_orient_polaire = 0;
-    integral_limit_orient_polaire_limit = 500;
- 
-    somme_erreur_dist_polaire += (cons_hypothenuse- hypothenuse);
-    somme_erreur_dist_polaire = constrain(somme_erreur_dist_polaire, -integral_limit_dist_polaire_limit, integral_limit_dist_polaire_limit);
-    commande_dist_polaire = coeff_P_dist_polaire * hypothenuse + (coeff_D_dist_polaire * (hypothenuse - hypothenuse_prec)) / Te + coeff_I_dist_polaire * somme_erreur_dist_polaire;
-    // commande_dist_polaire = constrain(commande_dist_polaire, -limit_commande_dist, limit_commande_dist);
-    hypothenuse_prec = hypothenuse;
-    // on a donc la vitesse "en ligne droite" que notre robot doit avoir
-
-    somme_erreur_orient_polaire += theta_parcourir * Te;
-    somme_erreur_orient_polaire = constrain(somme_erreur_orient_polaire, -integral_limit_orient_polaire_limit, integral_limit_orient_polaire_limit);
-    commande_orient_polaire = coeff_P_orient_polaire * theta_parcourir + (coeff_D_orient_polaire * (theta_parcourir - theta_parcourir_prec)) / Te + coeff_I_orient_polaire * somme_erreur_orient_polaire;
-    // commande_orient_polaire = constrain(commande_orient_polaire, -limit_commande_orient, limit_commande_orient);
-    theta_parcourir_prec = theta_parcourir;
-    // v_gauche = convert_distance_mm_to_tick(commande_dist_polaire + commande_orient_polaire); // vitesse de notre moteur gauche
-    // v_droite = convert_distance_mm_to_tick(commande_dist_polaire - commande_orient_polaire); // vitesse de notre moteur droit
-
-    // moteur_gauche_polaire(-round(v_gauche));
-    // moteur_droit_polaire(-round(v_droite));
-
-    // int consigne_dist_gauche = (convert_distance_mm_to_tick(cons_hypothenuse) + consigne_odo_gauche_prec);
-    // int consigne_dist_droite = (convert_distance_mm_to_tick(cons_hypothenuse) + consigne_odo_droite_prec);
-    // commande_dist_polaire = cons_hypothenuse;
-    int consigne_dist_gauche = commande_dist_polaire*0;
-    int consigne_dist_droite = commande_dist_polaire*0;
-
-    
-    int consigne_rot_gauche = (commande_orient_polaire) ;
-    int consigne_rot_droite = (commande_orient_polaire) ;
-
-    int commande_gauche = consigne_dist_gauche + consigne_rot_gauche; // commande en tick qu'on souhaite atteindre
-    int commande_droite = consigne_dist_droite - consigne_rot_droite; // commande en tick qu'on souhaite atteindre
-
-    asservissement_roue_folle_gauche_tick(commande_gauche, odo_tick_gauche); // PID en tick des roue avec pour 1ere argument la consigne et le deuxieme argument l'observation sur la roue odo
-    asservissement_roue_folle_droite_tick(commande_droite, odo_tick_droit);  // PID en tick des roue avec pour 1ere argument la consigne et le deuxieme argument l'observation sur la roue odo
+    asservissement_roue_folle_gauche_tick(round(commande_gauche), odo_tick_gauche); // PID en tick des roue avec pour 1ere argument la consigne et le deuxieme argument l'observation sur la roue odo
+    asservissement_roue_folle_droite_tick(round(commande_droite), odo_tick_droit);  // PID en tick des roue avec pour 1ere argument la consigne et le deuxieme argument l'observation sur la roue odo
 
     // Pour effectuer une sauvegarde pour les autres fonctions car oui ca fonctionne et non c'est pas le centre du monde
-    // consigne_odo_gauche_prec = odo_tick_gauche;
-    // consigne_odo_droite_prec = odo_tick_droit;
-    // consigne_odo_x_prec = odo_x;
-    // consigne_odo_y_prec = odo_y;
-    // consigne_theta_prec = degrees(theta_robot);
     // consigne_regulation_vitesse_droite = odo_tick_droit;
     // consigne_regulation_vitesse_gauche = odo_tick_gauche;
 
@@ -359,6 +323,12 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
     // {
     //     flag_fin_mvt = true;
     //     Serial.printf(" Vrai ");
+    // consigne_odo_gauche_prec = odo_tick_gauche;
+    // consigne_odo_droite_prec = odo_tick_droit;
+    // consigne_odo_x_prec = odo_x;
+    // consigne_odo_y_prec = odo_y;
+    // consigne_theta_prec = degrees(theta_robot);
+
     // }
     Serial.printf(" cs x %.1f ", coordonnee_x);
     Serial.printf(" cs_y %.1f ", coordonnee_y);
@@ -367,23 +337,19 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
     Serial.printf(" Odo x %.1f ", odo_x);
     Serial.printf(" odo_y %.1f ", odo_y);
     Serial.printf(" teheta %.3f ", degrees(theta_robot));
-    Serial.printf(" hypothenuse %.3f ", hypothenuse);
-    Serial.printf(" cons_hyp %.3f ", (float)(cons_hypothenuse));
-    // Serial.printf(" theta_parcourir %.3f ", degrees(theta_parcourir));
+    Serial.printf(" er_d %.3f ", erreur_distance);
+    Serial.printf(" er_o %.3f ", erreur_orient);
 
     // Serial.printf(" cmd_g %d ", commande_gauche);
     // Serial.printf(" cmd_d %d ", commande_droite);
     Serial.printf("  odo_gauche %.0f ", odo_tick_gauche);
     Serial.printf("  odo_droit  %.0f ", odo_tick_droit);
 
-    Serial.printf(" cmd_d_p %.1f ", commande_dist_polaire);
-    Serial.printf(" cmd_w_p %.1f ", commande_orient_polaire);
-    Serial.printf(" s_d_p %.1f ", somme_erreur_dist_polaire);
-    // // Serial.printf(" distance_accel_polaire %.3f ", distance_accel_polaire);
-    // Serial.printf(" distance_decl_polaire %.3f ", distance_decl_polaire);
-    // Serial.printf(" Ta %.3f ", Ta);
-    // Serial.printf(" Td %.3f ", Td);
-    // Serial.printf(" Tc %.3f ", Tc);
+    Serial.printf(" cmd_g_p %.1f ", (float)commande_gauche);
+    Serial.printf(" cmd_d_p %.1f ", (float)commande_droite);
+    Serial.printf(" cs_r %.1f ", (float)consigne_rot_gauche);
+    Serial.printf(" cs_d %.1f ", (float)consigne_dist_gauche);
+
     Serial.println();
 }
 

@@ -38,9 +38,9 @@ void controle(void *parameters)
     while (1)
     {
         read_x_y_theta();
-        int x = 400;
+        // int x = 200;
    
-        asser_polaire_tick(x, x, 0);
+        asser_polaire_tick(0, 0, 0);
 /*
         switch (liste.general_purpose)
         {
