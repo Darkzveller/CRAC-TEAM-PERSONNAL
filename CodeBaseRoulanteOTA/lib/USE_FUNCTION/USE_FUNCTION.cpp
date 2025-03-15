@@ -30,6 +30,13 @@ int convert_distance_mm_to_tick(float distance)
     int consigne_roue_odo = distance * (TIC_PER_TOUR / (2.0 * M_PI * SIZE_WHEEL_DIAMETER_mm / 2.0));
     return consigne_roue_odo;
 }
+float convert_distance_tick_to_mm(float nbr_tick)
+{
+
+    float distance_mm =nbr_tick *(2.0 * M_PI * SIZE_WHEEL_DIAMETER_mm / 2.0)/TIC_PER_TOUR;
+    // int consigne_roue_odo = distance * (TIC_PER_TOUR / (2.0 * M_PI * SIZE_WHEEL_DIAMETER_mm / 2.0));
+    return distance_mm;
+}
 
 void pourcentage_erreur(float val_theorique, float valeur_experimentale)
 {
