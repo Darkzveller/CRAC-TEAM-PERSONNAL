@@ -28,7 +28,7 @@ extern float tension_bat ;
 #define RESOLUTION_ROUE_CODEUSE 10.0
 #define COEFF_ROUE_DROITE 1.0
 #define COEFF_ROUE_GAUCHE 1.0
-#define SIZE_WHEEL_DIAMETER_mm 50.0
+#define SIZE_WHEEL_DIAMETER_mm 45.0
 extern float perimetre_robot;
 
 extern double theta_robot_prec;

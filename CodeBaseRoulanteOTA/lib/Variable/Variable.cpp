@@ -55,7 +55,7 @@ float somme_integral_roue_folle_gauche_tick = 0;
 
 float Vmax = 200;
 float Amax = 50;
-float Dmax = 2.5;
+float Dmax = 14;
 // float Dmax = 10;
 float limit_reprise_asser = 250;
 
@@ -159,7 +159,7 @@ float somme_erreur_freinage_roue_folle_gauche = 0;
 float erreur_prec_freinage_roue_folle_gauche = 0;
 //************************Asser Correction d'angle */
 
-double coeff_P_angle = 2;           
+double coeff_P_angle = 3;           
 double coeff_I_angle = 0.1;         
 double coeff_D_angle = 0;           
 double integral_limit_angle = 50.0; 
