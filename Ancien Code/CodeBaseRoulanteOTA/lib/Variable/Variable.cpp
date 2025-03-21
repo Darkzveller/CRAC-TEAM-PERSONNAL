@@ -133,7 +133,7 @@ String toStringD(Etat_vitesse_roue_folle_droite etat) {
 
 //************************Consigne de vitesse */
 float consigne_regulation_vitesse_droite = 0;
-float consigne_regulation_vitesse_gauche = 0;
+float consigne_position_gauche = 0;
 
 //************************Freinage */
 float coeff_P_freinage = 10;

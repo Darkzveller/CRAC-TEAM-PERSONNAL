@@ -161,8 +161,8 @@ String toStringG(Etat_vitesse_roue_folle_gauche etat);
 String toStringD(Etat_vitesse_roue_folle_droite etat);
 
 //************************Convitesse de vitesse */
-extern float consigne_regulation_vitesse_droite;
-extern float consigne_regulation_vitesse_gauche;
+extern float consigne_position_droite;
+extern float consigne_position_gauche;
 
 //************************Freinage */
 extern float coeff_P_freinage;
@@ -190,6 +190,21 @@ extern int etat_x_y_theta;
 extern double theta_premiere_rotation;
 extern double theta_deuxieme_rotation;
 extern float consigne_regulation_moyenne ;
+
+//************************Polaire en tick */
+extern float erreur_distance ;
+extern float erreur_orient ;
+extern float consigne_dist_polaire_tick_max ;
+extern float coeff_rot_polaire_tick ;
+extern float coeff_dist_polaire_tick ;
+extern float consigne_rot_polaire_tick ;
+extern float consigne_dist_polaire_tick;
+
+extern float coeff_decc_distance_polaire_tick ;
+extern float distance_decl_polaire_tick;
+
+extern bool calcul_decl_polaire_tick;
+
 
 //***********LOOP******************* */
 

@@ -15,6 +15,10 @@ float convert_distance_tick_to_mm(float nbr_tick);
 
 void pourcentage_erreur(float val_theorique, float valeur_experimentale);
 
+float normaliser_angle_deg(float angle_deg);
+float normaliser_angle_rad(float angle_rad);
+
+
 #endif
 
 

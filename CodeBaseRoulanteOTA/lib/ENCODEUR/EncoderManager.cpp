@@ -164,7 +164,7 @@ pareil pour ordo_y
             theta_robot = theta_robot * 0.0;
         }
         if (theta_robot < -(2 * PI))
-        {
+        {   
             theta_robot = theta_robot * 0.0;
         }*/
     // Serial.printf("dparcourue %4.2f distdroit %4.2f  dist gauche %4.2f ", distance_parcourue, odo_dist_droit, odo_dist_gauche);

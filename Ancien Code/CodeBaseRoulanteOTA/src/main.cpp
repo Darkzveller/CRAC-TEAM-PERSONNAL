@@ -75,8 +75,8 @@ void controle(void *parameters)
             }
             break;
         case TYPE_DEPLACEMENT_IMMOBILE:
-            consigne_regulation_vitesse_droite = consigne_odo_droite_prec;
-            consigne_regulation_vitesse_gauche = consigne_odo_gauche_prec;
+            consigne_position_droite = consigne_odo_droite_prec;
+            consigne_position_gauche = consigne_odo_gauche_prec;
             // Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE ");
             liste.general_purpose = TYPE_VIDE;
             flag_fin_mvt = true;
@@ -101,8 +101,8 @@ void controle(void *parameters)
         default:
             break;
         }
-        asservissement_roue_folle_droite_tick(consigne_regulation_vitesse_droite, odo_tick_droit);
-        asservissement_roue_folle_gauche_tick(consigne_regulation_vitesse_gauche, odo_tick_gauche);
+        asservissement_roue_folle_droite_tick(consigne_position_droite, odo_tick_droit);
+        asservissement_roue_folle_gauche_tick(consigne_position_gauche, odo_tick_gauche);
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
     }
 }
@@ -292,8 +292,8 @@ void loop()
     // Serial.printf(" vitesse_moyenne %.0f ", vitesse_moyenne);
     Serial.printf(" odo_tick_gauche %.0f ", odo_tick_gauche);
     Serial.printf(" odo_tick_droit %.0f ", odo_tick_droit);
-    Serial.printf(" consigne_regulation_vitesse_droite %.0f ", consigne_regulation_vitesse_droite);
-    Serial.printf(" consigne_regulation_vitesse_gauche %.0f ", consigne_regulation_vitesse_gauche);
+    Serial.printf(" consigne_position_droite %.0f ", consigne_position_droite);
+    Serial.printf(" consigne_regulation_vitesse_gauche %.0f ", consigne_position_gauche);
 
     Serial.printf(" Odo x %.3f ", odo_x);
     Serial.printf(" odo_y %.3f ", odo_y);

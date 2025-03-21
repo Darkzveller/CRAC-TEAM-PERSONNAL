@@ -152,8 +152,8 @@ String toStringG(Etat_vitesse_roue_folle_gauche etat);
 String toStringD(Etat_vitesse_roue_folle_droite etat);
 
 //************************Convitesse de vitesse */
-extern float consigne_regulation_vitesse_droite;
-extern float consigne_regulation_vitesse_gauche;
+extern float consigne_position_droite;
+extern float consigne_position_gauche;
 
 //************************Freinage */
 extern float coeff_P_freinage;
