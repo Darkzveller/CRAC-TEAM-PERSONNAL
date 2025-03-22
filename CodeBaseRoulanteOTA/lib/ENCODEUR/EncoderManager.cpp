@@ -18,8 +18,10 @@ void read_encodeurdroit()
 {
     long double val_tick = encoderdroite.getCount() * COEFF_ROUE_DROITE;
     odo_tick_droit = val_tick;
+    delta_odo_tick_droit = odo_tick_droit-odo_tick_droit_last;
     double dist = (2.0 * M_PI * (SIZE_WHEEL_DIAMETER_mm / 2.0) / TIC_PER_TOUR) * val_tick;
     odo_dist_droit = dist;
+    odo_tick_droit_last = odo_tick_droit;
     // Serial.printf("dista = %4.2f\n", dist);
 
     /*
@@ -62,8 +64,11 @@ void read_encodeurgauche()
 {
     long double val_tick = encodergauche.getCount() * COEFF_ROUE_GAUCHE;
     odo_tick_gauche = val_tick;
+    delta_odo_tick_gauche = odo_tick_gauche-odo_tick_gauche_last;
+
     double dist = (2.0 * M_PI * (SIZE_WHEEL_DIAMETER_mm / 2.0) / TIC_PER_TOUR) * val_tick;
     odo_dist_gauche = dist;
+    odo_tick_gauche_last = odo_tick_gauche;
     // Serial.printf("dista droite= %4.2f\n", dist);
 
     /*

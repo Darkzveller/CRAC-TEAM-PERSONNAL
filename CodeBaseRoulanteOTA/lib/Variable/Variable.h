@@ -28,7 +28,7 @@ extern float tension_bat ;
 #define RESOLUTION_ROUE_CODEUSE 10.0
 #define COEFF_ROUE_DROITE 1.0
 #define COEFF_ROUE_GAUCHE 1.0
-#define SIZE_WHEEL_DIAMETER_mm 45.0
+#define SIZE_WHEEL_DIAMETER_mm 50.0
 extern float perimetre_robot;
 
 extern double theta_robot_prec;
@@ -42,6 +42,9 @@ extern double odo_tick_droit;
 extern double odo_tick_gauche;
 extern double odo_tick_droit_last;
 extern double odo_tick_gauche_last;
+
+extern double delta_odo_tick_droit;
+extern double delta_odo_tick_gauche;
 
 extern double delta_droit;
 extern double delta_gauche;
@@ -59,6 +62,9 @@ extern float consigne_theta_prec;
 extern double consigne_odo_x_prec;
 extern double consigne_odo_y_prec;
 
+extern double odo_dist_gauche;
+extern double odo_dist_droit;
+
 #define PIN_ENCODEUR_1 23
 #define PIN_ENCODEUR_2 22
 
@@ -67,8 +73,32 @@ extern double consigne_odo_y_prec;
 // uint8_t  tab_encodeur_droit[2] = {23, 22};
 // uint8_t  tab_encodeur_gauche[2] = {36, 39};
 
-extern double odo_dist_gauche;
-extern double odo_dist_droit;
+//************Liste Ordre Deplacement */
+
+struct Ordre_deplacement
+{
+    int general_purpose;
+    float angle;
+    int sens_rotation;
+    int16_t distance;
+    int vitesse_croisiere;
+    int sens_ligne_droite;
+    float consigne_distance_recalage;
+    int vitesse_recalage;
+    int sens_recalage;
+    float x;
+    float y;
+    float theta;
+    float vitesse_x_y_theta;
+    float x_polaire;
+    float y_polaire;
+    int nbr_passage;
+};
+
+// Déclaration de la variable globale (définie dans `variable.cpp`)
+extern Ordre_deplacement liste;
+
+
 //************Asservissement ROUE FOLLE EN TICK */
 #define SPEED_TORTUE 45
 #define SPEED_NORMAL 60
@@ -182,6 +212,7 @@ extern double integral_limit_angle ;
 // Variables globales pour le PID
 extern double erreur_prec_angle ;    // Erreur précédente
 extern double somme_integral_angle; // Somme des erreurs pour le calcul intégral
+extern double correction ;
 
 //************************Mouvement */
 extern int sens ;
@@ -243,4 +274,5 @@ extern bool flag_fin_mvt;
 //*********** Qu'est ce qu'on voit au borne de la batterie******************* */
 extern float courant;
 extern float tension;
+extern float puissance;
 #endif
