@@ -10,8 +10,8 @@ extern int y_low_byte, y_high_byte;
 extern int t_low_byte, t_high_byte;
 // #define MON_TELEPHONE
 // #define MA_FREEBOX
-// #define MON_PC
-#define MATTHIEU_PHONE
+#define MON_PC
+// #define MATTHIEU_PHONE
 
 const char *name_card_elec = "espmaitre";
 // BESOIN DE ME SIMPLIFIER MA VIE

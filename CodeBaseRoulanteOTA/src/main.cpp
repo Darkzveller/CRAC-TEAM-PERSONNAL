@@ -413,8 +413,8 @@ void loop()
         // Serial.printf(" consigne_position_droite %.0f ", consigne_position_droite);
         // Serial.printf(" consigne_position_gauche %.0f ", consigne_position_gauche);
 
-        // Serial.printf(" odo_tick_droit %.0f ", odo_tick_droit);
-        // Serial.printf(" odo_tick_gauche %.0f ", odo_tick_gauche);
+        Serial.printf(" odo_tick_droit %.0f ", odo_tick_droit);
+        Serial.printf(" odo_tick_gauche %.0f ", odo_tick_gauche);
 
         // Serial.printf(" delta_tick_droit %.0f ", delta_odo_tick_droit);
         // Serial.printf(" delta_tick_gauche %.0f ", delta_odo_tick_gauche);
