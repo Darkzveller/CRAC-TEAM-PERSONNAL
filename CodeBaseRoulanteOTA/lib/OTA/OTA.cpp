@@ -319,15 +319,6 @@ void receptionWIFI(char ch)
       odo_y = 0;
       theta_robot = 0;
 
-      odo_tick_gauche = 0;
-      odo_tick_droit = 0;
-
-      consigne_odo_gauche_prec = odo_tick_gauche;
-      consigne_odo_droite_prec = odo_tick_droit;
-
-      consigne_position_droite = odo_tick_droit;
-      consigne_position_gauche = odo_tick_gauche;
-
       TelnetStream.println();
       TelnetStream.printf("Reset des coordonnées x y  theta et valeur odo ");
       TelnetStream.println();
@@ -357,6 +348,7 @@ void receptionWIFI(char ch)
 
       consigne_odo_x_prec = odo_x;
       consigne_odo_y_prec = odo_y;
+
       consigne_theta_prec = degrees(theta_robot);
       pause_asser = true;
      
