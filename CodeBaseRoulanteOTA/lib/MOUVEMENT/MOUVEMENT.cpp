@@ -64,64 +64,6 @@ void ligne_droite(int consigne, int vitesse)
     consigne_position_gauche += correction;
 }
 
-// void x_y_theta(float coordonnee_x, float coordonnee_y, float theta_fin, int vitesse)
-// {
-
-//     float hypothenuse = sqrt(pow(coordonnee_x, 2) + pow(coordonnee_y, 2));
-//     // TOA : Tangente = Opposé / Adjacent.
-//     theta_premiere_rotation = degrees(atan2(coordonnee_y, coordonnee_x));
-
-//     theta_deuxieme_rotation = theta_fin - theta_premiere_rotation;
-//     int time = 100;
-//     switch (etat_x_y_theta)
-//     {
-//     case -1:
-//         break;
-//     case 0:
-
-//         rotation(convert_angle_deg_to_tick(fabs(theta_premiere_rotation)), vitesse);
-
-//         if (return_flag_asser_roue())
-//         {
-
-//             stop_motors();
-//             delay(time);
-//             etat_x_y_theta = 1;
-//             lauch_flag_asser_roue(true);
-//             consigne_theta_prec = degrees(theta_robot);
-//         }
-//         break;
-
-//     case 1:
-
-//         ligne_droite((convert_distance_mm_to_tick(hypothenuse)), vitesse);
-
-//         if (return_flag_asser_roue())
-//         {
-//             stop_motors();
-//             delay(time);
-//             etat_x_y_theta = 2;
-//             lauch_flag_asser_roue(true);
-//         }
-//         break;
-//     case 2:
-
-//         rotation((convert_angle_deg_to_tick(theta_deuxieme_rotation)), vitesse);
-//         if (return_flag_asser_roue())
-//         {
-//             stop_motors();
-//             delay(time);
-//             consigne_theta_prec = degrees(theta_robot);
-
-//             etat_x_y_theta = -1;
-//         }
-//         break;
-
-//     default:
-//         break;
-//     }
-// }
-
 void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons, bool nbr_passage)
 {
     // coordonnee_x = 200;

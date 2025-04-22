@@ -70,7 +70,6 @@ float Dmax = 15;
 #endif
 #ifdef PARAMETRE_BASE_TEST
 float Dmax = 5;
-
 #endif
 float limit_reprise_asser = 150;    
 
