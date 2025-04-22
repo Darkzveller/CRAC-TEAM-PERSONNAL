@@ -65,9 +65,14 @@ float somme_integral_roue_folle_gauche_tick = 0;
 
 float Vmax = 200;
 float Amax = 50;
-float Dmax = 2.5;//14
-// float Dmax = 10;
-float limit_reprise_asser = 250;
+#ifdef PARAMETRE_BASE_OFFICIEL
+float Dmax = 15;
+#endif
+#ifdef PARAMETRE_BASE_TEST
+float Dmax = 5;
+
+#endif
+float limit_reprise_asser = 150;    
 
 float acc_actuel_droite = 0;
 double consigne_vit_droite = 0;
@@ -157,6 +162,7 @@ String toStringD(Etat_vitesse_roue_folle_droite etat)
 //************************Consigne de vitesse */
 float consigne_position_droite = 0;
 float consigne_position_gauche = 0;
+bool pause_asser= true ;
 
 //************************Asser Freinage */
 float coeff_P_freinage = 10;
