@@ -40,7 +40,7 @@ double consigne_odo_y_prec = 0;
 //************Liste Ordre Deplacement */
 
 Ordre_deplacement liste = {
-    TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0
 };
 
 // Variable asservissement

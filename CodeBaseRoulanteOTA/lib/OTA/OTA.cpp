@@ -305,12 +305,12 @@ void receptionWIFI(char ch)
       Serial.printf(" cmd %d", cmd);
       Serial.println();
       rxMsg.id = POLAIRE;
-      rxMsg.data[0] = x_high_byte;
-      rxMsg.data[1] = x_low_byte;
-      rxMsg.data[2] = y_high_byte;
-      rxMsg.data[3] = y_low_byte;
-      liste.nbr_passage = rxMsg.data[4];
-      liste.nbr_passage = true;
+      rxMsg.data[1] = x_high_byte;
+      rxMsg.data[2] = x_low_byte;
+      rxMsg.data[3] = y_high_byte;
+      rxMsg.data[4] = y_low_byte;
+      // liste.nbr_passage = rxMsg.data[0];
+      liste.nbr_passage = 0;
     }
 
     if (commande == "reset")

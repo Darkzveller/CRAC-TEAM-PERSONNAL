@@ -18,7 +18,6 @@ void controle(void *parameters)
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        asser_polaire_tick(200,200,0,0);
         read_x_y_theta();
         switch (liste.general_purpose)
         {
@@ -28,7 +27,7 @@ void controle(void *parameters)
             ligne_droite(liste.distance, liste.vitesse_croisiere);
             if (return_flag_asser_roue())
             {
-                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, TYPE_DEPLACEMENT_LIGNE_DROITE, 0, 0, 0, 0, 0, 0, 0);
+                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
                 liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
             }
 
@@ -43,7 +42,7 @@ void controle(void *parameters)
             if (return_flag_asser_roue())
             {
                 consigne_theta_prec = degrees(theta_robot);
-                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, TYPE_DEPLACEMENT_ROTATION, 0, 0, 0, 0, 0, 0, 0);
+                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
                 liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
             }
             break;
@@ -52,16 +51,28 @@ void controle(void *parameters)
             consigne_position_gauche = consigne_odo_gauche_prec;
             // Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE");
             liste.general_purpose = TYPE_VIDE;
-            sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0, 0, 0);
+            sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
 
             break;
         case TYPE_DEPLACEMENT_X_Y_POLAIRE:
             // Serial.printf(" TYPE_DEPLACEMENT_X_Y_POLAIRE ");
-            asser_polaire_tick(liste.x_polaire, liste.y_polaire, 0, liste.nbr_passage = true);
+            asser_polaire_tick(liste.x_polaire[liste.compteur_point_de_passage_polaire], liste.y_polaire[liste.compteur_point_de_passage_polaire], 0, liste.deceleration_polaire);
+
+            if (liste.compteur_point_de_passage_polaire != liste.nbr_passage)
+            {
+                liste.compteur_point_de_passage_polaire +=1;
+                liste.deceleration_polaire = false;
+            }
+            if (liste.compteur_point_de_passage_polaire == (liste.nbr_passage - 1))
+            {
+                liste.deceleration_polaire = true;
+                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
+            }
 
             if (flag_fin_mvt)
             {
-                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, TYPE_DEPLACEMENT_X_Y_POLAIRE, 0, 0, 0, 0, 0, 0, 0);
+
+                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
                 liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
             }
             break;
@@ -72,7 +83,7 @@ void controle(void *parameters)
             {
                 consigne_odo_droite_prec = odo_tick_droit;
                 consigne_odo_gauche_prec = odo_tick_gauche;
-                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, TYPE_DEPLACEMENT_RECALAGE, 0, 0, 0, 0, 0, 0, 0);
+                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
                 liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
                 // Serial.printf(" Odo x %.3f ", odo_x);
                 // Serial.printf(" odo_y %.3f ", odo_y);
@@ -177,19 +188,19 @@ void bus_can(void *parameters)
 
         case POLAIRE:
 
-            liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
-            liste.x_polaire = fusion_octet(rxMsg.data[0], rxMsg.data[1]);
-            liste.y_polaire = fusion_octet(rxMsg.data[2], rxMsg.data[3]);
-            liste.nbr_passage = rxMsg.data[4];
-            // liste.nbr_passage = true;
-            flag_fin_mvt = false;
-
-            rxMsg.id = 0;
+            liste.nbr_passage = rxMsg.data[0];
+            if (liste.nbr_passage_prec == liste.nbr_passage)
+            {
+                liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
+                flag_fin_mvt = false;
+                rxMsg.id = 0;
+            }
+            liste.x_polaire[liste.nbr_passage] = fusion_octet(rxMsg.data[1], rxMsg.data[2]);
+            liste.y_polaire[liste.nbr_passage] = fusion_octet(rxMsg.data[3], rxMsg.data[4]);
 
             Serial.printf(" POLAIRE ");
             Serial.printf(" liste.x_polaire %f ", liste.x_polaire);
             Serial.printf(" liste.y_polaire %f ", liste.y_polaire);
-
             Serial.println();
 
             break;
