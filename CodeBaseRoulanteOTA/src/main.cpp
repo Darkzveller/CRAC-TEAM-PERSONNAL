@@ -18,7 +18,7 @@ void controle(void *parameters)
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
-
+        asser_polaire_tick(200,200,0,0);
         read_x_y_theta();
         switch (liste.general_purpose)
         {
@@ -384,9 +384,9 @@ void loop()
     if (flag_controle)
     {
 
-        Serial.printf(" Odo x %.3f ", odo_x);
-        Serial.printf(" odo_y %.3f ", odo_y);
-        Serial.printf(" teheta %.3f ", degrees(theta_robot));
+        // Serial.printf(" Odo x %.3f ", odo_x);
+        // Serial.printf(" odo_y %.3f ", odo_y);
+        // Serial.printf(" teheta %.3f ", degrees(theta_robot));
         // Serial.printf(" delta_droit %.0f ", delta_droit);
         // Serial.printf("ROTATION ");
         // Serial.printf(" angle %f ", (float)fusion_octet(rxMsg.data[0], rxMsg.data[1]));
@@ -409,7 +409,7 @@ void loop()
         // // Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
         // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
         // Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
-        Serial.println();
+        // Serial.println();
         flag_controle = 0;
     }
 }

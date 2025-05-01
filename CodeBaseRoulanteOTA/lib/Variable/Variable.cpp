@@ -195,7 +195,7 @@ float consigne_regulation_moyenne = 0;
 
 float erreur_distance = 0;
 float erreur_orient = 0;
-float consigne_dist_polaire_tick_max = 130;
+float consigne_dist_polaire_tick_max = SPEED_ULTRA;
 float coeff_rot_polaire_tick = 0.15;
 float coeff_dist_polaire_tick = 1;
 float consigne_rot_polaire_tick = 0;

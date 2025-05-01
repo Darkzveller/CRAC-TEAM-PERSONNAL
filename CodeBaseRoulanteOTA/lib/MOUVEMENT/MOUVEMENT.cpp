@@ -68,11 +68,38 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
 {
     // coordonnee_x = 200;
     // coordonnee_y = 0;
+    static int sens = 1;
+    static int compteur = 0;
+
+    // Calcul de la distance à parcourir
     erreur_distance = convert_distance_mm_to_tick(sqrt(pow(coordonnee_x - odo_x, 2) + pow(coordonnee_y - odo_y, 2))); // On détermine la distance restante a parcourir
-    // erreur_orient = convert_angle_radian_to_tick((atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot));  // On détermine l'angle a parcour pour arriver a destination
-    erreur_orient = atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot; // On détermine l'angle a parcour pour arriver a destination
+                                                                                                                      // Calcul de l'orientation
+    erreur_orient = atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot;                                  // On détermine l'angle a parcour pour arriver a destination
     erreur_orient = normaliser_angle_rad(erreur_orient);
-    erreur_orient = convert_angle_radian_to_tick(erreur_orient);
+    // Déterminer si on doit inverser le sens au premier passage
+    if (compteur == 0)
+    {
+        float erreur_orient_deg = degrees(erreur_orient); // car convert_tick_to_angle_deg demande un tick normalement
+        if ((erreur_orient_deg > 90.0) || (erreur_orient_deg < -90.0))
+        {
+            sens = -1;
+        }
+        else
+        {
+            sens = 1;
+        }
+        compteur = 1;
+    }
+
+    // Si sens inversé, corriger l'orientation
+    if (sens == -1)
+    {
+        // Serial.printf("SENS ");
+        erreur_orient += radians(180.0);
+        erreur_orient = normaliser_angle_rad(erreur_orient); // Très important après ajout de 180°
+    }
+
+    // Maintenant on convertit erreur_orient en tick
     erreur_orient = constrain(erreur_orient, -1250, 1250);
     consigne_rot_polaire_tick = erreur_orient;
 
@@ -82,7 +109,7 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
         consigne_dist_polaire_tick = consigne_dist_polaire_tick_max * facteur_deccel;
         if (convert_distance_tick_to_mm(erreur_distance) <= 10.0)
         {
-            Serial.printf(" Vrai ");
+            // Serial.printf(" Vrai ");
             consigne_odo_gauche_prec = odo_tick_gauche;
             consigne_odo_droite_prec = odo_tick_droit;
             consigne_odo_x_prec = odo_x;
@@ -91,26 +118,29 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
             flag_fin_mvt = true;
             calcul_decl_polaire_tick = false;
         }
-        Serial.printf(" Vrai 4");
+        // Serial.printf(" Vrai 4");
     }
     else if ((erreur_orient > convert_angle_deg_to_tick(20)) || (erreur_orient < convert_angle_deg_to_tick(-20)))
     {
-        Serial.printf(" Vrai 2");
+        // Serial.printf(" Vrai 2");
         // coeff_rot_polaire_tick = 0.5;
         consigne_dist_polaire_tick = 0;
     }
     else
     {
-        Serial.printf(" Vrai 3");
+        // Serial.printf(" Vrai 3");
         // coeff_rot_polaire_tick = 0.1;
         consigne_dist_polaire_tick = consigne_dist_polaire_tick_max;
     }
-
+    // Inverser la consigne de distance si besoin
+    if (sens == -1)
+    {
+        // Serial.printf("dist négatif ");
+        consigne_dist_polaire_tick = -consigne_dist_polaire_tick;
+    }
+    // Commandes des moteurs
     consigne_position_gauche = odo_tick_gauche + coeff_dist_polaire_tick * consigne_dist_polaire_tick + coeff_rot_polaire_tick * consigne_rot_polaire_tick; // commande en tick qu'on souhaite atteindre
     consigne_position_droite = odo_tick_droit + coeff_dist_polaire_tick * consigne_dist_polaire_tick - coeff_rot_polaire_tick * consigne_rot_polaire_tick;  // commande en tick qu'on souhaite atteindre
-
-    // asservissement_roue_folle_gauche_tick(round(commande_gauche), odo_tick_gauche); // PID en tick des roue avec pour 1ere argument la consigne et le deuxieme argument l'observation sur la roue odo
-    // asservissement_roue_folle_droite_tick(round(commande_droite), odo_tick_droit);  // PID en tick des roue avec pour 1ere argument la consigne et le deuxieme argument l'observation sur la roue odo
 
     if (calcul_decl_polaire_tick == false)
     {
@@ -128,10 +158,13 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
     Serial.printf(" er_d %.3f ", convert_distance_tick_to_mm(erreur_distance));
     Serial.printf(" er_o %.3f ", convert_tick_to_angle_deg(erreur_orient));
 
-    Serial.printf(" cmd_d %.1f ", consigne_dist_polaire_tick);
-    Serial.printf(" cmd_r %.1f ", consigne_rot_polaire_tick);
-    Serial.printf(" cff_r %.1f ", coeff_rot_polaire_tick);
-    Serial.printf(" cff_d %.1f ", coeff_dist_polaire_tick);
+    Serial.printf(" consigne_position_droite %.0f ", consigne_position_droite);
+    Serial.printf(" consigne_position_gauche %.0f ", consigne_position_gauche);
+
+    // Serial.printf(" cmd_d %.1f ", consigne_dist_polaire_tick);
+    // Serial.printf(" cmd_r %.1f ", consigne_rot_polaire_tick);
+    // Serial.printf(" cff_r %.1f ", coeff_rot_polaire_tick);
+    // Serial.printf(" cff_d %.1f ", coeff_dist_polaire_tick);
 
     // Serial.printf(" dist_dcl %.1f ", convert_distance_tick_to_mm(distance_decl_polaire_tick));
     // Serial.printf(" coef_decl %.1f ", coeff_decc_distance_polaire_tick);
@@ -203,7 +236,6 @@ bool recalage(uint8_t direction, uint8_t type_modif, uint16_t nouvelle_valeur, u
 
             Serial.printf("modif effec x");
             // delay( 2000);
-
         }
     }
     if (type_modif == MODIF_THETA)
@@ -277,6 +309,3 @@ bool toucher_objet_solid()
         return false;
     }
 }
-
-
-
