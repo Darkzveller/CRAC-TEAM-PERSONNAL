@@ -60,7 +60,7 @@ void controle(void *parameters)
 
             if (liste.compteur_point_de_passage_polaire != liste.nbr_passage)
             {
-                liste.compteur_point_de_passage_polaire +=1;
+                liste.compteur_point_de_passage_polaire += 1;
                 liste.deceleration_polaire = false;
             }
             if (liste.compteur_point_de_passage_polaire == (liste.nbr_passage - 1))
@@ -95,8 +95,7 @@ void controle(void *parameters)
                 // Serial.println();
             }
             break;
-
-        case TYPE_VIDE:
+            case TYPE_VIDE:
             // Serial.printf(" TYPE_VIDE ");
             // Serial.printf(" Odo x %.3f ", odo_x);
             // Serial.printf(" odo_y %.3f ", odo_y);
@@ -104,10 +103,17 @@ void controle(void *parameters)
             // Serial.println();
             break;
 
+        case TYPE_EVITEMENT:
+
+
+
+        break;
+
         default:
             break;
         }
-        if (pause_asser)
+
+        if ((stop_start_robot_fin_match == false) && (pause_asser_test == true))
         {
             asservissement_roue_folle_droite_tick(consigne_position_droite, odo_tick_droit);
             asservissement_roue_folle_gauche_tick(consigne_position_gauche, odo_tick_gauche);
@@ -220,6 +226,14 @@ void bus_can(void *parameters)
             Serial.printf(" liste.consigne_rotation_recalge %d ", liste.consigne_rotation_recalge);
 
             Serial.println();
+
+            break;
+        case STOP_ROBOT_FIN_MATCH:
+            stop_start_robot_fin_match = rxMsg.data[0];
+
+            break;
+            case START_ROBOT_MATCH:
+            stop_start_robot_fin_match = rxMsg.data[0];
 
             break;
 

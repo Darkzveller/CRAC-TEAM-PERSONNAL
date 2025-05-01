@@ -464,7 +464,6 @@ double regulation_vitesse_roue_folle_gauche(float cons, float Vmax_consigne)
     return consigne_dist_gauche;
 }
 
-
 bool return_flag_asser_roue()
 {
 
@@ -516,3 +515,20 @@ double asservissement_angle_correction(double consigne_angle, double observation
 
     return correction; // Retourne la correction à appliquer
 }
+
+// void decceleration_evitement(bool start_evitement)
+// {
+
+//     if (start_evitement)
+//     {
+//         etat_actuel_vit_roue_folle_droite = ETAT_VIDE_Vitesse_ROUE_FOLLE_DROITE;
+//         etat_actuel_vit_roue_folle_gauche = ETAT_VIDE_Vitesse_ROUE_FOLLE_GAUCHE;
+
+//         consigne_position_droite = odo_tick_droit;
+//         consigne_position_gauche = odo_tick_gauche;
+//         if (vitesse_rob > 0)
+//         {
+//             consigne_position_droite  
+//         }
+//     }
+// }
