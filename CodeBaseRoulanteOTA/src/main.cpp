@@ -347,8 +347,6 @@ void setup()
     // delay(10000);
     // Initialisation de la communication série à 115200 bauds
     Serial.begin(115200);
-    odo_x = 1225;
-    odo_y =139.0;
     // Serial.println("Booting with OTA"); // Message indiquant le démarrage avec OTA
     // Appel à la fonction de configuration OTA (non définie dans ce code, mais probablement ailleurs)
     // setupOTA();
