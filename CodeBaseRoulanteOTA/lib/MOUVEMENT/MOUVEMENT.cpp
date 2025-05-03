@@ -112,7 +112,7 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
             Serial.printf("Vrai 5");
             float facteur_deccel = erreur_distance / distance_decl_polaire_tick;
             consigne_dist_polaire_tick = consigne_dist_polaire_tick_max * facteur_deccel;
-            if (convert_distance_tick_to_mm(erreur_distance) <= 10.0)
+            if (convert_distance_tick_to_mm(erreur_distance) <= 17.5)
             {
                 Serial.printf(" Vrai ");
                 consigne_odo_gauche_prec = odo_tick_gauche;
