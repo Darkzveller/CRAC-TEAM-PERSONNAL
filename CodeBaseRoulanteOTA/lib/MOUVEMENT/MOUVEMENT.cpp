@@ -73,7 +73,9 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
     // coordonnee_y = 0;
     erreur_distance = convert_distance_mm_to_tick(sqrt(pow(coordonnee_x - odo_x, 2) + pow(coordonnee_y - odo_y, 2))); // On détermine la distance restante a parcourir
     // erreur_orient = convert_angle_radian_to_tick((atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot));  // On détermine l'angle a parcour pour arriver a destination
-    erreur_orient = atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot; // On détermine l'angle a parcour pour arriver a destination
+    // erreur_orient = atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot; // On détermine l'angle a parcour pour arriver a destination
+        erreur_orient = atan2(coordonnee_x - odo_x, coordonnee_y - odo_y) - theta_robot; // On détermine l'angle a parcour pour arriver a destination
+
     erreur_orient = normaliser_angle_rad(erreur_orient);
     // Déterminer si on doit inverser le sens au premier passage
     if (compteur == 0)

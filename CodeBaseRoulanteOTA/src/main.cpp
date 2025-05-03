@@ -19,22 +19,7 @@ void controle(void *parameters)
     while (1)
     {
         read_x_y_theta();
-        static int azk = 0;
-
-        if (azk == 0)
-        {
-            azk = 1;
-            liste.nbr_passage = 0;
-            liste.x_polaire[0] = 100;
-            liste.y_polaire[0] = 100;
-            liste.x_polaire[1] = 100;
-            liste.y_polaire[1] = 200;
-            liste.compteur_point_de_passage_polaire=0;
-            liste.checksum_nbr_passage = 1;
-            liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
-            flag_fin_mvt = false;
-        }
-        switch (liste.general_purpose)
+         switch (liste.general_purpose)
         {
         case TYPE_DEPLACEMENT_LIGNE_DROITE:
             liste.vitesse_croisiere = SPEED_NORMAL;
@@ -362,6 +347,8 @@ void setup()
     // delay(10000);
     // Initialisation de la communication série à 115200 bauds
     Serial.begin(115200);
+    odo_x = 1225;
+    odo_y =139.0;
     // Serial.println("Booting with OTA"); // Message indiquant le démarrage avec OTA
     // Appel à la fonction de configuration OTA (non définie dans ce code, mais probablement ailleurs)
     // setupOTA();
@@ -387,7 +374,7 @@ void setup()
     // Serial.printf("avncement_droite enter : %.0f\n", avncement_droite);
 
     reset_encodeur();
-    delay(10000);
+    delay(1000);
     reset_encodeur();
 
     xTaskCreate(
