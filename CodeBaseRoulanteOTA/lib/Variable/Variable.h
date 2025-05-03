@@ -3,8 +3,8 @@
 #ifndef Variable_H
 #define Variable_H
 
-#define PARAMETRE_BASE_TEST 
-// #define PARAMETRE_BASE_OFFICIEL
+// #define PARAMETRE_BASE_TEST 
+#define PARAMETRE_BASE_OFFICIEL
 
 extern float tension_bat ;
 // Parametre FreeRTOS
@@ -17,8 +17,15 @@ extern float tension_bat ;
 #define POURCENT_MAX_PWM 0.75
 // Moteur droit
 #define PWM_1 17
+#ifdef PARAMETRE_BASE_TEST
 #define M1_INA 26
 #define M1_INB 25
+#endif
+#ifdef PARAMETRE_BASE_OFFICIEL
+#define M1_INA 25
+#define M1_INB 26
+#endif
+
 #define channel_1 0
 // Moteur Gauche
 #define PWM_2 18
@@ -106,7 +113,7 @@ struct Ordre_deplacement
   float x_polaire[255];
   float y_polaire[255];
   uint8_t nbr_passage;
-  uint8_t nbr_passage_prec;
+  uint8_t checksum_nbr_passage;
 
 };
 

@@ -161,7 +161,7 @@ String toStringD(Etat_vitesse_roue_folle_droite etat)
 //************************Consigne de vitesse */
 float consigne_position_droite = 0;
 float consigne_position_gauche = 0;
-bool pause_asser_test= true ;
+bool pause_asser_test= false ;
 
 //************************Asser Freinage */
 float coeff_P_freinage = 10;
@@ -196,7 +196,7 @@ float consigne_regulation_moyenne = 0;
 float erreur_distance = 0;
 float erreur_orient = 0;
 float consigne_dist_polaire_tick_max = SPEED_ULTRA;
-float coeff_rot_polaire_tick = 0.15;
+float coeff_rot_polaire_tick =0.1;
 float coeff_dist_polaire_tick = 1;
 float consigne_rot_polaire_tick = 0;
 float consigne_dist_polaire_tick = 0;

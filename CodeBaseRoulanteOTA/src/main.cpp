@@ -19,6 +19,21 @@ void controle(void *parameters)
     while (1)
     {
         read_x_y_theta();
+        static int azk = 0;
+
+        if (azk == 0)
+        {
+            azk = 1;
+            liste.nbr_passage = 0;
+            liste.x_polaire[0] = -200;
+            liste.y_polaire[0] = -200;
+            // liste.x_polaire[1] = 200;
+            // liste.y_polaire[1] = 1000;
+
+            liste.checksum_nbr_passage = 0;
+            liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
+            flag_fin_mvt = false;
+        }
         switch (liste.general_purpose)
         {
         case TYPE_DEPLACEMENT_LIGNE_DROITE:
@@ -34,7 +49,7 @@ void controle(void *parameters)
             break;
         case TYPE_DEPLACEMENT_ROTATION:
 
-            // Serial.printf("TYPE_DEPLACEMENT_ROTATION ");
+            Serial.printf("TYPE_DEPLACEMENT_ROTATION ");
 
             liste.vitesse_croisiere = SPEED_NORMAL;
             rotation(liste.angle, liste.vitesse_croisiere);
@@ -49,7 +64,7 @@ void controle(void *parameters)
         case TYPE_DEPLACEMENT_IMMOBILE:
             consigne_position_droite = consigne_odo_droite_prec;
             consigne_position_gauche = consigne_odo_gauche_prec;
-            // Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE");
+            Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE");
             liste.general_purpose = TYPE_VIDE;
             sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
 
@@ -57,17 +72,6 @@ void controle(void *parameters)
         case TYPE_DEPLACEMENT_X_Y_POLAIRE:
             // Serial.printf(" TYPE_DEPLACEMENT_X_Y_POLAIRE ");
             asser_polaire_tick(liste.x_polaire[liste.compteur_point_de_passage_polaire], liste.y_polaire[liste.compteur_point_de_passage_polaire], 0, liste.deceleration_polaire);
-
-            if (liste.compteur_point_de_passage_polaire != liste.nbr_passage)
-            {
-                liste.compteur_point_de_passage_polaire += 1;
-                liste.deceleration_polaire = false;
-            }
-            if (liste.compteur_point_de_passage_polaire == (liste.nbr_passage - 1))
-            {
-                liste.deceleration_polaire = true;
-                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
-            }
 
             if (flag_fin_mvt)
             {
@@ -77,7 +81,7 @@ void controle(void *parameters)
             }
             break;
         case TYPE_DEPLACEMENT_RECALAGE:
-            // Serial.printf(" TYPE_DEPLACEMENT_RECALAGE ");
+            Serial.printf(" TYPE_DEPLACEMENT_RECALAGE ");
 
             if (recalage(liste.direction_recalage, liste.type_modif_x_y_theta_recalge_rien, liste.nouvelle_valeur_x_y_theta_rien, liste.consigne_rotation_recalge))
             {
@@ -95,7 +99,7 @@ void controle(void *parameters)
                 // Serial.println();
             }
             break;
-            case TYPE_VIDE:
+        case TYPE_VIDE:
             // Serial.printf(" TYPE_VIDE ");
             // Serial.printf(" Odo x %.3f ", odo_x);
             // Serial.printf(" odo_y %.3f ", odo_y);
@@ -105,19 +109,15 @@ void controle(void *parameters)
 
         case TYPE_EVITEMENT:
 
-
-
-        break;
+            break;
 
         default:
             break;
         }
 
-        if ((stop_start_robot_fin_match == false) && (pause_asser_test == true))
-        {
-            asservissement_roue_folle_droite_tick(consigne_position_droite, odo_tick_droit);
-            asservissement_roue_folle_gauche_tick(consigne_position_gauche, odo_tick_gauche);
-        }
+        asservissement_roue_folle_droite_tick(consigne_position_droite, odo_tick_droit);
+        asservissement_roue_folle_gauche_tick(consigne_position_gauche, odo_tick_gauche);
+        // Serial.printf("caca");
         flag_controle = 1;
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
     }
@@ -184,7 +184,6 @@ void bus_can(void *parameters)
             Serial.printf("LIGNE_DROITE ");
             Serial.printf(" rxMsg.data[0] %d ", rxMsg.data[0]);
             Serial.printf(" rxMsg.data[1] %d ", rxMsg.data[1]);
-
             Serial.printf(" distance %d ", fusion_octet(rxMsg.data[0], rxMsg.data[1]));
             Serial.printf(" liste.distance %d ", liste.distance);
             Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
@@ -195,24 +194,38 @@ void bus_can(void *parameters)
         case POLAIRE:
 
             liste.nbr_passage = rxMsg.data[0];
-            if (liste.nbr_passage_prec == liste.nbr_passage)
-            {
-                liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
-                flag_fin_mvt = false;
-                rxMsg.id = 0;
-            }
             liste.x_polaire[liste.nbr_passage] = fusion_octet(rxMsg.data[1], rxMsg.data[2]);
             liste.y_polaire[liste.nbr_passage] = fusion_octet(rxMsg.data[3], rxMsg.data[4]);
 
+            liste.checksum_nbr_passage = rxMsg.data[5] - 1;
+
+            if (liste.checksum_nbr_passage == liste.nbr_passage)
+            {
+                // Serial.printf("CAOPFJAPFOJAPOEFJPCNAPEFIJAPNEVAPFOJCJCAOPFJAPFOJAPOEFJPCNAPEFIJAPNEVAPFOJCJCAOPFJAPFOJAPOEFJPCNAPEFIJAPNEVAPFOJCJCAOPFJAPFOJAPOEFJPCNAPEFIJAPNEVAPFOJCJCAOPFJAPFOJAPOEFJPCNAPEFIJAPNEVAPFOJCJ");
+                liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
+                flag_fin_mvt = false;
+                rxMsg.id = 0;
+                liste.compteur_point_de_passage_polaire = 0;
+            }
+
             Serial.printf(" POLAIRE ");
-            Serial.printf(" liste.x_polaire %f ", liste.x_polaire);
-            Serial.printf(" liste.y_polaire %f ", liste.y_polaire);
+            Serial.printf(" liste.nbr_passage %d ", liste.nbr_passage);
+            Serial.printf(" liste.checksum_nbr_passage %d ", liste.checksum_nbr_passage);
+
+            Serial.printf(" liste.x_polaire %f ", liste.x_polaire[liste.nbr_passage]);
+            Serial.printf(" liste.y_polaire %f ", liste.y_polaire[liste.nbr_passage]);
+
+            // Serial.printf(" rxMsg.data[1] %d ", rxMsg.data[1]);
+            // Serial.printf(" rxMsg.data[2] %d ", rxMsg.data[2]);
+            // Serial.printf(" rxMsg.data[3] %d ", rxMsg.data[3]);
+            // Serial.printf(" rxMsg.data[4] %d ", rxMsg.data[4]);
+
             Serial.println();
 
             break;
         case RECALAGE:
 
-            liste.general_purpose = TYPE_DEPLACEMENT_RECALAGE;
+            // liste.general_purpose = TYPE_DEPLACEMENT_RECALAGE;
             liste.direction_recalage = rxMsg.data[0];
             liste.type_modif_x_y_theta_recalge_rien = rxMsg.data[1];
             liste.nouvelle_valeur_x_y_theta_rien = fusion_octet(rxMsg.data[2], rxMsg.data[3]);
@@ -224,7 +237,6 @@ void bus_can(void *parameters)
             Serial.printf(" liste.type_modif_x_y_theta_recalge_rien %d ", liste.type_modif_x_y_theta_recalge_rien);
             Serial.printf(" liste.nouvelle_valeur_x_y_theta_rien %d ", liste.nouvelle_valeur_x_y_theta_rien);
             Serial.printf(" liste.consigne_rotation_recalge %d ", liste.consigne_rotation_recalge);
-
             Serial.println();
 
             break;
@@ -232,7 +244,7 @@ void bus_can(void *parameters)
             stop_start_robot_fin_match = rxMsg.data[0];
 
             break;
-            case START_ROBOT_MATCH:
+        case START_ROBOT_MATCH:
             stop_start_robot_fin_match = rxMsg.data[0];
 
             break;
@@ -323,6 +335,7 @@ void bus_can(void *parameters)
             break;
 
         case 0:
+            // Serial.printf("Rien\n");
             // {
             //     int16_t odo_x_int = static_cast<int16_t>(odo_x * 10);
             //     int16_t odo_y_int = static_cast<int16_t>(odo_y * 10);
@@ -351,7 +364,7 @@ void setup()
     Serial.begin(115200);
     // Serial.println("Booting with OTA"); // Message indiquant le démarrage avec OTA
     // Appel à la fonction de configuration OTA (non définie dans ce code, mais probablement ailleurs)
-    setupOTA();
+    // setupOTA();
     // Initialisation des moteurs
     setup_motors();
     stop_motors();
@@ -374,7 +387,7 @@ void setup()
     // Serial.printf("avncement_droite enter : %.0f\n", avncement_droite);
 
     reset_encodeur();
-    delay(500);
+    delay(10000);
     reset_encodeur();
 
     xTaskCreate(
@@ -408,33 +421,41 @@ void loop()
 {
     if (flag_controle)
     {
+        if (!return_flag_asser_roue)
+        {
+            // Serial.printf(" PS_ASSER %d ", pause_asser_test);
 
-        // Serial.printf(" Odo x %.3f ", odo_x);
-        // Serial.printf(" odo_y %.3f ", odo_y);
-        // Serial.printf(" teheta %.3f ", degrees(theta_robot));
-        // Serial.printf(" delta_droit %.0f ", delta_droit);
-        // Serial.printf("ROTATION ");
-        // Serial.printf(" angle %f ", (float)fusion_octet(rxMsg.data[0], rxMsg.data[1]));
-        // Serial.printf(" liste.dist %f", (float)liste.distance);
+            Serial.printf(" Odo x %.3f ", odo_x);
+            Serial.printf(" odo_y %.3f ", odo_y);
+            Serial.printf(" teheta %.3f ", degrees(theta_robot));
+            // Serial.printf("CPT_PS %d", liste.compteur_point_de_passage_polaire);
 
-        // Serial.printf(" consigne_position_droite %.0f ", consigne_position_droite);
-        // Serial.printf(" consigne_position_gauche %.0f ", consigne_position_gauche);
+            // Serial.printf(" er_d %.3f ", convert_distance_tick_to_mm(erreur_distance));
+            // Serial.printf(" er_o %.3f ", convert_tick_to_angle_deg(erreur_orient));
+            // Serial.printf(" delta_droit %.0f ", delta_droit);
+            // Serial.printf("ROTATION ");
+            // Serial.printf(" angle %f ", (float)fusion_octet(rxMsg.data[0], rxMsg.data[1]));
+            // Serial.printf(" liste.dist %f", (float)liste.distance);
 
-        // Serial.printf(" odo_tick_droit %.0f ", odo_tick_droit);
-        // Serial.printf(" odo_tick_gauche %.0f ", odo_tick_gauche);
+            // Serial.printf(" consigne_position_droite %.0f ", consigne_position_droite);
+            // Serial.printf(" consigne_position_gauche %.0f ", consigne_position_gauche);
 
-        // Serial.printf(" delta_tick_droit %.0f ", delta_odo_tick_droit);
-        // Serial.printf(" delta_tick_gauche %.0f ", delta_odo_tick_gauche);
+            // Serial.printf(" odo_tick_droit %.0f ", odo_tick_droit);
+            // Serial.printf(" odo_tick_gauche %.0f ", odo_tick_gauche);
 
-        // Serial.printf("cs_dist_mm %f", convert_distance_tick_to_mm(liste.distance));
-        // Serial.printf(" cs_dist_tic %d", (liste.distance));
+            // Serial.printf(" delta_tick_droit %.0f ", delta_odo_tick_droit);
+            // Serial.printf(" delta_tick_gauche %.0f ", delta_odo_tick_gauche);
 
-        // // // Serial.printf(" vitesse robo %f ", vitesse_rob);
+            // Serial.printf("cs_dist_mm %f", convert_distance_tick_to_mm(liste.distance));
+            // Serial.printf(" cs_dist_tic %d", (liste.distance));
 
-        // // Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
-        // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
-        // Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
-        // Serial.println();
+            // // // Serial.printf(" vitesse robo %f ", vitesse_rob);
+
+            // // Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
+            // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
+            // Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
+            Serial.println();
+        }
         flag_controle = 0;
     }
 }

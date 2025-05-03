@@ -327,7 +327,7 @@ void receptionWIFI(char ch)
       Serial.println();
     }
 
-    if (commande == "stop_asser")
+    if (commande == "s")
     {
 
       pause_asser_test = false;
@@ -337,8 +337,9 @@ void receptionWIFI(char ch)
       Serial.println();
       Serial.printf("stop_asser");
       Serial.println();
+      delay(1000);
     }
-    if (commande == "start_asser")
+    if (commande == "st")
     {
       consigne_position_droite = odo_tick_droit;
       consigne_position_gauche = odo_tick_gauche;
@@ -358,6 +359,8 @@ void receptionWIFI(char ch)
       Serial.println();
       Serial.printf("start_asser");
       Serial.println();
+      delay(1000);
+
     }
 
     if ((commande == "RESTART") || (commande == "restart"))

@@ -4,7 +4,7 @@
 
 void setup_motors()
 {
-    // Moteur droit
+// Moteur droit
     pinMode(M1_INA, OUTPUT);
     pinMode(M1_INB, OUTPUT);
     ledcSetup(channel_1, frequence, resolution_pwm);
@@ -18,6 +18,7 @@ void setup_motors()
 void moteur_droit(int pwm, bool sens)
 {
     // Serial.printf("Pwm MotorD %4d ", pwm);
+    // Serial.printf("SensD %d ", sens);
 
     if (sens == true)
     {
@@ -35,6 +36,8 @@ void moteur_droit(int pwm, bool sens)
 void moteur_gauche(int pwm, bool sens)
 {
     // Serial.printf(" Pwm MotorG %4d ", pwm);
+    // Serial.printf("SensG %d ", sens);
+
     if (sens == true)
     {
         digitalWrite(M2_INA, 1);
