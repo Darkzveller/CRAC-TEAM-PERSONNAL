@@ -103,20 +103,30 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
     erreur_orient = constrain(erreur_orient, -1250, 1250);
     consigne_rot_polaire_tick = erreur_orient;
 
-    if ((erreur_distance <= distance_decl_polaire_tick) && (nbr_passage == true))
+    if ((erreur_distance <= distance_decl_polaire_tick))
     {
-        float facteur_deccel = erreur_distance / distance_decl_polaire_tick;
-        consigne_dist_polaire_tick = consigne_dist_polaire_tick_max * facteur_deccel;
-        if (convert_distance_tick_to_mm(erreur_distance) <= 10.0)
+        if (liste.compteur_point_de_passage_polaire == liste.checksum_nbr_passage)
         {
-            Serial.printf(" Vrai ");
-            consigne_odo_gauche_prec = odo_tick_gauche;
-            consigne_odo_droite_prec = odo_tick_droit;
-            consigne_odo_x_prec = odo_x;
-            consigne_odo_y_prec = odo_y;
-            consigne_theta_prec = degrees(theta_robot);
-            flag_fin_mvt = true;
-            calcul_decl_polaire_tick = false;
+            Serial.printf("Vrai 5");
+            float facteur_deccel = erreur_distance / distance_decl_polaire_tick;
+            consigne_dist_polaire_tick = consigne_dist_polaire_tick_max * facteur_deccel;
+            if (convert_distance_tick_to_mm(erreur_distance) <= 10.0)
+            {
+                Serial.printf(" Vrai ");
+                consigne_odo_gauche_prec = odo_tick_gauche;
+                consigne_odo_droite_prec = odo_tick_droit;
+                consigne_odo_x_prec = odo_x;
+                consigne_odo_y_prec = odo_y;
+                consigne_theta_prec = degrees(theta_robot);
+                flag_fin_mvt = true;
+                calcul_decl_polaire_tick = false;
+            }
+        }
+        else
+        {
+            liste.compteur_point_de_passage_polaire += 1;
+            // liste.deceleration_polaire = false;
+            Serial.printf(" Vrai 6");
         }
         Serial.printf(" Vrai 4");
     }

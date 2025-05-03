@@ -25,12 +25,12 @@ void controle(void *parameters)
         {
             azk = 1;
             liste.nbr_passage = 0;
-            liste.x_polaire[0] = -200;
-            liste.y_polaire[0] = -200;
-            // liste.x_polaire[1] = 200;
-            // liste.y_polaire[1] = 1000;
-
-            liste.checksum_nbr_passage = 0;
+            liste.x_polaire[0] = 100;
+            liste.y_polaire[0] = 100;
+            liste.x_polaire[1] = 100;
+            liste.y_polaire[1] = 200;
+            liste.compteur_point_de_passage_polaire=0;
+            liste.checksum_nbr_passage = 1;
             liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
             flag_fin_mvt = false;
         }
