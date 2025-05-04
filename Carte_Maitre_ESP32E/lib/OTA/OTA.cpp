@@ -468,6 +468,31 @@ void receptionWIFI(char ch)
       sendCANMessage(POLAIRE, 0, 0, 8, x_high_byte, x_low_byte, y_high_byte, y_low_byte, 0, 0, 0, 0);
     }
 
+
+    // Carte MPP
+    if ((commande == "P"))
+    {
+      TelnetStream.println();
+
+      TelnetStream.printf("CONSTRUIRE_AVANT_PREPARER ");
+      TelnetStream.println();
+      Serial.printf("CONSTRUIRE_AVANT_PREPARER");
+      Serial.println();
+
+      sendCANMessage(CONSTRUIRE_AVANT_PREPARER, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0);
+    }
+    if ((commande == "C"))
+    {
+      TelnetStream.println();
+
+      TelnetStream.printf("Contruis 2 etage ");
+      TelnetStream.println();
+      Serial.printf("Contruis 2 etage");
+      Serial.println();
+
+      sendCANMessage(CONSTRUIRE_AVANT_2ETAGE, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0);
+    }
+
     chaine = "";
   }
   else

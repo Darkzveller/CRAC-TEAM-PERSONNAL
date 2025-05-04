@@ -18,7 +18,7 @@ void setup()
   Serial.begin(115200);
   Serial.printf("CACA");
   setupCAN(1000E3);
-  setupOTA();
+  // setupOTA();
   int i = 0;
   // while (!TelnetStream.available())
   // {
@@ -36,6 +36,9 @@ void setup()
 void loop()
 {
   readCANMessage();
+
+
+
   // Serial.printf("Send command ON ALL Bat ");
   // Serial.printf("Send command Rotation with cons");
   // Serial.println();

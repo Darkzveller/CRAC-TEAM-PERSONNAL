@@ -72,9 +72,7 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
     // coordonnee_x = 200;
     // coordonnee_y = 0;
     erreur_distance = convert_distance_mm_to_tick(sqrt(pow(coordonnee_x - odo_x, 2) + pow(coordonnee_y - odo_y, 2))); // On détermine la distance restante a parcourir
-    // erreur_orient = convert_angle_radian_to_tick((atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot));  // On détermine l'angle a parcour pour arriver a destination
-    // erreur_orient = atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot; // On détermine l'angle a parcour pour arriver a destination
-        erreur_orient = atan2(coordonnee_x - odo_x, coordonnee_y - odo_y) - theta_robot; // On détermine l'angle a parcour pour arriver a destination
+    erreur_orient = atan2(coordonnee_x - odo_x, coordonnee_y - odo_y) - theta_robot;                                  // On détermine l'angle a parcour pour arriver a destination
 
     erreur_orient = normaliser_angle_rad(erreur_orient);
     // Déterminer si on doit inverser le sens au premier passage
@@ -126,8 +124,8 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
         }
         else
         {
+
             liste.compteur_point_de_passage_polaire += 1;
-            // liste.deceleration_polaire = false;
             Serial.printf(" Vrai 6");
         }
         Serial.printf(" Vrai 4");
@@ -150,7 +148,6 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
         // Serial.printf("dist négatif ");
         consigne_dist_polaire_tick = -consigne_dist_polaire_tick;
     }
-
 
     consigne_position_gauche = odo_tick_gauche + coeff_dist_polaire_tick * consigne_dist_polaire_tick + coeff_rot_polaire_tick * consigne_rot_polaire_tick; // commande en tick qu'on souhaite atteindre
     consigne_position_droite = odo_tick_droit + coeff_dist_polaire_tick * consigne_dist_polaire_tick - coeff_rot_polaire_tick * consigne_rot_polaire_tick;  // commande en tick qu'on souhaite atteindre

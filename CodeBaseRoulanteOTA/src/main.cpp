@@ -19,7 +19,7 @@ void controle(void *parameters)
     while (1)
     {
         read_x_y_theta();
-         switch (liste.general_purpose)
+        switch (liste.general_purpose)
         {
         case TYPE_DEPLACEMENT_LIGNE_DROITE:
             liste.vitesse_croisiere = SPEED_NORMAL;
@@ -57,7 +57,6 @@ void controle(void *parameters)
         case TYPE_DEPLACEMENT_X_Y_POLAIRE:
             // Serial.printf(" TYPE_DEPLACEMENT_X_Y_POLAIRE ");
             asser_polaire_tick(liste.x_polaire[liste.compteur_point_de_passage_polaire], liste.y_polaire[liste.compteur_point_de_passage_polaire], 0, liste.deceleration_polaire);
-
             if (flag_fin_mvt)
             {
 
@@ -99,9 +98,11 @@ void controle(void *parameters)
         default:
             break;
         }
-
-        asservissement_roue_folle_droite_tick(consigne_position_droite, odo_tick_droit);
-        asservissement_roue_folle_gauche_tick(consigne_position_gauche, odo_tick_gauche);
+        if (!stop_asser)
+        {
+            asservissement_roue_folle_droite_tick(consigne_position_droite, odo_tick_droit);
+            asservissement_roue_folle_gauche_tick(consigne_position_gauche, odo_tick_gauche);
+        }
         // Serial.printf("caca");
         flag_controle = 1;
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(Te));
@@ -179,6 +180,12 @@ void bus_can(void *parameters)
         case POLAIRE:
 
             liste.nbr_passage = rxMsg.data[0];
+            /*On vide la liste*/
+            if (liste.nbr_passage == 0)
+            {
+                memset(liste.x_polaire, 0, sizeof(liste.x_polaire));
+                memset(liste.y_polaire, 0, sizeof(liste.y_polaire));
+            }
             liste.x_polaire[liste.nbr_passage] = fusion_octet(rxMsg.data[1], rxMsg.data[2]);
             liste.y_polaire[liste.nbr_passage] = fusion_octet(rxMsg.data[3], rxMsg.data[4]);
 
@@ -226,11 +233,11 @@ void bus_can(void *parameters)
 
             break;
         case STOP_ROBOT_FIN_MATCH:
-            stop_start_robot_fin_match = rxMsg.data[0];
+            stop_asser = rxMsg.data[0];
 
             break;
         case START_ROBOT_MATCH:
-            stop_start_robot_fin_match = rxMsg.data[0];
+            stop_asser = rxMsg.data[0];
 
             break;
 

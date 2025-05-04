@@ -216,7 +216,6 @@ String toStringD(Etat_vitesse_roue_folle_droite etat);
 //************************Convitesse de vitesse */
 extern float consigne_position_droite;
 extern float consigne_position_gauche;
-extern bool pause_asser_test ;
 
 
 //************************Freinage */
@@ -297,7 +296,7 @@ extern signed char FIFO_max_occupation;
 
 extern bool flag_fin_mvt;
 
-extern bool stop_start_robot_fin_match;
+extern bool stop_asser;
 //*********** Qu'est ce qu'on voit au borne de la batterie******************* */
 extern float courant;
 extern float tension;

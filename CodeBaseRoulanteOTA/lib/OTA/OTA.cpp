@@ -330,7 +330,7 @@ void receptionWIFI(char ch)
     if (commande == "s")
     {
 
-      pause_asser_test = false;
+      stop_asser = false;
       TelnetStream.println();
       TelnetStream.printf("stop_asser ");
       TelnetStream.println();
@@ -351,7 +351,7 @@ void receptionWIFI(char ch)
       consigne_odo_y_prec = odo_y;
 
       consigne_theta_prec = degrees(theta_robot);
-      pause_asser_test = true;
+      stop_asser = true;
      
       TelnetStream.println();
       TelnetStream.printf("start_asser ");
