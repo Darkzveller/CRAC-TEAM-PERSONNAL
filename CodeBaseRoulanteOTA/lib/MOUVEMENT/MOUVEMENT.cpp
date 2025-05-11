@@ -161,31 +161,31 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
         distance_decl_polaire_tick = 0.5 * pow(2, consigne_dist_polaire_tick_max / coeff_decc_distance_polaire_tick) * coeff_decc_distance_polaire_tick;
     }
 
-    Serial.printf(" cs x %.1f ", coordonnee_x);
-    Serial.printf(" cs_y %.1f ", coordonnee_y);
+    // Serial.printf(" cs x %.1f ", coordonnee_x);
+    // Serial.printf(" cs_y %.1f ", coordonnee_y);
 
-    Serial.printf(" Odo x %.1f ", odo_x);
-    Serial.printf(" odo_y %.1f ", odo_y);
-    Serial.printf(" teheta %.3f ", degrees(theta_robot));
+    // Serial.printf(" Odo x %.1f ", odo_x);
+    // Serial.printf(" odo_y %.1f ", odo_y);
+    // Serial.printf(" teheta %.3f ", degrees(theta_robot));
 
-    Serial.printf(" er_d %.3f ", convert_distance_tick_to_mm(erreur_distance));
-    Serial.printf(" er_o %.3f ", convert_tick_to_angle_deg(erreur_orient));
+    // Serial.printf(" er_d %.3f ", convert_distance_tick_to_mm(erreur_distance));
+    // Serial.printf(" er_o %.3f ", convert_tick_to_angle_deg(erreur_orient));
 
-    Serial.printf(" cmd_d %.1f ", consigne_dist_polaire_tick);
-    Serial.printf(" cmd_r %.1f ", consigne_rot_polaire_tick);
-    Serial.printf(" cff_r %.1f ", coeff_rot_polaire_tick);
-    Serial.printf(" cff_d %.1f ", coeff_dist_polaire_tick);
+    // Serial.printf(" cmd_d %.1f ", consigne_dist_polaire_tick);
+    // Serial.printf(" cmd_r %.1f ", consigne_rot_polaire_tick);
+    // Serial.printf(" cff_r %.1f ", coeff_rot_polaire_tick);
+    // Serial.printf(" cff_d %.1f ", coeff_dist_polaire_tick);
 
     // Serial.printf(" dist_dcl %.1f ", convert_distance_tick_to_mm(distance_decl_polaire_tick));
     // Serial.printf(" coef_decl %.1f ", coeff_decc_distance_polaire_tick);
 
-    Serial.printf(" odo_g %.0f ", odo_tick_gauche);
-    Serial.printf(" odo_d %.0f ", odo_tick_droit);
+    // Serial.printf(" odo_g %.0f ", odo_tick_gauche);
+    // Serial.printf(" odo_d %.0f ", odo_tick_droit);
 
     // Serial.printf(" angl_tick %.1f ", (float)convert_angle_deg_to_tick(90));
     // Serial.printf(" angl_deg %.1f ", convert_tick_to_angle_deg(convert_angle_deg_to_tick(90)));
 
-    Serial.println();
+    // Serial.println();
 }
 
 bool recalage(uint8_t direction, uint8_t type_modif, uint16_t nouvelle_valeur, uint16_t consigne_rotation)

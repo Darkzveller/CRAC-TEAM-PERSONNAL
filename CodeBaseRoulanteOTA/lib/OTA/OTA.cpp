@@ -9,9 +9,10 @@
 // je fixe le nom de mon réseau Wi-Fi, ce qui simplifie les démarches, notamment lors des débogages
 //  Informations de connexion WiFi
 
-#define MON_TELEPHONE
+// #define MON_TELEPHONE
 // #define MA_FREEBOX
 // #define MON_PC
+#define MATTHIEU_PHONE
 
 const char *name_card_elec = "baseroulante";
 // BESOIN DE ME SIMPLIFIER MA VIE
@@ -27,6 +28,12 @@ const char *password = "subcrescat-degend@-parciore@2-adducturos"; // Mot de pas
 const char *ssid = "Detective-Conan"; // SSID du réseau WiFi
 const char *password = "99xS,304";    // Mot de passe du réseau WiFi
 #endif
+
+#ifdef MATTHIEU_PHONE                         // Nom d'hôte de la carte ESP32
+const char *ssid = "iPhone de Géraldine"; // SSID du réseau WiFi
+const char *password = "unmotdepassecompliquer";    // Mot de passe du réseau WiFi
+#endif
+
 // Fonction pour gérer les opérations OTA dans une tâche séparée
 void ota_handle(void *parameter)
 {

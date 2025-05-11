@@ -23,7 +23,7 @@ void controle(void *parameters)
         {
         case TYPE_DEPLACEMENT_LIGNE_DROITE:
             liste.vitesse_croisiere = SPEED_NORMAL;
-            Serial.printf("TYPE_DEPLACEMENT_LIGNE_DROITE ");
+            // Serial.printf("TYPE_DEPLACEMENT_LIGNE_DROITE ");
             ligne_droite(liste.distance, liste.vitesse_croisiere);
             if (return_flag_asser_roue())
             {
@@ -34,7 +34,7 @@ void controle(void *parameters)
             break;
         case TYPE_DEPLACEMENT_ROTATION:
 
-            Serial.printf("TYPE_DEPLACEMENT_ROTATION ");
+            // Serial.printf("TYPE_DEPLACEMENT_ROTATION ");
 
             liste.vitesse_croisiere = SPEED_NORMAL;
             rotation(liste.angle, liste.vitesse_croisiere);
@@ -49,7 +49,7 @@ void controle(void *parameters)
         case TYPE_DEPLACEMENT_IMMOBILE:
             consigne_position_droite = consigne_odo_droite_prec;
             consigne_position_gauche = consigne_odo_gauche_prec;
-            Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE");
+            // Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE");
             liste.general_purpose = TYPE_VIDE;
             sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
 
@@ -65,7 +65,7 @@ void controle(void *parameters)
             }
             break;
         case TYPE_DEPLACEMENT_RECALAGE:
-            Serial.printf(" TYPE_DEPLACEMENT_RECALAGE ");
+            // Serial.printf(" TYPE_DEPLACEMENT_RECALAGE ");
 
             if (recalage(liste.direction_recalage, liste.type_modif_x_y_theta_recalge_rien, liste.nouvelle_valeur_x_y_theta_rien, liste.consigne_rotation_recalge))
             {
@@ -356,7 +356,7 @@ void setup()
     Serial.begin(115200);
     // Serial.println("Booting with OTA"); // Message indiquant le démarrage avec OTA
     // Appel à la fonction de configuration OTA (non définie dans ce code, mais probablement ailleurs)
-    // setupOTA();
+    setupOTA();
     // Initialisation des moteurs
     setup_motors();
     stop_motors();
@@ -365,14 +365,6 @@ void setup()
     // Initialisation du Can
     setupCAN(1000E3);
 
-    // Boucle jusqu'à ce qu'un client soit connecté via le port série WiFi
-    // while (!SerialWIFI.available())
-    // {
-    //     delay(500);                                             // Attente de 500 ms avant de vérifier à nouveau
-    //     Serial.println("Aucun client connecté, en attente..."); // Message indiquant qu'il n'y a pas de client connecté
-    // }
-    // delay(10000);
-    // affichage_commande_wifi();
     Serial.println("on commence");
 
     // Serial.printf("avncement_gauche enter : %.0f\n", avncement_gauche);
