@@ -6,5 +6,5 @@ void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, 
 void readCANMessage();
 bool messageCANForMe(uint16_t ID);
 float conversion_4char_to_float(unsigned char *adresse_tableau);
-
+uint8_t convert_short_1_byte(uint16_t short_2_transform, uint8_t* high, uint8_t* low);
 #endif

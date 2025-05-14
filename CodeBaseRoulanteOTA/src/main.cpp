@@ -61,6 +61,12 @@ void controle(void *parameters)
             {
 
                 sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
+
+                lowByte = ((uint16_t)degrees(theta_robot) & 0xFF);         // Octet de poids faible
+                highByte = (((uint16_t)degrees(theta_robot) >> 8) & 0xFF); // Octet de poids fort
+                convert_short_1_byte((uint16_t)degrees(theta_robot), &highByte, &highByte);
+                sendCANMessage(ODO_SEND, 0, 0, 8, highByte, lowByte, 0, 0, 0, 0, 0, 0);
+
                 liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
             }
             break;
@@ -356,7 +362,7 @@ void setup()
     Serial.begin(115200);
     // Serial.println("Booting with OTA"); // Message indiquant le démarrage avec OTA
     // Appel à la fonction de configuration OTA (non définie dans ce code, mais probablement ailleurs)
-    setupOTA();
+    // setupOTA();
     // Initialisation des moteurs
     setup_motors();
     stop_motors();

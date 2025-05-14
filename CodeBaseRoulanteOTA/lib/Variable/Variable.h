@@ -283,6 +283,8 @@ extern unsigned char FIFO_ecriture;
 extern signed char FIFO_lecture;
 extern signed char FIFO_occupation;
 extern signed char FIFO_max_occupation;
+extern uint8_t lowByte ;  // Octet de poids faible
+extern uint8_t highByte; // Octet de poids fort
 
 //***********Ordre de déplacement******************* */
 #define TYPE_DEPLACEMENT_IMMOBILE 1
