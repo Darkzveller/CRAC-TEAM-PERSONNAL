@@ -250,7 +250,7 @@ bool recalage(uint8_t direction, uint8_t type_modif, uint16_t nouvelle_valeur, u
     }
     if (type_modif == MODIF_THETA)
     {
-        theta_robot = radians(convert_angle_deg_to_tick(nouvelle_valeur));
+        theta_robot = radians((nouvelle_valeur));
         consigne_theta_prec = convert_angle_deg_to_tick(nouvelle_valeur);
     }
 

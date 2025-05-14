@@ -104,7 +104,7 @@ struct Ordre_deplacement
   int sens_ligne_droite;
   uint8_t type_modif_x_y_theta_recalge_rien;
   uint8_t direction_recalage;
-  uint16_t nouvelle_valeur_x_y_theta_rien;
+  float nouvelle_valeur_x_y_theta_rien;
   uint16_t consigne_rotation_recalge;
   float x;
   bool deceleration_polaire;
