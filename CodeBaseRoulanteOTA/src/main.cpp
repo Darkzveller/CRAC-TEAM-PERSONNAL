@@ -79,6 +79,7 @@ void controle(void *parameters)
                 consigne_odo_droite_prec = odo_tick_droit;
                 consigne_odo_gauche_prec = odo_tick_gauche;
                 sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
+                sendCANMessage(ODO_SEND, 0, 0, 8, (((uint16_t)degrees(theta_robot) >> 8) & 0xFF), ((uint16_t)degrees(theta_robot) & 0xFF), (((uint16_t)odo_x >> 8) & 0xFF), ((uint16_t)odo_x & 0xFF), (((uint16_t)odo_y >> 8) & 0xFF), ((uint16_t)odo_y & 0xFF), 0, 0);
                 liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
                 // Serial.printf(" Odo x %.3f ", odo_x);
                 // Serial.printf(" odo_y %.3f ", odo_y);
