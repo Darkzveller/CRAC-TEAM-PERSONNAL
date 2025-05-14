@@ -4,6 +4,7 @@
 #include "EncoderManager.h"
 #include "ID_CAN.h"
 #include "CAN_ESP32E.h"
+#include "MOUVEMENT.h"
 
 // Je laisse le routeur choisir l'adresse IP et
 // je fixe le nom de mon réseau Wi-Fi, ce qui simplifie les démarches, notamment lors des débogages
@@ -29,9 +30,9 @@ const char *ssid = "Detective-Conan"; // SSID du réseau WiFi
 const char *password = "99xS,304";    // Mot de passe du réseau WiFi
 #endif
 
-#ifdef MATTHIEU_PHONE                         // Nom d'hôte de la carte ESP32
-const char *ssid = "iPhone de Géraldine"; // SSID du réseau WiFi
-const char *password = "unmotdepassecompliquer";    // Mot de passe du réseau WiFi
+#ifdef MATTHIEU_PHONE                            // Nom d'hôte de la carte ESP32
+const char *ssid = "iPhone de Géraldine";        // SSID du réseau WiFi
+const char *password = "unmotdepassecompliquer"; // Mot de passe du réseau WiFi
 #endif
 
 // Fonction pour gérer les opérations OTA dans une tâche séparée
@@ -337,7 +338,7 @@ void receptionWIFI(char ch)
     if (commande == "s")
     {
 
-      stop_asser = false;
+      stop_asser = true;
       TelnetStream.println();
       TelnetStream.printf("stop_asser ");
       TelnetStream.println();
@@ -348,18 +349,19 @@ void receptionWIFI(char ch)
     }
     if (commande == "st")
     {
-      consigne_position_droite = odo_tick_droit;
-      consigne_position_gauche = odo_tick_gauche;
+      enregistreur_odo();
+      // consigne_position_droite = odo_tick_droit;
+      // consigne_position_gauche = odo_tick_gauche;
 
-      consigne_odo_gauche_prec = odo_tick_gauche;
-      consigne_odo_droite_prec = odo_tick_droit;
+      // consigne_odo_gauche_prec = odo_tick_gauche;
+      // consigne_odo_droite_prec = odo_tick_droit;
 
-      consigne_odo_x_prec = odo_x;
-      consigne_odo_y_prec = odo_y;
+      // consigne_odo_x_prec = odo_x;
+      // consigne_odo_y_prec = odo_y;
 
-      consigne_theta_prec = degrees(theta_robot);
-      stop_asser = true;
-     
+      // consigne_theta_prec = degrees(theta_robot);
+      stop_asser = false;
+
       TelnetStream.println();
       TelnetStream.printf("start_asser ");
       TelnetStream.println();
@@ -367,7 +369,6 @@ void receptionWIFI(char ch)
       Serial.printf("start_asser");
       Serial.println();
       delay(1000);
-
     }
 
     if ((commande == "RESTART") || (commande == "restart"))

@@ -218,9 +218,6 @@ unsigned char FIFO_ecriture = 0;
 signed char FIFO_lecture = 0;
 signed char FIFO_occupation = 0;
 signed char FIFO_max_occupation = 0;
-uint8_t lowByte = 0;  // Octet de poids faible
-uint8_t highByte = 0; // Octet de poids fort
-
 //***********Ordre de déplacement******************* */
 bool flag_fin_mvt = true;
 bool stop_asser = false;

@@ -28,9 +28,9 @@ const char *ssid = "Detective-Conan"; // SSID du réseau WiFi
 const char *password = "99xS,304";    // Mot de passe du réseau WiFi
 #endif
 
-#ifdef MATTHIEU_PHONE                         // Nom d'hôte de la carte ESP32
-const char *ssid = "iPhone de Géraldine"; // SSID du réseau WiFi
-const char *password = "unmotdepassecompliquer";    // Mot de passe du réseau WiFi
+#ifdef MATTHIEU_PHONE                            // Nom d'hôte de la carte ESP32
+const char *ssid = "iPhone de Géraldine";        // SSID du réseau WiFi
+const char *password = "unmotdepassecompliquer"; // Mot de passe du réseau WiFi
 #endif
 
 bool justepouraffichage = 0;
@@ -345,6 +345,41 @@ void receptionWIFI(char ch)
 
       sendCANMessage(XYTHETA, 0, 0, 8, x_high_byte, x_low_byte, y_high_byte, y_low_byte, t_high_byte, t_low_byte, 0, 0);
     }
+    if (commande == "r")
+    {
+      cmd = valeur.toInt();
+
+      uint8_t lowByte = (int(-10)) & 0xFF;         // Octet de poids faible
+      uint8_t highByte = ((int(-10)) >> 8) & 0xFF; // Octet de poids fort
+      t_low_byte = lowByte;
+      t_high_byte = highByte;
+      TelnetStream.println();
+
+      TelnetStream.printf("Send command t with cons");
+      TelnetStream.printf(" cmd %d", cmd);
+      TelnetStream.println();
+
+      Serial.println();
+      Serial.printf("Send command recala rot 180 with cons");
+      Serial.printf(" cmd 180");
+      Serial.println();
+      lowByte = 1440 & 0xFF;         // Octet de poids faible
+      highByte = (1440 >> 8) & 0xFF; // Octet de poids fort
+      x_low_byte = lowByte;
+      x_high_byte = highByte;
+
+      lowByte = 745 & 0xFF;         // Octet de poids faible
+      highByte = (745 >> 8) & 0xFF; // Octet de poids fort
+      y_low_byte = lowByte;
+      y_high_byte = highByte;
+
+      sendCANMessage(RECALAGE, 0, 0, 8, 0, 3, t_high_byte, t_low_byte, 0, 0, 0, 0);
+      delay(100);
+      sendCANMessage(RECALAGE, 0, 0, 8, 0, 1, x_high_byte, x_low_byte, 0, 0, 0, 0);
+      delay(100);
+      sendCANMessage(RECALAGE, 0, 0, 8, 0, 2, y_high_byte, y_low_byte, 0, 0, 0, 0);
+    }
+
     if ((commande == "RESTART") || (commande == "restart"))
     {
       TelnetStream.println();
@@ -465,9 +500,8 @@ void receptionWIFI(char ch)
       Serial.printf(" cmd %d", cmd);
       Serial.println();
 
-      sendCANMessage(POLAIRE, 0, 0, 8, x_high_byte, x_low_byte, y_high_byte, y_low_byte, 0, 0, 0, 0);
+      sendCANMessage(POLAIRE, 0, 0, 8, 0, x_high_byte, x_low_byte, y_high_byte, y_low_byte, 1, 0, 0);
     }
-
 
     // Carte MPP
     if ((commande == "P"))

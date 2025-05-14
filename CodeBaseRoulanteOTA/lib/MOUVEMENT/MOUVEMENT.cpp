@@ -105,12 +105,13 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
 
     if ((erreur_distance <= distance_decl_polaire_tick))
     {
+
         if (liste.compteur_point_de_passage_polaire == liste.checksum_nbr_passage)
         {
             Serial.printf("Vrai 5");
             float facteur_deccel = erreur_distance / distance_decl_polaire_tick;
             consigne_dist_polaire_tick = consigne_dist_polaire_tick_max * facteur_deccel;
-            if (convert_distance_tick_to_mm(erreur_distance) <= 17.5)
+            if (convert_distance_tick_to_mm(erreur_distance) <= 7.5)
             {
                 Serial.printf(" Vrai ");
                 consigne_odo_gauche_prec = odo_tick_gauche;
@@ -188,7 +189,7 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
     // Serial.println();
 }
 
-bool recalage(uint8_t direction, uint8_t type_modif, uint16_t nouvelle_valeur, uint16_t consigne_rotation)
+bool recalage(uint8_t direction, uint8_t type_modif, float nouvelle_valeur, uint16_t consigne_rotation)
 {
     bool flag_modif_fait = false;
     enum MouvementRecalage
@@ -318,4 +319,19 @@ bool toucher_objet_solid()
     {
         return false;
     }
+}
+
+
+void enregistreur_odo(){
+
+            consigne_odo_droite_prec = odo_tick_droit;
+        consigne_odo_gauche_prec = odo_tick_gauche;
+                        consigne_odo_x_prec = odo_x;
+                consigne_odo_y_prec = odo_y;
+                consigne_theta_prec = degrees(theta_robot);
+                consigne_position_gauche = odo_tick_gauche;
+                consigne_position_droite = odo_tick_droit;
+
+
+
 }
