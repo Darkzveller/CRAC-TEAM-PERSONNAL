@@ -380,6 +380,68 @@ void receptionWIFI(char ch)
       sendCANMessage(RECALAGE, 0, 0, 8, 0, 2, y_high_byte, y_low_byte, 0, 0, 0, 0);
     }
 
+    if (commande == "calib")
+    {
+      Serial.println("message");
+
+      uint16_t cmd_x = 1225;
+      uint16_t cmd_y = 139;
+
+      uint8_t lowByte_x = cmd_x & 0xFF;         // Octet de poids faible
+      uint8_t highByte_x = (cmd_x >> 8) & 0xFF; // Octet de poids fort
+
+      uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
+      uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
+
+      sendCANMessage(RECALAGE, 0, 0, 8, 0, 1, highByte_x, lowByte_x, 0, 0, 0, 0);
+
+      delay(2000);
+
+      sendCANMessage(RECALAGE, 0, 0, 8, 0, 2, highByte_y, lowByte_y, 0, 0, 0, 0);
+    }
+    if (commande == "start")
+    {
+      uint16_t couille_x[5] = {1225, 1139, 1100, 1100, 1100};
+      uint16_t couille_y[5] = {225, 600, 680, 720, 761};
+
+      for (int i = 0; i < 5; i++)
+      {
+        Serial.println("message");
+        uint16_t cmd_x = couille_x[i];
+        uint16_t cmd_y = couille_y[i];
+
+        uint8_t lowByte_x = cmd_x & 0xFF;         // Octet de poids faible
+        uint8_t highByte_x = (cmd_x >> 8) & 0xFF; // Octet de poids fort
+
+        uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
+        uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
+
+        sendCANMessage(POLAIRE, 0, 0, 8, i, highByte_x, lowByte_x, highByte_y, lowByte_y, 5, 0, 0);
+      }
+    }
+
+    if (commande == "tn")
+    {
+      cmd = uint16_t(-90);
+
+      uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
+      uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
+      t_low_byte = lowByte;
+      t_high_byte = highByte;
+      TelnetStream.println();
+
+      TelnetStream.printf("Send command theta negatif with cons");
+      TelnetStream.printf(" cmd %d", cmd);
+      TelnetStream.println();
+
+      Serial.println();
+      Serial.printf("Send command theta negatif with cons");
+      Serial.printf(" cmd %d", cmd);
+      Serial.println();
+
+      sendCANMessage(ODO_SEND, 0, 0, 8, t_high_byte, t_low_byte, 0, 0, 0, 0, 0, 0);
+    }
+
     if ((commande == "RESTART") || (commande == "restart"))
     {
       TelnetStream.println();

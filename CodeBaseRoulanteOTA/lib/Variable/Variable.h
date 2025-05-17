@@ -114,7 +114,6 @@ struct Ordre_deplacement
   float y_polaire[255];
   uint8_t nbr_passage;
   uint8_t checksum_nbr_passage;
-  bool souvenir_nbr_passage_zero;
 
 };
 
@@ -217,6 +216,7 @@ String toStringD(Etat_vitesse_roue_folle_droite etat);
 //************************Convitesse de vitesse */
 extern float consigne_position_droite;
 extern float consigne_position_gauche;
+extern bool pause_asser_test ;
 
 
 //************************Freinage */
@@ -297,7 +297,7 @@ extern signed char FIFO_max_occupation;
 
 extern bool flag_fin_mvt;
 
-extern bool stop_asser;
+extern bool stop_start_robot_fin_match;
 //*********** Qu'est ce qu'on voit au borne de la batterie******************* */
 extern float courant;
 extern float tension;

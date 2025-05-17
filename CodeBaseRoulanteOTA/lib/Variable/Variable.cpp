@@ -161,6 +161,7 @@ String toStringD(Etat_vitesse_roue_folle_droite etat)
 //************************Consigne de vitesse */
 float consigne_position_droite = 0;
 float consigne_position_gauche = 0;
+bool pause_asser_test= false ;
 
 //************************Asser Freinage */
 float coeff_P_freinage = 10;
@@ -196,7 +197,7 @@ float erreur_distance = 0;
 float erreur_orient = 0;
 float consigne_dist_polaire_tick_max = SPEED_ULTRA;
 float coeff_rot_polaire_tick =0.1;
-float coeff_dist_polaire_tick = 2;
+float coeff_dist_polaire_tick = 1;
 float consigne_rot_polaire_tick = 0;
 float consigne_dist_polaire_tick = 0;
 
@@ -220,7 +221,7 @@ signed char FIFO_occupation = 0;
 signed char FIFO_max_occupation = 0;
 //***********Ordre de déplacement******************* */
 bool flag_fin_mvt = true;
-bool stop_asser = false;
+bool stop_start_robot_fin_match = false;
 
 //*********** Qu'est ce qu'on voit au borne de la batterie******************* */
 float courant=0;

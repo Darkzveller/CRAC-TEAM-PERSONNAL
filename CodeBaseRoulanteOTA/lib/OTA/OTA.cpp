@@ -4,16 +4,15 @@
 #include "EncoderManager.h"
 #include "ID_CAN.h"
 #include "CAN_ESP32E.h"
-#include "MOUVEMENT.h"
 
 // Je laisse le routeur choisir l'adresse IP et
 // je fixe le nom de mon réseau Wi-Fi, ce qui simplifie les démarches, notamment lors des débogages
 //  Informations de connexion WiFi
 
-#define MON_TELEPHONE
+// #define MON_TELEPHONE
 // #define MA_FREEBOX
 // #define MON_PC
-// #define MATTHIEU_PHONE
+#define MATTHIEU_PHONE
 
 const char *name_card_elec = "baseroulante";
 // BESOIN DE ME SIMPLIFIER MA VIE
@@ -29,11 +28,11 @@ const char *password = "subcrescat-degend@-parciore@2-adducturos"; // Mot de pas
 const char *ssid = "Detective-Conan"; // SSID du réseau WiFi
 const char *password = "99xS,304";    // Mot de passe du réseau WiFi
 #endif
-
 #ifdef MATTHIEU_PHONE                            // Nom d'hôte de la carte ESP32
 const char *ssid = "iPhone de Géraldine";        // SSID du réseau WiFi
 const char *password = "unmotdepassecompliquer"; // Mot de passe du réseau WiFi
 #endif
+
 
 // Fonction pour gérer les opérations OTA dans une tâche séparée
 void ota_handle(void *parameter)
@@ -338,7 +337,7 @@ void receptionWIFI(char ch)
     if (commande == "s")
     {
 
-      stop_asser = true;
+      pause_asser_test = false;
       TelnetStream.println();
       TelnetStream.printf("stop_asser ");
       TelnetStream.println();
@@ -349,19 +348,18 @@ void receptionWIFI(char ch)
     }
     if (commande == "st")
     {
-      enregistreur_odo();
-      // consigne_position_droite = odo_tick_droit;
-      // consigne_position_gauche = odo_tick_gauche;
+      consigne_position_droite = odo_tick_droit;
+      consigne_position_gauche = odo_tick_gauche;
 
-      // consigne_odo_gauche_prec = odo_tick_gauche;
-      // consigne_odo_droite_prec = odo_tick_droit;
+      consigne_odo_gauche_prec = odo_tick_gauche;
+      consigne_odo_droite_prec = odo_tick_droit;
 
-      // consigne_odo_x_prec = odo_x;
-      // consigne_odo_y_prec = odo_y;
+      consigne_odo_x_prec = odo_x;
+      consigne_odo_y_prec = odo_y;
 
-      // consigne_theta_prec = degrees(theta_robot);
-      stop_asser = false;
-
+      consigne_theta_prec = degrees(theta_robot);
+      pause_asser_test = true;
+     
       TelnetStream.println();
       TelnetStream.printf("start_asser ");
       TelnetStream.println();
@@ -369,6 +367,7 @@ void receptionWIFI(char ch)
       Serial.printf("start_asser");
       Serial.println();
       delay(1000);
+
     }
 
     if ((commande == "RESTART") || (commande == "restart"))
