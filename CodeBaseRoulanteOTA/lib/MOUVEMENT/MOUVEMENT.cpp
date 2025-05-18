@@ -4,6 +4,7 @@
 #include "MOTEUR.h"
 #include <mat.h>
 #include "USE_FUNCTION.h"
+#include "OTA.h"
 void rotation(int consigne, int vitesse)
 {
     if (consigne >= 0)
@@ -24,11 +25,12 @@ void rotation(int consigne, int vitesse)
 
     consigne_position_droite = regulation_vitesse_roue_folle_droite(consigne_droite, vitesse_croisiere_droit);
     consigne_position_gauche = regulation_vitesse_roue_folle_gauche(consigne_gauche, vitesse_croisiere_gauche);
-    if ((etat_actuel_vit_roue_folle_gauche != ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE) || (etat_actuel_vit_roue_folle_droite != ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE))
+    if ((etat_actuel_vit_roue_folle_gauche != ETAT_DECELERATION_Vitesse_ROUE_FOLLE_GAUCHE) && (etat_actuel_vit_roue_folle_droite != ETAT_DECELERATION_Vitesse_ROUE_FOLLE_DROITE))
     {
         float ecart = consigne_odo_gauche_prec + consigne_odo_droite_prec;
         consigne_position_gauche = -consigne_position_droite + ecart;
     }
+
     // // // On force les consignes à être égales et opposées
     // consigne_position_droite = sens * consigne_regulation_moyenne;
     // consigne_position_gauche = -sens * consigne_regulation_moyenne;
@@ -110,16 +112,22 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
         if (liste.compteur_point_de_passage_polaire == liste.checksum_nbr_passage)
         {
             Serial.printf("Vrai 5");
+            TelnetStream.printf("Vrai 5");
+
             float facteur_deccel = erreur_distance / distance_decl_polaire_tick;
             consigne_dist_polaire_tick = consigne_dist_polaire_tick_max * facteur_deccel;
-            if (convert_distance_tick_to_mm(erreur_distance) <= 17.5)
+            if (convert_distance_tick_to_mm(erreur_distance) <= 7.5)
             {
                 Serial.printf(" Vrai ");
-                consigne_odo_gauche_prec = odo_tick_gauche;
-                consigne_odo_droite_prec = odo_tick_droit;
-                consigne_odo_x_prec = odo_x;
-                consigne_odo_y_prec = odo_y;
-                consigne_theta_prec = degrees(theta_robot);
+                TelnetStream.printf(" Vrai ");
+
+                // consigne_odo_gauche_prec = odo_tick_gauche;
+                // consigne_odo_droite_prec = odo_tick_droit;
+                // consigne_odo_x_prec = odo_x;
+                // consigne_odo_y_prec = odo_y;
+                // consigne_theta_prec = degrees(theta_robot);
+                                enregistreur_odo();
+
                 flag_fin_mvt = true;
                 calcul_decl_polaire_tick = false;
             }
@@ -129,18 +137,23 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
             liste.compteur_point_de_passage_polaire += 1;
             // liste.deceleration_polaire = false;
             Serial.printf(" Vrai 6");
+            TelnetStream.printf(" Vrai 6");
         }
         Serial.printf(" Vrai 4");
     }
     else if ((erreur_orient > convert_angle_deg_to_tick(20)) || (erreur_orient < convert_angle_deg_to_tick(-20)))
     {
         Serial.printf(" Vrai 2");
+                    TelnetStream.printf(" Vrai 2");
+
         // coeff_rot_polaire_tick = 0.5;
         consigne_dist_polaire_tick = 0;
     }
     else
     {
         Serial.printf(" Vrai 3");
+                            TelnetStream.printf(" Vrai 3");
+
         // coeff_rot_polaire_tick = 0.1;
         consigne_dist_polaire_tick = consigne_dist_polaire_tick_max;
     }

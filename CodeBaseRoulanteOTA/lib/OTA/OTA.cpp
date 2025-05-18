@@ -12,7 +12,8 @@
 // #define MON_TELEPHONE
 // #define MA_FREEBOX
 // #define MON_PC
-#define MATTHIEU_PHONE
+// #define MATTHIEU_PHONE
+#define ROUTEUR_CRAC_COUPE
 
 const char *name_card_elec = "baseroulante";
 // BESOIN DE ME SIMPLIFIER MA VIE
@@ -31,6 +32,10 @@ const char *password = "99xS,304";    // Mot de passe du réseau WiFi
 #ifdef MATTHIEU_PHONE                            // Nom d'hôte de la carte ESP32
 const char *ssid = "iPhone de Géraldine";        // SSID du réseau WiFi
 const char *password = "unmotdepassecompliquer"; // Mot de passe du réseau WiFi
+#endif
+#ifdef ROUTEUR_CRAC_COUPE                            // Nom d'hôte de la carte ESP32
+const char *ssid = "esp2.4hz";        // SSID du réseau WiFi
+const char *password = "cracadmin"; // Mot de passe du réseau WiFi
 #endif
 
 

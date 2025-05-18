@@ -380,8 +380,7 @@ void receptionWIFI(char ch)
       sendCANMessage(RECALAGE, 0, 0, 8, 0, 2, y_high_byte, y_low_byte, 0, 0, 0, 0);
     }
 
-    if (commande == "calib")
-    {
+    if(commande == "calib"){
       Serial.println("message");
 
       uint16_t cmd_x = 1225;
@@ -393,19 +392,17 @@ void receptionWIFI(char ch)
       uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
       uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
 
-      sendCANMessage(RECALAGE, 0, 0, 8, 0, 1, highByte_x, lowByte_x, 0, 0, 0, 0);
+      sendCANMessage(RECALAGE, 0 , 0, 8, 0, 1,highByte_x,lowByte_x,0,0,0,0);
 
       delay(2000);
 
-      sendCANMessage(RECALAGE, 0, 0, 8, 0, 2, highByte_y, lowByte_y, 0, 0, 0, 0);
+      sendCANMessage(RECALAGE, 0 , 0, 8, 0, 2,highByte_y,lowByte_y,0,0,0,0);
     }
-    if (commande == "start")
-    {
-      uint16_t couille_x[5] = {1225, 1139, 1100, 1100, 1100};
-      uint16_t couille_y[5] = {225, 600, 680, 720, 761};
+    if(commande == "p1"){
+      uint16_t couille_x[20] = {1224,1255,1277,1290,1296,1295,1289,1278,1263,1245,1225,1204,1183,1162,1143,1126,1112,1103,1098,1100};
+      uint16_t couille_y[20] = {225,260,294,325,355,383,409,434,458,482,505,527,549,572,594,617,641,666,692,761};
 
-      for (int i = 0; i < 5; i++)
-      {
+      for(int i = 0; i < 20; i ++){
         Serial.println("message");
         uint16_t cmd_x = couille_x[i];
         uint16_t cmd_y = couille_y[i];
@@ -416,31 +413,106 @@ void receptionWIFI(char ch)
         uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
         uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
 
-        sendCANMessage(POLAIRE, 0, 0, 8, i, highByte_x, lowByte_x, highByte_y, lowByte_y, 5, 0, 0);
-      }
+
+        sendCANMessage(POLAIRE,0,0,8,i,highByte_x,lowByte_x,highByte_y,lowByte_y,5,0,0);
+      } 
+    }
+    if(commande == "p2"){
+      uint16_t couille_x[20] = {1100,1085,1068,1049,1028,1006,982,958,934,909,886,864,843,824,807,794,783,776,773,775};
+      uint16_t couille_y[20] = {761,757,752,746,739,730,719,707,694,680,665,648,630,612,592,571,549,526,503,439};
+
+      for(int i = 0; i < 20; i ++){
+        Serial.println("message");
+        uint16_t cmd_x = couille_x[i];
+        uint16_t cmd_y = couille_y[i];
+
+        uint8_t lowByte_x = cmd_x & 0xFF;         // Octet de poids faible
+        uint8_t highByte_x = (cmd_x >> 8) & 0xFF; // Octet de poids fort
+
+        uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
+        uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
+
+
+        sendCANMessage(POLAIRE,0,0,8,i,highByte_x,lowByte_x,highByte_y,lowByte_y,5,0,0);
+      } 
+    }
+    if(commande == "p3"){
+      uint16_t couille_x[20] = {775, 775, 775, 775, 775, 775, 775, 774, 775, 775, 775, 775, 775, 775, 774, 775, 774, 774, 775, 775};
+      uint16_t couille_y[20] = {439, 492, 534, 566, 587, 600, 605, 603, 594, 580,562, 541, 517, 491, 464, 438, 412, 388, 368, 269};
+
+      for(int i = 0; i < 20; i ++){
+        Serial.println("message");
+        uint16_t cmd_x = couille_x[i];
+        uint16_t cmd_y = couille_y[i];
+
+        uint8_t lowByte_x = cmd_x & 0xFF;         // Octet de poids faible
+        uint8_t highByte_x = (cmd_x >> 8) & 0xFF; // Octet de poids fort
+
+        uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
+        uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
+
+
+        sendCANMessage(POLAIRE,0,0,8,i,highByte_x,lowByte_x,highByte_y,lowByte_y,5,0,0);
+      } 
+    }
+    if(commande == "p4"){
+      uint16_t couille_x[20] = {774, 705, 671, 666, 685, 721, 769, 823, 877, 931,986, 1040, 1094, 1148, 1202, 1244, 1248, 1233, 1218, 1225};
+      uint16_t couille_y[20] = {269, 392, 480, 539, 575, 593, 599, 600, 599, 600, 599, 599, 600, 599, 599, 587, 537, 467, 398, 269};
+
+      for(int i = 0; i < 20; i ++){
+        Serial.println("message");
+        uint16_t cmd_x = couille_x[i];
+        uint16_t cmd_y = couille_y[i];
+
+        uint8_t lowByte_x = cmd_x & 0xFF;         // Octet de poids faible
+        uint8_t highByte_x = (cmd_x >> 8) & 0xFF; // Octet de poids fort
+
+        uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
+        uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
+
+
+        sendCANMessage(POLAIRE,0,0,8,i,highByte_x,lowByte_x,highByte_y,lowByte_y,5,0,0);
+      } 
+    }
+    if(commande == "p5"){
+      uint16_t couille_x[20] = {1225, 1311, 1337, 1319, 1269, 1203, 1132, 1061, 991, 920, 850, 779, 708, 638, 567, 499, 457, 430, 394, 264};
+      uint16_t couille_y[20] = {269, 425, 523, 575, 596, 600, 599, 600, 599, 599, 600, 600, 599, 599, 599, 595, 543, 466, 404, 400};
+
+      for(int i = 0; i < 20; i ++){
+        Serial.println("message");
+        uint16_t cmd_x = couille_x[i];
+        uint16_t cmd_y = couille_y[i];
+
+        uint8_t lowByte_x = cmd_x & 0xFF;         // Octet de poids faible
+        uint8_t highByte_x = (cmd_x >> 8) & 0xFF; // Octet de poids fort
+
+        uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
+        uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
+
+
+        sendCANMessage(POLAIRE,0,0,8,i,highByte_x,lowByte_x,highByte_y,lowByte_y,5,0,0);
+      } 
+    }
+    if(commande == "p6"){
+      uint16_t couille_x[20] = {264, 373, 445, 486, 506, 511, 511, 512, 512, 511,511, 512, 512, 511, 511, 511, 509, 462, 388, 264};
+      uint16_t couille_y[20] = {399, 409, 438, 481, 534, 594, 656, 719, 782, 844, 907, 969, 1032, 1095, 1157, 1220, 1281, 1315, 1325, 1325};
+
+      for(int i = 0; i < 20; i ++){
+        Serial.println("message");
+        uint16_t cmd_x = couille_x[i];
+        uint16_t cmd_y = couille_y[i];
+
+        uint8_t lowByte_x = cmd_x & 0xFF;         // Octet de poids faible
+        uint8_t highByte_x = (cmd_x >> 8) & 0xFF; // Octet de poids fort
+
+        uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
+        uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
+
+
+        sendCANMessage(POLAIRE,0,0,8,i,highByte_x,lowByte_x,highByte_y,lowByte_y,5,0,0);
+      } 
     }
 
-    if (commande == "tn")
-    {
-      cmd = uint16_t(-90);
-
-      uint8_t lowByte = cmd & 0xFF;         // Octet de poids faible
-      uint8_t highByte = (cmd >> 8) & 0xFF; // Octet de poids fort
-      t_low_byte = lowByte;
-      t_high_byte = highByte;
-      TelnetStream.println();
-
-      TelnetStream.printf("Send command theta negatif with cons");
-      TelnetStream.printf(" cmd %d", cmd);
-      TelnetStream.println();
-
-      Serial.println();
-      Serial.printf("Send command theta negatif with cons");
-      Serial.printf(" cmd %d", cmd);
-      Serial.println();
-
-      sendCANMessage(ODO_SEND, 0, 0, 8, t_high_byte, t_low_byte, 0, 0, 0, 0, 0, 0);
-    }
 
     if ((commande == "RESTART") || (commande == "restart"))
     {

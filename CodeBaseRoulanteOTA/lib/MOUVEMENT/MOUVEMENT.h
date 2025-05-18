@@ -10,5 +10,6 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
 
 bool recalage(uint8_t direction, uint8_t type_modif, float nouvelle_valeur, uint16_t consigne_rotation);
 bool toucher_objet_solid();
+void enregistreur_odo();
 
 #endif

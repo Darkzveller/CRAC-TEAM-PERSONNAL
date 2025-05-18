@@ -167,7 +167,7 @@ void bus_can(void *parameters)
 
         case ROTATION:
             // Pour se simplifier j'ai préférer décomposer les etapes quitte a prendre un peu plus de temps cpu
-
+            enregistreur_odo();
             liste.general_purpose = TYPE_DEPLACEMENT_ROTATION;
 
             // liste.angle = TIC_PER_TOUR * angle / 80.0;
@@ -181,6 +181,7 @@ void bus_can(void *parameters)
             Serial.printf(" angle %f ", (float)fusion_octet(rxMsg.data[0], rxMsg.data[1]));
             Serial.printf(" liste.angle %f", (float)liste.angle);
             Serial.printf(" liste.vitesse_croisiere %d ", liste.vitesse_croisiere);
+
             TelnetStream.printf("ROTATION ");
             TelnetStream.printf(" angle %f ", (float)fusion_octet(rxMsg.data[0], rxMsg.data[1]));
             TelnetStream.printf(" liste.angle %f", (float)liste.angle);
@@ -191,7 +192,7 @@ void bus_can(void *parameters)
             break;
 
         case LIGNE_DROITE:
-
+            enregistreur_odo();
             liste.general_purpose = TYPE_DEPLACEMENT_LIGNE_DROITE;
             liste.distance = convert_distance_mm_to_tick(fusion_octet(rxMsg.data[0], rxMsg.data[1]));
             liste.vitesse_croisiere = rxMsg.data[2];
@@ -218,6 +219,7 @@ void bus_can(void *parameters)
 
             if (liste.checksum_nbr_passage == liste.nbr_passage)
             {
+                enregistreur_odo();
                 // Serial.printf("CAOPFJAPFOJAPOEFJPCNAPEFIJAPNEVAPFOJCJCAOPFJAPFOJAPOEFJPCNAPEFIJAPNEVAPFOJCJCAOPFJAPFOJAPOEFJPCNAPEFIJAPNEVAPFOJCJCAOPFJAPFOJAPOEFJPCNAPEFIJAPNEVAPFOJCJCAOPFJAPFOJAPOEFJPCNAPEFIJAPNEVAPFOJCJ");
                 liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
                 flag_fin_mvt = false;
@@ -241,6 +243,7 @@ void bus_can(void *parameters)
 
             break;
         case RECALAGE:
+            enregistreur_odo();
 
             liste.general_purpose = TYPE_DEPLACEMENT_RECALAGE;
             liste.direction_recalage = rxMsg.data[0];
@@ -254,7 +257,7 @@ void bus_can(void *parameters)
             Serial.printf(" liste.type_modif_x_y_theta_recalge_rien %d ", liste.type_modif_x_y_theta_recalge_rien);
             Serial.printf(" liste.nouvelle_valeur_x_y_theta_rien %d ", liste.nouvelle_valeur_x_y_theta_rien);
             Serial.printf(" liste.consigne_rotation_recalge %d ", liste.consigne_rotation_recalge);
-            
+
             TelnetStream.printf(" RECALAGE ");
             TelnetStream.printf(" liste.direction_recalage %d ", liste.direction_recalage);
             TelnetStream.printf(" liste.type_modif_x_y_theta_recalge_rien %d ", liste.type_modif_x_y_theta_recalge_rien);
@@ -458,8 +461,8 @@ void loop()
             // Serial.printf(" er_d %.3f ", convert_distance_tick_to_mm(erreur_distance));
             // Serial.printf(" er_o %.3f ", convert_tick_to_angle_deg(erreur_orient));
             // Serial.printf(" delta_droit %.0f ", delta_droit);
-            // Serial.printf("ROTATION ");
-            // Serial.printf(" angle %f ", (float)fusion_octet(rxMsg.data[0], rxMsg.data[1]));
+            Serial.printf("ROTATION ");
+            Serial.printf(" angle %f ", (float)fusion_octet(rxMsg.data[0], rxMsg.data[1]));
             // Serial.printf(" liste.dist %f", (float)liste.distance);
 
             // Serial.printf(" consigne_position_droite %.0f ", consigne_position_droite);
