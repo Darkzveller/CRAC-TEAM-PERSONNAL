@@ -126,6 +126,9 @@ extern Ordre_deplacement liste;
 #define SPEED_TORTUE 45
 #define SPEED_NORMAL 60
 #define SPEED_ULTRA  100
+#define SPEED_TURBO  150
+#define SPEED_ULTRA_TURBO  200
+
 extern float coeff_P_roue_folle_tick_gauche;
 extern float coeff_D_roue_folle_tick_gauche;
 extern float coeff_I_roue_folle_tick_gauche;
@@ -284,6 +287,7 @@ extern unsigned char FIFO_ecriture;
 extern signed char FIFO_lecture;
 extern signed char FIFO_occupation;
 extern signed char FIFO_max_occupation;
+extern bool flag_can_printf;
 
 //***********Ordre de déplacement******************* */
 #define TYPE_DEPLACEMENT_IMMOBILE 1

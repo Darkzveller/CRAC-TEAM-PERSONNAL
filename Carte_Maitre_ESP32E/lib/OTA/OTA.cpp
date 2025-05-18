@@ -8,10 +8,13 @@
 extern int x_low_byte, x_high_byte;
 extern int y_low_byte, y_high_byte;
 extern int t_low_byte, t_high_byte;
-// #define MON_TELEPHONE
+uint8_t nbr_ps = 20;
+
+#define MON_TELEPHONE
 // #define MA_FREEBOX
 // #define MON_PC
-#define MATTHIEU_PHONE
+// #define MATTHIEU_PHONE
+// #define ROUTEUR_CRAC_COUPE
 
 const char *name_card_elec = "espmaitre";
 // BESOIN DE ME SIMPLIFIER MA VIE
@@ -27,10 +30,13 @@ const char *password = "subcrescat-degend@-parciore@2-adducturos"; // Mot de pas
 const char *ssid = "Detective-Conan"; // SSID du réseau WiFi
 const char *password = "99xS,304";    // Mot de passe du réseau WiFi
 #endif
-
 #ifdef MATTHIEU_PHONE                            // Nom d'hôte de la carte ESP32
 const char *ssid = "iPhone de Géraldine";        // SSID du réseau WiFi
 const char *password = "unmotdepassecompliquer"; // Mot de passe du réseau WiFi
+#endif
+#ifdef ROUTEUR_CRAC_COUPE           // Nom d'hôte de la carte ESP32
+const char *ssid = "esp2.4hz";      // SSID du réseau WiFi
+const char *password = "cracadmin"; // Mot de passe du réseau WiFi
 #endif
 
 bool justepouraffichage = 0;
@@ -380,7 +386,8 @@ void receptionWIFI(char ch)
       sendCANMessage(RECALAGE, 0, 0, 8, 0, 2, y_high_byte, y_low_byte, 0, 0, 0, 0);
     }
 
-    if(commande == "calib"){
+    if (commande == "calib")
+    {
       Serial.println("message");
 
       uint16_t cmd_x = 1225;
@@ -392,17 +399,21 @@ void receptionWIFI(char ch)
       uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
       uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
 
-      sendCANMessage(RECALAGE, 0 , 0, 8, 0, 1,highByte_x,lowByte_x,0,0,0,0);
+      sendCANMessage(RECALAGE, 0, 0, 8, 0, 1, highByte_x, lowByte_x, 0, 0, 0, 0);
 
-      delay(2000);
+      delay(20);
 
-      sendCANMessage(RECALAGE, 0 , 0, 8, 0, 2,highByte_y,lowByte_y,0,0,0,0);
+      sendCANMessage(RECALAGE, 0, 0, 8, 0, 2, highByte_y, lowByte_y, 0, 0, 0, 0);
     }
-    if(commande == "p1"){
-      uint16_t couille_x[20] = {1224,1255,1277,1290,1296,1295,1289,1278,1263,1245,1225,1204,1183,1162,1143,1126,1112,1103,1098,1100};
-      uint16_t couille_y[20] = {225,260,294,325,355,383,409,434,458,482,505,527,549,572,594,617,641,666,692,761};
+    if (commande == "p1")
+    {
+      // uint16_t couille_x[nbr_ps] = {1224, 1255, 1277, 1290, 1296, 1295, 1289, 1278, 1263, 1245, 1225, 1204, 1183, 1162, 1143, 1126, 1112, 1103, 1098, 1100};
+      // uint16_t couille_y[nbr_ps] = {225 ,  260,  294,  325,  355,  383,  409,  434,  458,  482,  505,  527,  549,  572,  594,  617,  641,  666,  692,  761};
+      uint16_t couille_x[18] = {1224, 1255, 1277, 1290, 1296, 1295, 1289, 1278, 1263, 1245, 1225, 1204, 1183, 1162, 1143, 1126, 1112, 1098};
+      uint16_t couille_y[18] = {225, 260, 294, 325, 355, 383, 409, 434, 458, 482, 505, 527, 549, 572, 594, 617, 641, 720};
 
-      for(int i = 0; i < 20; i ++){
+      for (int i = 0; i < 18; i++)
+      {
         Serial.println("message");
         uint16_t cmd_x = couille_x[i];
         uint16_t cmd_y = couille_y[i];
@@ -413,15 +424,19 @@ void receptionWIFI(char ch)
         uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
         uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
 
-
-        sendCANMessage(POLAIRE,0,0,8,i,highByte_x,lowByte_x,highByte_y,lowByte_y,5,0,0);
-      } 
+        sendCANMessage(POLAIRE, 0, 0, 8, i, highByte_x, lowByte_x, highByte_y, lowByte_y, 18, 0, 0);
+        delay(300);
+      }
     }
-    if(commande == "p2"){
-      uint16_t couille_x[20] = {1100,1085,1068,1049,1028,1006,982,958,934,909,886,864,843,824,807,794,783,776,773,775};
-      uint16_t couille_y[20] = {761,757,752,746,739,730,719,707,694,680,665,648,630,612,592,571,549,526,503,439};
+    if (commande == "p2")
+    {
+      // uint16_t couille_x[nbr_ps - 1] = {1028, 1006, 982, 958, 934, 909, 886, 864, 843, 824, 807, 794, 783, 776, 773, 775 ,775   ,775    ,775};
+      // uint16_t couille_y[nbr_ps - 1] = {739 , 730 , 719, 707, 694, 680, 665, 648, 630, 612, 592, 571, 549, 526, 503, 439 ,440-60,440-120, 360};
+      uint16_t couille_x[nbr_ps - 5] = {1028, 958, 934, 909, 886, 864, 843, 824, 807, 794, 783, 776, 773, 800, 820};
+      uint16_t couille_y[nbr_ps - 5] = {700, 707, 694, 680, 665, 648, 630, 612, 592, 571, 549, 526, 503, 439, 390};
 
-      for(int i = 0; i < 20; i ++){
+      for (int i = 0; i < nbr_ps - 5; i++)
+      {
         Serial.println("message");
         uint16_t cmd_x = couille_x[i];
         uint16_t cmd_y = couille_y[i];
@@ -432,15 +447,17 @@ void receptionWIFI(char ch)
         uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
         uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
 
-
-        sendCANMessage(POLAIRE,0,0,8,i,highByte_x,lowByte_x,highByte_y,lowByte_y,5,0,0);
-      } 
+        sendCANMessage(POLAIRE, 0, 0, 8, i, highByte_x, lowByte_x, highByte_y, lowByte_y, nbr_ps - 5, 0, 0);
+        delay(300);
+      }
     }
-    if(commande == "p3"){
-      uint16_t couille_x[20] = {775, 775, 775, 775, 775, 775, 775, 774, 775, 775, 775, 775, 775, 775, 774, 775, 774, 774, 775, 775};
-      uint16_t couille_y[20] = {439, 492, 534, 566, 587, 600, 605, 603, 594, 580,562, 541, 517, 491, 464, 438, 412, 388, 368, 269};
+    if (commande == "p3")
+    {
+      uint16_t couille_x[nbr_ps] = {775, 775, 775, 775, 775, 775, 775, 774, 775, 775, 775, 775, 775, 775, 774, 775, 774, 774, 775, 775};
+      uint16_t couille_y[nbr_ps] = {439, 492, 534, 566, 587, 600, 605, 603, 594, 580, 562, 541, 517, 491, 464, 438, 412, 388, 368, 269};
 
-      for(int i = 0; i < 20; i ++){
+      for (int i = 0; i < nbr_ps; i++)
+      {
         Serial.println("message");
         uint16_t cmd_x = couille_x[i];
         uint16_t cmd_y = couille_y[i];
@@ -451,15 +468,17 @@ void receptionWIFI(char ch)
         uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
         uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
 
-
-        sendCANMessage(POLAIRE,0,0,8,i,highByte_x,lowByte_x,highByte_y,lowByte_y,5,0,0);
-      } 
+        sendCANMessage(POLAIRE, 0, 0, 8, i, highByte_x, lowByte_x, highByte_y, lowByte_y, nbr_ps, 0, 0);
+        delay(10);
+      }
     }
-    if(commande == "p4"){
-      uint16_t couille_x[20] = {774, 705, 671, 666, 685, 721, 769, 823, 877, 931,986, 1040, 1094, 1148, 1202, 1244, 1248, 1233, 1218, 1225};
-      uint16_t couille_y[20] = {269, 392, 480, 539, 575, 593, 599, 600, 599, 600, 599, 599, 600, 599, 599, 587, 537, 467, 398, 269};
+    if (commande == "p4")
+    {
+      uint16_t couille_x[nbr_ps] = {774, 705, 671, 666, 685, 721, 769, 823, 877, 931, 986, 1040, 1094, 1148, 1202, 1244, 1248, 1233, 1218, 1225};
+      uint16_t couille_y[nbr_ps] = {269, 392, 480, 539, 575, 593, 599, 600, 599, 600, 599, 599, 600, 599, 599, 587, 537, 467, 398, 269};
 
-      for(int i = 0; i < 20; i ++){
+      for (int i = 0; i < nbr_ps; i++)
+      {
         Serial.println("message");
         uint16_t cmd_x = couille_x[i];
         uint16_t cmd_y = couille_y[i];
@@ -470,15 +489,17 @@ void receptionWIFI(char ch)
         uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
         uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
 
-
-        sendCANMessage(POLAIRE,0,0,8,i,highByte_x,lowByte_x,highByte_y,lowByte_y,5,0,0);
-      } 
+        sendCANMessage(POLAIRE, 0, 0, 8, i, highByte_x, lowByte_x, highByte_y, lowByte_y, nbr_ps, 0, 0);
+        delay(10);
+      }
     }
-    if(commande == "p5"){
-      uint16_t couille_x[20] = {1225, 1311, 1337, 1319, 1269, 1203, 1132, 1061, 991, 920, 850, 779, 708, 638, 567, 499, 457, 430, 394, 264};
-      uint16_t couille_y[20] = {269, 425, 523, 575, 596, 600, 599, 600, 599, 599, 600, 600, 599, 599, 599, 595, 543, 466, 404, 400};
+    if (commande == "p5")
+    {
+      uint16_t couille_x[nbr_ps] = {1225, 1311, 1337, 1319, 1269, 1203, 1132, 1061, 991, 920, 850, 779, 708, 638, 567, 499, 457, 430, 394, 264};
+      uint16_t couille_y[nbr_ps] = {269, 425, 523, 575, 596, 600, 599, 600, 599, 599, 600, 600, 599, 599, 599, 595, 543, 466, 404, 400};
 
-      for(int i = 0; i < 20; i ++){
+      for (int i = 0; i < nbr_ps; i++)
+      {
         Serial.println("message");
         uint16_t cmd_x = couille_x[i];
         uint16_t cmd_y = couille_y[i];
@@ -489,15 +510,17 @@ void receptionWIFI(char ch)
         uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
         uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
 
-
-        sendCANMessage(POLAIRE,0,0,8,i,highByte_x,lowByte_x,highByte_y,lowByte_y,5,0,0);
-      } 
+        sendCANMessage(POLAIRE, 0, 0, 8, i, highByte_x, lowByte_x, highByte_y, lowByte_y, nbr_ps, 0, 0);
+        delay(10);
+      }
     }
-    if(commande == "p6"){
-      uint16_t couille_x[20] = {264, 373, 445, 486, 506, 511, 511, 512, 512, 511,511, 512, 512, 511, 511, 511, 509, 462, 388, 264};
-      uint16_t couille_y[20] = {399, 409, 438, 481, 534, 594, 656, 719, 782, 844, 907, 969, 1032, 1095, 1157, 1220, 1281, 1315, 1325, 1325};
+    if (commande == "p6")
+    {
+      uint16_t couille_x[nbr_ps] = {264, 373, 445, 486, 506, 511, 511, 512, 512, 511, 511, 512, 512, 511, 511, 511, 509, 462, 388, 264};
+      uint16_t couille_y[nbr_ps] = {399, 409, 438, 481, 534, 594, 656, 719, 782, 844, 907, 969, 1032, 1095, 1157, 1220, 1281, 1315, 1325, 1325};
 
-      for(int i = 0; i < 20; i ++){
+      for (int i = 0; i < nbr_ps; i++)
+      {
         Serial.println("message");
         uint16_t cmd_x = couille_x[i];
         uint16_t cmd_y = couille_y[i];
@@ -508,11 +531,10 @@ void receptionWIFI(char ch)
         uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
         uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
 
-
-        sendCANMessage(POLAIRE,0,0,8,i,highByte_x,lowByte_x,highByte_y,lowByte_y,5,0,0);
-      } 
+        sendCANMessage(POLAIRE, 0, 0, 8, i, highByte_x, lowByte_x, highByte_y, lowByte_y, nbr_ps, 0, 0);
+        delay(10);
+      }
     }
-
 
     if ((commande == "RESTART") || (commande == "restart"))
     {

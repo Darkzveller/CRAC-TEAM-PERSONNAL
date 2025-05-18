@@ -196,7 +196,7 @@ float consigne_regulation_moyenne = 0;
 float erreur_distance = 0;
 float erreur_orient = 0;
 float consigne_dist_polaire_tick_max = SPEED_ULTRA;
-float coeff_rot_polaire_tick =0.1;
+float coeff_rot_polaire_tick =0.15;
 float coeff_dist_polaire_tick = 1;
 float consigne_rot_polaire_tick = 0;
 float consigne_dist_polaire_tick = 0;
@@ -219,6 +219,7 @@ unsigned char FIFO_ecriture = 0;
 signed char FIFO_lecture = 0;
 signed char FIFO_occupation = 0;
 signed char FIFO_max_occupation = 0;
+bool flag_can_printf = false;
 //***********Ordre de déplacement******************* */
 bool flag_fin_mvt = true;
 bool stop_start_robot_fin_match = false;
