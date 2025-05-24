@@ -10,4 +10,7 @@ void read_encodeurdroit();
 void read_encodeurgauche();
 void reset_encodeur();
 void read_x_y_theta();
+void enregistreur_odo();
+float moyenneur(float *buf);
+
 #endif

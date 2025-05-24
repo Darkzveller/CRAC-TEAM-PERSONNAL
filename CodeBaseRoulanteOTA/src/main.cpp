@@ -21,21 +21,29 @@ void controle(void *parameters)
         read_x_y_theta();
         static int pp = 0;
 
-        // if (pp == 0)
-        // {
-        //     liste.nbr_passage = rxMsg.data[0];
-        //     liste.x_polaire[liste.nbr_passage] = 1500;
-        //     liste.y_polaire[liste.nbr_passage] = 500;
+        if (pp == 0)
+        {
+            liste.nbr_passage = 1;
+            liste.x_polaire[0] = 250;
+            liste.y_polaire[0] = 500;
+            liste.x_polaire[1]=500;
+            liste.y_polaire[1] = 250;
 
-        //     liste.checksum_nbr_passage = 0;
+            // liste.nbr_passage = 0;
+            // liste.x_polaire[0] = 0;
+            // liste.y_polaire[0] = 0;
+            // // liste.x_polaire[1]=500;
+            // liste.y_polaire[1] = 250;
 
-        //     liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
-        //     flag_fin_mvt = false;
-        //     rxMsg.id = 0;
-        //     liste.compteur_point_de_passage_polaire = 0;
+            liste.checksum_nbr_passage = liste.nbr_passage;
 
-        //     pp = 1;
-        // }
+            liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
+            flag_fin_mvt = false;
+            rxMsg.id = 0;
+            liste.compteur_point_de_passage_polaire = 0;
+
+            pp = 1;
+        }
 
         switch (liste.general_purpose)
         {
@@ -411,7 +419,7 @@ void setup()
     Serial.begin(115200);
     // Serial.println("Booting with OTA"); // Message indiquant le démarrage avec OTA
     // Appel à la fonction de configuration OTA (non définie dans ce code, mais probablement ailleurs)
-    setupOTA();
+    // setupOTA();
     // Initialisation des moteurs
     setup_motors();
     stop_motors();
@@ -472,10 +480,10 @@ void loop()
         {
             // Serial.printf(" PS_ASSER %d ", pause_asser_test);
 
-            Serial.printf(" Odo x %.3f ", odo_x);
-            Serial.printf(" odo_y %.3f ", odo_y);
-            Serial.printf(" teheta %.3f ", degrees(theta_robot));
-            // Serial.printf("CPT_PS %d", liste.compteur_point_de_passage_polaire);
+            // Serial.printf(" Odo x %.3f ", odo_x);
+            // Serial.printf(" odo_y %.3f ", odo_y);
+            // Serial.printf(" teheta %.3f ", degrees(theta_robot));
+            // // Serial.printf("CPT_PS %d", liste.compteur_point_de_passage_polaire);
 
             // Serial.printf(" er_d %.3f ", convert_distance_tick_to_mm(erreur_distance));
             // Serial.printf(" er_o %.3f ", convert_tick_to_angle_deg(erreur_orient));
@@ -501,7 +509,7 @@ void loop()
             // // Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
             // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
             // Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
-            Serial.println();
+            // Serial.println();
         }
         flag_controle = 0;
     }

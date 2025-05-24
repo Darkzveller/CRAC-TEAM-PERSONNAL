@@ -40,15 +40,14 @@ double consigne_odo_y_prec = 0;
 //************Liste Ordre Deplacement */
 
 Ordre_deplacement liste = {
-    TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0
-};
+    TYPE_DEPLACEMENT_IMMOBILE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // Variable asservissement
 //************Asservissement ROUE FOLLE EN TICK */
 
 float coeff_P_roue_folle_tick_gauche = 10;
-float coeff_D_roue_folle_tick_gauche = 0.25;
-float coeff_I_roue_folle_tick_gauche = 0.4;
+float coeff_D_roue_folle_tick_gauche = 250;
+float coeff_I_roue_folle_tick_gauche = 0.0;
 
 float coeff_P_roue_folle_tick_droite = coeff_P_roue_folle_tick_gauche;
 float coeff_D_roue_folle_tick_droite = coeff_D_roue_folle_tick_gauche;
@@ -71,7 +70,7 @@ float Dmax = 15;
 #ifdef PARAMETRE_BASE_TEST
 float Dmax = 5;
 #endif
-float limit_reprise_asser = 150;    
+float limit_reprise_asser = 150;
 
 float acc_actuel_droite = 0;
 double consigne_vit_droite = 0;
@@ -157,11 +156,10 @@ String toStringD(Etat_vitesse_roue_folle_droite etat)
     }
 }
 
-
 //************************Consigne de vitesse */
 float consigne_position_droite = 0;
 float consigne_position_gauche = 0;
-bool pause_asser_test= false ;
+bool pause_asser_test = false;
 
 //************************Asser Freinage */
 float coeff_P_freinage = 10;
@@ -174,10 +172,10 @@ float somme_erreur_freinage_roue_folle_gauche = 0;
 float erreur_prec_freinage_roue_folle_gauche = 0;
 //************************Asser Correction d'angle */
 
-double coeff_P_angle = 2.5;           
-double coeff_I_angle = 0.1;         
-double coeff_D_angle = 0;           
-double integral_limit_angle = 50.0; 
+double coeff_P_angle = 2.5;
+double coeff_I_angle = 0.1;
+double coeff_D_angle = 0;
+double integral_limit_angle = 50.0;
 // Variables globales pour le PID
 double erreur_prec_angle = 0.0;    // Erreur précédente
 double somme_integral_angle = 0.0; // Somme des erreurs pour le calcul intégral
@@ -195,8 +193,8 @@ float consigne_regulation_moyenne = 0;
 
 float erreur_distance = 0;
 float erreur_orient = 0;
-float consigne_dist_polaire_tick_max = SPEED_ULTRA;
-float coeff_rot_polaire_tick =0.15;
+float consigne_dist_polaire_tick_max = SPEED_ULTRA_TURBO;
+float coeff_rot_polaire_tick = 0.5;
 float coeff_dist_polaire_tick = 1;
 float consigne_rot_polaire_tick = 0;
 float consigne_dist_polaire_tick = 0;
@@ -205,7 +203,6 @@ float coeff_decc_distance_polaire_tick = 15.25;
 float distance_decl_polaire_tick = 0;
 
 bool calcul_decl_polaire_tick = false;
-
 
 //***********Loop******************* */
 
@@ -225,6 +222,6 @@ bool flag_fin_mvt = true;
 bool stop_start_robot_fin_match = false;
 
 //*********** Qu'est ce qu'on voit au borne de la batterie******************* */
-float courant=0;
-float tension =0;
-float puissance=0;
+float courant = 0;
+float tension = 0;
+float puissance = 0;

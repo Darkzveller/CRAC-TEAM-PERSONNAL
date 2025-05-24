@@ -5,6 +5,9 @@
 #include <mat.h>
 #include "USE_FUNCTION.h"
 #include "OTA.h"
+#include "EncoderManager.h"
+static int flag_sens_polaire = 0;
+
 void rotation(int consigne, int vitesse)
 {
     if (consigne >= 0)
@@ -68,107 +71,33 @@ void ligne_droite(int consigne, int vitesse)
 
 void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons, bool nbr_passage)
 {
-    static int sens = 1;
-    static int compteur = 0;
 
     // coordonnee_x = 200;
     // coordonnee_y = 0;
     erreur_distance = convert_distance_mm_to_tick(sqrt(pow(coordonnee_x - odo_x, 2) + pow(coordonnee_y - odo_y, 2))); // On détermine la distance restante a parcourir
-                                                                                                                      // erreur_orient = convert_angle_radian_to_tick((atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot));  // On détermine l'angle a parcour pour arriver a destination
-                                                                                                                      // erreur_orient = atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot; // On détermine l'angle a parcour pour arriver a destination
-    erreur_orient = atan2(coordonnee_x - odo_x, coordonnee_y - odo_y) - theta_robot;                                  // On détermine l'angle a parcour pour arriver a destination
+    // erreur_orient = convert_angle_radian_to_tick((atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot));  // On détermine l'angle a parcour pour arriver a destination
+    erreur_orient = atan2(coordonnee_y - odo_y, coordonnee_x - odo_x) - theta_robot; // On détermine l'angle a parcour pour arriver a destination
+    // erreur_orient =  atan2(coordonnee_x - odo_x, coordonnee_y - odo_y) - theta_robot;            // On détermine l'angle a parcour pour arriver a destination
 
     erreur_orient = normaliser_angle_rad(erreur_orient);
     Serial.printf(" er_o_avant_detec %.1f ", degrees(erreur_orient));
     TelnetStream.printf(" er_o_avant_detec %.1f ", degrees(erreur_orient));
 
-    Serial.printf(" cpt_av %d ", compteur);
-
-    // Déterminer si on doit inverser le sens au premier passage
-    if (compteur == 0)
-    {
-        float erreur_orient_deg = degrees(erreur_orient); // car convert_tick_to_angle_deg demande un tick normalement
-        if ((erreur_orient_deg > 90.0) || (erreur_orient_deg < -90.0))
-        {
-            sens = -1;
-        }
-        else
-        {
-            sens = 1;
-        }
-        compteur = 1;
-    }
-
-    // Si sens inversé, corriger l'orientation
-    if (sens == -1)
-    {
-        Serial.printf("SENS ");
-        TelnetStream.printf("SENS N ");
-
-        erreur_orient += radians(180.0);
-        erreur_orient = normaliser_angle_rad(erreur_orient); // Très important après ajout de 180°
-    }
-    else
-    {
-        TelnetStream.printf("SENS P");
-    }
+    Serial.printf(" flg_sp %d ", flag_sens_polaire);
 
     // Maintenant on convertit erreur_orient en tick
-    erreur_orient = convert_angle_radian_to_tick(erreur_orient);
-    erreur_orient = constrain(erreur_orient, -1250, 1250);
+    erreur_orient = convert_angle_radian_to_tick(normaliser_angle_rad((determination_sens_polaire(erreur_orient))));
+    // erreur_orient = constrain(erreur_orient, -1250, 1250);
     consigne_rot_polaire_tick = erreur_orient;
 
-    if ((erreur_distance <= distance_decl_polaire_tick))
-    {
-        if (liste.compteur_point_de_passage_polaire == liste.checksum_nbr_passage)
-        {
-            Serial.printf("Vrai 5");
-            // TelnetStream.printf("Vrai 5");
-
-            float facteur_deccel = erreur_distance / distance_decl_polaire_tick;
-            consigne_dist_polaire_tick = consigne_dist_polaire_tick_max * facteur_deccel;
-            if (convert_distance_tick_to_mm(erreur_distance) <= 15.5)
-            {
-                Serial.printf(" Vrai ");
-                // TelnetStream.printf(" Vrai ");
-
-                // consigne_odo_gauche_prec = odo_tick_gauche;
-                // consigne_odo_droite_prec = odo_tick_droit;
-                // consigne_odo_x_prec = odo_x;
-                // consigne_odo_y_prec = odo_y;
-                // consigne_theta_prec = degrees(theta_robot);
-                enregistreur_odo();
-                compteur = 0;
-                sens = 1;
-                liste.compteur_point_de_passage_polaire = 0;
-                flag_fin_mvt = true;
-                calcul_decl_polaire_tick = false;
-            }
-        }
-        else
-        {
-            liste.compteur_point_de_passage_polaire += 1;
-            // liste.deceleration_polaire = false;
-
-            Serial.printf(" Vrai 6");
-            // TelnetStream.printf(" Vrai 6");
-        }
-        Serial.printf(" Vrai 4");
-    }
-    else if ((erreur_orient > convert_angle_deg_to_tick(20)) || (erreur_orient < convert_angle_deg_to_tick(-20)))
+    if ((erreur_orient > convert_angle_deg_to_tick(20)) || (erreur_orient < convert_angle_deg_to_tick(-20)))
     {
         Serial.printf(" Vrai 2");
-        // TelnetStream.printf(" Vrai 2");
-
-        // coeff_rot_polaire_tick = 0.5;
         consigne_dist_polaire_tick = 0;
     }
     else
     {
         Serial.printf(" Vrai 3");
-        // TelnetStream.printf(" Vrai 3");
-
-        // coeff_rot_polaire_tick = 0.1;
         consigne_dist_polaire_tick = consigne_dist_polaire_tick_max;
     }
     // Inverser la consigne de distance si besoin
@@ -177,25 +106,17 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
         Serial.printf("dist négatif ");
         consigne_dist_polaire_tick = -consigne_dist_polaire_tick;
     }
+    gestion_freinage_et_point_de_passage(20, 5, theta_cons);
 
     consigne_position_gauche = odo_tick_gauche + coeff_dist_polaire_tick * consigne_dist_polaire_tick + coeff_rot_polaire_tick * consigne_rot_polaire_tick; // commande en tick qu'on souhaite atteindre
     consigne_position_droite = odo_tick_droit + coeff_dist_polaire_tick * consigne_dist_polaire_tick - coeff_rot_polaire_tick * consigne_rot_polaire_tick;  // commande en tick qu'on souhaite atteindre
-
-    // asservissement_roue_folle_gauche_tick(round(commande_gauche), odo_tick_gauche); // PID en tick des roue avec pour 1ere argument la consigne et le deuxieme argument l'observation sur la roue odo
-    // asservissement_roue_folle_droite_tick(round(commande_droite), odo_tick_droit);  // PID en tick des roue avec pour 1ere argument la consigne et le deuxieme argument l'observation sur la roue odo
-
-    if (calcul_decl_polaire_tick == false)
-    {
-        calcul_decl_polaire_tick = true;
-        distance_decl_polaire_tick = 0.5 * pow(2, consigne_dist_polaire_tick_max / coeff_decc_distance_polaire_tick) * coeff_decc_distance_polaire_tick;
-    }
 
     Serial.printf(" cs x %.1f ", coordonnee_x);
     Serial.printf(" cs_y %.1f ", coordonnee_y);
     TelnetStream.printf(" cs x %.1f ", coordonnee_x);
     TelnetStream.printf(" cs_y %.1f ", coordonnee_y);
 
-    Serial.printf(" cpt %d ", compteur);
+    // Serial.printf(" cpt %d ", compteur);
     Serial.printf(" S %d ", sens);
 
     Serial.printf(" Odo x %.1f ", odo_x);
@@ -207,6 +128,10 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
 
     Serial.printf(" er_d %.3f ", convert_distance_tick_to_mm(erreur_distance));
     Serial.printf(" er_o %.3f ", convert_tick_to_angle_deg(erreur_orient));
+    Serial.printf(" consigne_dist_polaire_tick %f", consigne_dist_polaire_tick);
+
+    Serial.printf(" cs_p_gauche %f ", consigne_position_gauche);
+    Serial.printf(" cs_p_droit  %f ", consigne_position_droite);
 
     // Serial.printf(" cmd_d %.1f ", consigne_dist_polaire_tick);
     // Serial.printf(" cmd_r %.1f ", consigne_rot_polaire_tick);
@@ -216,8 +141,8 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
     // Serial.printf(" dist_dcl %.1f ", convert_distance_tick_to_mm(distance_decl_polaire_tick));
     // Serial.printf(" coef_decl %.1f ", coeff_decc_distance_polaire_tick);
 
-    Serial.printf(" odo_g %.0f ", odo_tick_gauche);
-    Serial.printf(" odo_d %.0f ", odo_tick_droit);
+    // Serial.printf(" odo_g %.0f ", odo_tick_gauche);
+    // Serial.printf(" odo_d %.0f ", odo_tick_droit);
 
     // Serial.printf(" angl_tick %.1f ", (float)convert_angle_deg_to_tick(90));
     // Serial.printf(" angl_deg %.1f ", convert_tick_to_angle_deg(convert_angle_deg_to_tick(90)));
@@ -359,14 +284,86 @@ bool toucher_objet_solid()
         return false;
     }
 }
-void enregistreur_odo()
+float determination_sens_polaire(float erreur_orient_radians)
 {
 
-    consigne_odo_droite_prec = odo_tick_droit;
-    consigne_odo_gauche_prec = odo_tick_gauche;
-    consigne_odo_x_prec = odo_x;
-    consigne_odo_y_prec = odo_y;
-    consigne_theta_prec = degrees(theta_robot);
-    consigne_position_gauche = odo_tick_gauche;
-    consigne_position_droite = odo_tick_droit;
+    // Déterminer si on doit inverser le sens au premier passage
+    if (flag_sens_polaire == 0)
+    {
+        float erreur_orient_deg = degrees(erreur_orient_radians); // car convert_tick_to_angle_deg demande un tick normalement
+        if ((erreur_orient_deg > 90.0) || (erreur_orient_deg < -90.0))
+        {
+            sens = -1;
+        }
+        else
+        {
+            sens = 1;
+        }
+        flag_sens_polaire = 1;
+    }
+
+    // Si sens inversé, corriger l'orientation
+    if (sens == -1)
+    {
+        Serial.printf("SENS ");
+        TelnetStream.printf("SENS N ");
+
+        erreur_orient_radians += radians(180.0);
+        erreur_orient_radians = normaliser_angle_rad(erreur_orient_radians); // Très important après ajout de 180°
+    }
+    else
+    {
+        TelnetStream.printf("SENS P");
+    }
+    return erreur_orient_radians;
+}
+
+void gestion_freinage_et_point_de_passage(float distance_de_seuil_minimal_et_changement_point_passage__mm, float seuil_minimal_autorise_permettant_de_quitter_asser_polaire_mm, float theta_cons)
+{
+
+    if (theta_cons == 0)
+    {
+        if (convert_distance_tick_to_mm(erreur_distance) <= distance_de_seuil_minimal_et_changement_point_passage__mm)
+        {
+            if (liste.compteur_point_de_passage_polaire == liste.checksum_nbr_passage)
+            {
+                Serial.printf("Vrai 5");
+                // TelnetStream.printf("Vrai 5");
+
+                float facteur_deccel = erreur_distance / convert_distance_mm_to_tick(distance_de_seuil_minimal_et_changement_point_passage__mm);
+                consigne_dist_polaire_tick = consigne_dist_polaire_tick_max * facteur_deccel / distance_de_seuil_minimal_et_changement_point_passage__mm;
+                Serial.printf(" fdecl %f", facteur_deccel);
+                // consigne_dist_polaire_tick =0;
+                // coeff_rot_polaire_tick = 0;
+
+                if (convert_distance_tick_to_mm(erreur_distance) <= seuil_minimal_autorise_permettant_de_quitter_asser_polaire_mm)
+                {
+                    Serial.printf(" Vrai ");
+                    enregistreur_odo();
+                    reset_parametre_polaire();
+                    liste.compteur_point_de_passage_polaire = 0;
+                    flag_fin_mvt = true;
+                }
+            }
+            else
+            {
+                liste.compteur_point_de_passage_polaire += 1;
+                Serial.printf(" Vrai 6");
+                // TelnetStream.printf(" Vrai 6");
+            }
+        }
+    }
+    else if (convert_tick_to_angle_deg(erreur_orient) <= 5)
+    {
+        float facteur_deccel = erreur_orient / convert_distance_mm_to_tick(5);
+        coeff_rot_polaire_tick = coeff_rot_polaire_tick * facteur_deccel / 5;
+    }
+}
+
+void reset_parametre_polaire()
+{
+    flag_sens_polaire = 0;
+    sens = 1;
+    consigne_dist_polaire_tick_max = fabs(consigne_dist_polaire_tick_max);
+    coeff_rot_polaire_tick = 0.5;
 }

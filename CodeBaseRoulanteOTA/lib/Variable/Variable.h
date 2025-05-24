@@ -3,8 +3,8 @@
 #ifndef Variable_H
 #define Variable_H
 
-// #define PARAMETRE_BASE_TEST 
-#define PARAMETRE_BASE_OFFICIEL
+#define PARAMETRE_BASE_TEST 
+// #define PARAMETRE_BASE_OFFICIEL
 
 extern float tension_bat ;
 // Parametre FreeRTOS
