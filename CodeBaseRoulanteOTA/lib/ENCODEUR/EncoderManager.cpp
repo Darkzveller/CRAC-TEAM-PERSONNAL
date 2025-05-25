@@ -169,8 +169,8 @@ pareil pour ordo_y
     theta_robot_prec = ((delta_droit - delta_gauche) * 0.5) / ENTRAXE;
     theta_robot += theta_robot_prec;
     // Mise à jour des coordonnées x et y
-    odo_x += cos(theta_robot) * distance_parcourue;
-    odo_y += sin(theta_robot) * distance_parcourue;
+    odo_x -= cos(theta_robot) * distance_parcourue;
+    odo_y -= sin(theta_robot) * distance_parcourue;
 
     vitesse_rob = distance_parcourue / Te;
 

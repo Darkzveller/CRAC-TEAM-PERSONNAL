@@ -3,8 +3,8 @@
 #ifndef Variable_H
 #define Variable_H
 
-#define PARAMETRE_BASE_TEST 
-// #define PARAMETRE_BASE_OFFICIEL
+// #define PARAMETRE_BASE_TEST 
+#define PARAMETRE_BASE_OFFICIEL
 
 extern float tension_bat ;
 // Parametre FreeRTOS
@@ -127,7 +127,10 @@ extern Ordre_deplacement liste;
 #define SPEED_NORMAL 60
 #define SPEED_ULTRA  100
 #define SPEED_TURBO  150
-#define SPEED_ULTRA_TURBO  200
+#define SPEED_TURBO_ULTRA  200
+
+// #define SPEED_ULTRA_TURBO  200
+// #define SPEED_ULTRA_TURBO  200
 
 extern float coeff_P_roue_folle_tick_gauche;
 extern float coeff_D_roue_folle_tick_gauche;
@@ -251,6 +254,8 @@ extern double theta_deuxieme_rotation;
 extern float consigne_regulation_moyenne ;
 
 //************************Polaire en tick */
+#define TOLERANCE_ERREUR_AUTORISER 5
+#define SEUIL_ACTIVATION_DECELERATION 85
 extern float erreur_distance ;
 extern float erreur_orient ;
 extern float consigne_dist_polaire_tick_max ;

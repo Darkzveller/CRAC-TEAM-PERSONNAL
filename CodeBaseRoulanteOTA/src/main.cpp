@@ -10,7 +10,7 @@
 #include "CAN_ESP32E.h"
 #include "USE_FUNCTION.h"
 
-float rectificateur_coeeff = 0;
+float rectificateur_coeeff = 1;
 
 void controle(void *parameters)
 {
@@ -23,11 +23,11 @@ void controle(void *parameters)
 
         if (pp == 0)
         {
-            liste.nbr_passage = 1;
+            liste.nbr_passage = 0;
             liste.x_polaire[0] = 250;
-            liste.y_polaire[0] = 500;
-            liste.x_polaire[1]=500;
-            liste.y_polaire[1] = 250;
+            liste.y_polaire[0] = 0;
+            // liste.x_polaire[1]=500;
+            // liste.y_polaire[1] = 250;
 
             // liste.nbr_passage = 0;
             // liste.x_polaire[0] = 0;
