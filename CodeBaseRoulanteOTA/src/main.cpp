@@ -24,8 +24,11 @@ void controle(void *parameters)
         if (pp == 0)
         {
             liste.nbr_passage = 0;
-            liste.x_polaire[0] = 250;
+            liste.x_polaire[0] = 0;
             liste.y_polaire[0] = 0;
+            // liste.x_polaire[0] = 250;
+            // liste.y_polaire[0] = 500;
+
             // liste.x_polaire[1]=500;
             // liste.y_polaire[1] = 250;
 
@@ -34,7 +37,7 @@ void controle(void *parameters)
             // liste.y_polaire[0] = 0;
             // // liste.x_polaire[1]=500;
             // liste.y_polaire[1] = 250;
-
+            liste.rotation_polaire[0] = 90;
             liste.checksum_nbr_passage = liste.nbr_passage;
 
             liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
@@ -96,7 +99,7 @@ void controle(void *parameters)
             Serial.printf(" liste.cptps %d ", liste.compteur_point_de_passage_polaire);
             TelnetStream.printf(" liste.cptps %d ", liste.compteur_point_de_passage_polaire);
 
-            asser_polaire_tick(liste.x_polaire[liste.compteur_point_de_passage_polaire], liste.y_polaire[liste.compteur_point_de_passage_polaire], 0, liste.deceleration_polaire);
+            asser_polaire_tick(liste.x_polaire[liste.compteur_point_de_passage_polaire], liste.y_polaire[liste.compteur_point_de_passage_polaire], liste.rotation_polaire[liste.compteur_point_de_passage_polaire], liste.deceleration_polaire);
             // TelnetStream.println();
 
             if (flag_fin_mvt)
@@ -252,7 +255,7 @@ void bus_can(void *parameters)
             Serial.printf(" liste.x_polaire %f ", liste.x_polaire[liste.nbr_passage]);
             Serial.printf(" liste.y_polaire %f ", liste.y_polaire[liste.nbr_passage]);
             Serial.printf(" liste.cptps %d ", liste.compteur_point_de_passage_polaire);
-       
+
             TelnetStream.printf(" POLAIRE ");
             TelnetStream.printf(" liste.nbr_passage %d ", liste.nbr_passage);
             TelnetStream.printf(" liste.checksum_nbr_passage %d ", liste.checksum_nbr_passage);

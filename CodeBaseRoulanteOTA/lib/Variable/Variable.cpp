@@ -194,8 +194,8 @@ float consigne_regulation_moyenne = 0;
 float erreur_distance = 0;
 float erreur_orient = 0;
 float consigne_dist_polaire_tick_max = SPEED_TURBO_ULTRA;
-float coeff_rot_polaire_tick = 0.5;
-float coeff_dist_polaire_tick = 1;
+float coeff_rot_polaire_tick = VALEUR_DEFAUT_COEFF_ROT_POLAIRE_TICK;
+float coeff_dist_polaire_tick = VALEUR_DEFAUT_COEFF_DIST_POLAIRE_TICK;
 float consigne_rot_polaire_tick = 0;
 float consigne_dist_polaire_tick = 0;
 

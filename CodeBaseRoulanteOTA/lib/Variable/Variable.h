@@ -112,6 +112,7 @@ struct Ordre_deplacement
   float vitesse_x_y_theta;
   float x_polaire[255];
   float y_polaire[255];
+  float rotation_polaire[255];
   uint8_t nbr_passage;
   uint8_t checksum_nbr_passage;
 
@@ -254,8 +255,14 @@ extern double theta_deuxieme_rotation;
 extern float consigne_regulation_moyenne ;
 
 //************************Polaire en tick */
-#define TOLERANCE_ERREUR_AUTORISER 5
-#define SEUIL_ACTIVATION_DECELERATION 85
+#define TOLERANCE_ERREUR_DISTANCE_AUTORISER 5
+#define SEUIL_ACTIVATION_DECELERATION_DISTANCE 85
+
+#define VALEUR_DEFAUT_COEFF_ROT_POLAIRE_TICK 0.5
+#define VALEUR_DEFAUT_COEFF_DIST_POLAIRE_TICK 1
+#define VALEUR_ROTATION_SUR_PLACE_COEFF_ROT_POLAIRE_TICK 1.2
+#define VALEUR_ROTATION_SUR_PLACE_COEFF_DIST_POLAIRE_TICK 0
+
 extern float erreur_distance ;
 extern float erreur_orient ;
 extern float consigne_dist_polaire_tick_max ;
