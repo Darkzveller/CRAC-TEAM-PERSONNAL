@@ -19,7 +19,7 @@ void controle(void *parameters)
     while (1)
     {
         read_x_y_theta();
-        static int pp = 0;
+        static int pp = 1;
 
         if (pp == 0)
         {
@@ -237,6 +237,7 @@ void bus_can(void *parameters)
             liste.y_polaire[liste.nbr_passage] = fusion_octet(rxMsg.data[3], rxMsg.data[4]);
 
             liste.checksum_nbr_passage = rxMsg.data[5] - 1;
+            liste.rotation_polaire[liste.nbr_passage] = fusion_octet(rxMsg.data[6], rxMsg.data[7]);
 
             if (liste.checksum_nbr_passage == liste.nbr_passage)
             {
