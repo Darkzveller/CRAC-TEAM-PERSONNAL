@@ -120,30 +120,30 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
     consigne_position_gauche = odo_tick_gauche - coeff_dist_polaire_tick * consigne_dist_polaire_tick - coeff_rot_polaire_tick * consigne_rot_polaire_tick; // commande en tick qu'on souhaite atteindre
     consigne_position_droite = odo_tick_droit - coeff_dist_polaire_tick * consigne_dist_polaire_tick + coeff_rot_polaire_tick * consigne_rot_polaire_tick;  // commande en tick qu'on souhaite atteindre
 
-    Serial.printf(" cs x %.1f ", coordonnee_x);
-    Serial.printf(" cs_y %.1f ", coordonnee_y);
-    Serial.printf(" cs_t %.1f ", theta_cons);
+    // Serial.printf(" cs x %.1f ", coordonnee_x);
+    // Serial.printf(" cs_y %.1f ", coordonnee_y);
+    // Serial.printf(" cs_t %.1f ", theta_cons);
 
-    TelnetStream.printf(" cs x %.1f ", coordonnee_x);
-    TelnetStream.printf(" cs_y %.1f ", coordonnee_y);
+    // TelnetStream.printf(" cs x %.1f ", coordonnee_x);
+    // TelnetStream.printf(" cs_y %.1f ", coordonnee_y);
 
     // Serial.printf(" cpt %d ", compteur);
-    Serial.printf(" S %d ", sens);
+    // Serial.printf(" S %d ", sens);
 
-    Serial.printf(" Odo x %.1f ", odo_x);
-    Serial.printf(" odo_y %.1f ", odo_y);
-    Serial.printf(" teheta %.3f ", degrees(theta_robot));
-    TelnetStream.printf(" Odo x %.3f ", odo_x);
-    TelnetStream.printf(" odo_y %.3f ", odo_y);
-    TelnetStream.printf(" teheta %.3f ", degrees(theta_robot));
+    // Serial.printf(" Odo x %.1f ", odo_x);
+    // Serial.printf(" odo_y %.1f ", odo_y);
+    // Serial.printf(" teheta %.3f ", degrees(theta_robot));
+    // TelnetStream.printf(" Odo x %.3f ", odo_x);
+    // TelnetStream.printf(" odo_y %.3f ", odo_y);
+    // TelnetStream.printf(" teheta %.3f ", degrees(theta_robot));
 
-    Serial.printf(" er_d %.3f ", convert_distance_tick_to_mm(erreur_distance));
-    Serial.printf(" er_o %.3f ", convert_tick_to_angle_deg(erreur_orient));
+    // Serial.printf(" er_d %.3f ", convert_distance_tick_to_mm(erreur_distance));
+    // Serial.printf(" er_o %.3f ", convert_tick_to_angle_deg(erreur_orient));
     // Serial.printf(" consigne_dist_polaire_tick %f", consigne_dist_polaire_tick);
     // Serial.printf(" consigne_dist_polaire_tick_max %f", consigne_dist_polaire_tick_max);
 
-    Serial.printf(" cs_p_gauche %f ", consigne_position_gauche);
-    Serial.printf(" cs_p_droit  %f ", consigne_position_droite);
+    // Serial.printf(" cs_p_gauche %f ", consigne_position_gauche);
+    // Serial.printf(" cs_p_droit  %f ", consigne_position_droite);
 
     // Serial.printf(" cmd_d %.1f ", consigne_dist_polaire_tick);
     // Serial.printf(" cmd_r %.1f ", consigne_rot_polaire_tick);

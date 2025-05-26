@@ -71,22 +71,22 @@ void setupCAN(int baudrate)
     // delay(5000);
 }
 
-void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, int data2, int data3, int data4, int data5, int data6,int data7)
+void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, int data2, int data3, int data4, int data5, int data6, int data7)
 {
     // Exemple : Envoi d'un message CAN
     twai_message_t message;
     message.identifier = id; // ID CAN
     message.extd = ext;
-    message.rtr = rtr;            // Active le mode identifiant étendu (29 bits)
+    message.rtr = rtr;                 // Active le mode identifiant étendu (29 bits)
     message.data_length_code = length; // DLC : Nombre d'octets dans le message
-    message.data[0] = data0;      // Données a envoyés
+    message.data[0] = data0;           // Données a envoyés
     message.data[1] = data1;
     message.data[2] = data2;
     message.data[3] = data3;
     message.data[4] = data4;
     message.data[5] = data5;
     message.data[6] = data6;
-      message.data[7] = data7;
+    message.data[7] = data7;
     // Envoi du message avec un délai d'attente de 1000 ms
     if (twai_transmit(&message, pdMS_TO_TICKS(10)) == ESP_OK)
     {
@@ -178,14 +178,14 @@ bool messageCANForMe(uint16_t ID)
     case XYTHETA:
         return true;
         break;
-        case POLAIRE:
+    case POLAIRE:
         return true;
         break;
 
     case RECALAGE:
         return true;
         break;
-        case BATT_MAIN:
+    case BATT_MAIN:
         return true;
         break;
     case BATT_1:
@@ -223,4 +223,39 @@ float conversion_4char_to_float(unsigned char *adresse_tableau)
     ptr = (float *)adresse_tableau; // donne l'adresse du tableau au pointeur qui pointe vers un float
     nombre = *ptr;                  // met dans le nombre le contenu à l'adresse du pointeur, le nombre réel codé en binaire
     return nombre;
+}
+
+void send_x_y_regulierement(int x, int y, int time_to_repeat_send)
+{
+
+    uint8_t lowByte = x & 0xFF;         // Octet de poids faible
+    uint8_t highByte = (x >> 8) & 0xFF; // Octet de poids fort
+
+    uint8_t x_low_byte = lowByte;
+    uint8_t x_high_byte = highByte;
+
+    lowByte = y & 0xFF;         // Octet de poids faibl
+    highByte = (y >> 8) & 0xFF; // Octet de poids fort
+    static int intervalle = 0;
+    if ((millis() - intervalle) > time_to_repeat_send)
+    {
+        // Affiche une trace série pour indiquer l'envoi du message
+        Serial.printf("ODO_SEND_X_Y\n");
+
+        // Envoie un message CAN avec les données ODO
+        sendCANMessage(
+            ODO_SEND_X_Y,                    // ID du message
+            0,                               // Priorité ou type (selon ton implémentation)
+            0,                               // Flags ou identifiant secondaire
+            8,                               // Longueur du message (8 octets)
+            ((uint16_t)(odo_x) >> 8) & 0xFF, // Byte 0: partie haute de odo_x
+            (uint16_t)(odo_x) & 0xFF,        // Byte 1: partie basse de odo_x
+            ((uint16_t)(odo_y) >> 8) & 0xFF, // Byte 2: partie haute de odo_y
+            (uint16_t)(odo_y) & 0xFF,        // Byte 3: partie basse de odo_y
+            0, 0, 0, 0                       // Bytes 4 à 7: inutilisés ou réservés
+        );
+
+        // Met à jour l'intervalle pour le prochain envoi
+        intervalle = millis();
+    }
 }

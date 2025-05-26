@@ -11,7 +11,6 @@
 #include "USE_FUNCTION.h"
 
 float rectificateur_coeeff = 1;
-
 void controle(void *parameters)
 {
     TickType_t xLastWakeTime;
@@ -20,6 +19,7 @@ void controle(void *parameters)
     {
         read_x_y_theta();
         static int pp = 1;
+        // Vérifie si plus de 500 ms se sont écoulées depuis la dernière exécution
 
         if (pp == 0)
         {
@@ -59,6 +59,8 @@ void controle(void *parameters)
             if (return_flag_asser_roue())
             {
                 sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
+                Serial.printf("ACKNOWLEDGE_BASE_ROULANTE TYPE_DEPLACEMENT_LIGNE_DROITE");
+                Serial.println();
                 liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
             }
             // TelnetStream.println();
@@ -77,17 +79,24 @@ void controle(void *parameters)
             {
                 consigne_theta_prec = degrees(theta_robot);
                 sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
+                Serial.printf("ACKNOWLEDGE_BASE_ROULANTE TYPE_DEPLACEMENT_ROTATION");
+                Serial.println();
+
                 liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
             }
             break;
         case TYPE_DEPLACEMENT_IMMOBILE:
+        enregistreur_odo();
             consigne_position_droite = consigne_odo_droite_prec;
             consigne_position_gauche = consigne_odo_gauche_prec;
             Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE");
             // TelnetStream.printf(" TYPE_DEPLACEMENT_IMMOBILE");
 
             liste.general_purpose = TYPE_VIDE;
-            sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
+            // sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
+            // Serial.printf("ACKNOWLEDGE_BASE_ROULANTE TYPE_DEPLACEMENT_IMMOBILE");
+            Serial.println();
+
             // TelnetStream.println();
 
             break;
@@ -104,10 +113,12 @@ void controle(void *parameters)
 
             if (flag_fin_mvt)
             {
-
+                reset_parametre_polaire();
                 sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
-                sendCANMessage(ODO_SEND, 0, 0, 8, (((uint16_t)degrees(theta_robot) >> 8) & 0xFF), ((uint16_t)degrees(theta_robot) & 0xFF), (((uint16_t)odo_x >> 8) & 0xFF), ((uint16_t)odo_x & 0xFF), (((uint16_t)odo_y >> 8) & 0xFF), ((uint16_t)odo_y & 0xFF), 0, 0);
+                sendCANMessage(ODO_SEND_TETHA, 0, 0, 8, (((uint16_t)normaliser_angle_deg(degrees(theta_robot)) >> 8) & 0xFF), ((uint16_t)normaliser_angle_deg(degrees(theta_robot)) & 0xFF), 0, 0, 0, 0, 0, 0);
                 liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
+                Serial.printf("ACKNOWLEDGE_BASE_ROULANTE TYPE_DEPLACEMENT_X_Y_POLAIRE");
+                Serial.println();
             }
             break;
         case TYPE_DEPLACEMENT_RECALAGE:
@@ -120,6 +131,9 @@ void controle(void *parameters)
                 consigne_odo_gauche_prec = odo_tick_gauche;
                 sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
                 liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
+                // Serial.printf("Don tACKNOWLEDGE_BASE_ROULANTE TYPE_DEPLACEMENT_X_Y_POLAIRE");
+                // Serial.println();
+
                 // Serial.printf(" Odo x %.3f ", odo_x);
                 // Serial.printf(" odo_y %.3f ", odo_y);
                 // Serial.printf(" teheta %.3f ", degrees(theta_robot));
@@ -164,7 +178,7 @@ void bus_can(void *parameters)
     while (1)
     {
         readCANMessage();
-
+        send_x_y_regulierement(odo_x, odo_y, 500);
         // // Attendre la fin du mouvement avant de passer à l'ordre suivant
         // if (flag_fin_mvt)
         // {
@@ -401,7 +415,7 @@ void bus_can(void *parameters)
             //     uint8_t highByte_x = (odo_x_int >> 8) & 0xFF;
             //     uint8_t lowByte_y = odo_y_int & 0xFF;
             //     uint8_t highByte_y = (odo_y_int >> 8) & 0xFF;
-            //     // sendCANMessage(ODO_SEND, 0, 0, 8, highByte_x, lowByte_x, highByte_y, lowByte_y, 0, 0, 0, 0);
+            //     // sendCANMessage(ODO_SEND_TETHA, 0, 0, 8, highByte_x, lowByte_x, highByte_y, lowByte_y, 0, 0, 0, 0);
             // }
 
             break;
@@ -484,9 +498,9 @@ void loop()
         {
             // Serial.printf(" PS_ASSER %d ", pause_asser_test);
 
-            // Serial.printf(" Odo x %.3f ", odo_x);
-            // Serial.printf(" odo_y %.3f ", odo_y);
-            // Serial.printf(" teheta %.3f ", degrees(theta_robot));
+            Serial.printf(" Odo x %.3f ", odo_x);
+            Serial.printf(" odo_y %.3f ", odo_y);
+            Serial.printf(" teheta %.3f ", degrees(theta_robot));
             // // Serial.printf("CPT_PS %d", liste.compteur_point_de_passage_polaire);
 
             // Serial.printf(" er_d %.3f ", convert_distance_tick_to_mm(erreur_distance));
@@ -513,7 +527,7 @@ void loop()
             // // Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
             // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
             // Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
-            // Serial.println();
+            Serial.println();
         }
         flag_controle = 0;
     }

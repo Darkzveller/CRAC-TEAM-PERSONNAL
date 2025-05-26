@@ -6,5 +6,6 @@ void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, 
 void readCANMessage();
 bool messageCANForMe(uint16_t ID);
 float conversion_4char_to_float(unsigned char *adresse_tableau);
+void send_x_y_regulierement(int x, int y, int time_to_repeat_send);
 
 #endif
