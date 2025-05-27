@@ -240,21 +240,21 @@ void send_x_y_regulierement(int x, int y, int time_to_repeat_send)
     if ((millis() - intervalle) > time_to_repeat_send)
     {
         // Affiche une trace série pour indiquer l'envoi du message
-        Serial.printf("ODO_SEND_X_Y\n");
+        // Serial.printf("ODO_SEND_X_Y\n");
 
         // Envoie un message CAN avec les données ODO
-        sendCANMessage(
-            ODO_SEND_X_Y,                    // ID du message
-            0,                               // Priorité ou type (selon ton implémentation)
-            0,                               // Flags ou identifiant secondaire
-            8,                               // Longueur du message (8 octets)
-            ((uint16_t)(odo_x) >> 8) & 0xFF, // Byte 0: partie haute de odo_x
-            (uint16_t)(odo_x) & 0xFF,        // Byte 1: partie basse de odo_x
-            ((uint16_t)(odo_y) >> 8) & 0xFF, // Byte 2: partie haute de odo_y
-            (uint16_t)(odo_y) & 0xFF,        // Byte 3: partie basse de odo_y
-            0, 0, 0, 0                       // Bytes 4 à 7: inutilisés ou réservés
-        );
-
+        /*  sendCANMessage(
+              ODO_SEND_X_Y,                    // ID du message
+              0,                               // Priorité ou type (selon ton implémentation)
+              0,                               // Flags ou identifiant secondaire
+              8,                               // Longueur du message (8 octets)
+              ((uint16_t)(odo_x) >> 8) & 0xFF, // Byte 0: partie haute de odo_x
+              (uint16_t)(odo_x) & 0xFF,        // Byte 1: partie basse de odo_x
+              ((uint16_t)(odo_y) >> 8) & 0xFF, // Byte 2: partie haute de odo_y
+              (uint16_t)(odo_y) & 0xFF,        // Byte 3: partie basse de odo_y
+              0, 0, 0, 0                       // Bytes 4 à 7: inutilisés ou réservés
+          );
+  */
         // Met à jour l'intervalle pour le prochain envoi
         intervalle = millis();
     }

@@ -62,10 +62,21 @@ void pourcentage_erreur(float val_theorique, float valeur_experimentale)
     Serial.print(pourcent_mes);
 }
 
-float normaliser_angle_deg(float angle_deg) {
+float normaliser_angle_deg(float angle_deg)
+{
     return fmod(angle_deg + 180.0, 360.0) - 180.0;
 }
 
-float normaliser_angle_rad(float angle_rad) {
-    return fmod(angle_rad + M_PI / 2, 2.0 * M_PI) - (M_PI / 2.0);
+float normaliser_angle_rad(float angle_rad)
+{
+    // return fmod(angle_rad + M_PI / 2, 2.0 * M_PI) - (M_PI / 2.0);
+    while (angle_rad > M_PI)
+    {
+        angle_rad -= 2.0 * M_PI;
+    }
+    while (angle_rad < -M_PI)
+    {
+        angle_rad += 2.0 * M_PI;
+    }
+    return angle_rad;
 }

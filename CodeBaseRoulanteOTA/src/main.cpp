@@ -101,12 +101,12 @@ void controle(void *parameters)
 
             break;
         case TYPE_DEPLACEMENT_X_Y_POLAIRE:
-            Serial.printf(" TYPE_DEPLACEMENT_X_Y_POLAIRE ");
+            // Serial.printf(" TYPE_DEPLACEMENT_X_Y_POLAIRE ");
             // TelnetStream.printf(" TYPE_DEPLACEMENT_IMMOBILE");
             // Serial.printf(" liste.x_polaire %f ", liste.x_polaire[liste.compteur_point_de_passage_polaire]);
             // Serial.printf(" liste.y_polaire %f ", liste.y_polaire[liste.compteur_point_de_passage_polaire]);
-            Serial.printf(" liste.cptps %d ", liste.compteur_point_de_passage_polaire);
-            TelnetStream.printf(" liste.cptps %d ", liste.compteur_point_de_passage_polaire);
+            // Serial.printf(" liste.cptps %d ", liste.compteur_point_de_passage_polaire);
+            // TelnetStream.printf(" liste.cptps %d ", liste.compteur_point_de_passage_polaire);
 
             asser_polaire_tick(liste.x_polaire[liste.compteur_point_de_passage_polaire], liste.y_polaire[liste.compteur_point_de_passage_polaire], liste.rotation_polaire[liste.compteur_point_de_passage_polaire], liste.deceleration_polaire);
             // TelnetStream.println();

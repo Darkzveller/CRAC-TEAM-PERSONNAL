@@ -9,6 +9,7 @@ extern int x_low_byte, x_high_byte;
 extern int y_low_byte, y_high_byte;
 extern int t_low_byte, t_high_byte;
 uint8_t nbr_ps = 20;
+uint8_t nbr_strat = 6;
 
 #define MON_TELEPHONE
 // #define MA_FREEBOX
@@ -392,18 +393,21 @@ void receptionWIFI(char ch)
 
       uint16_t cmd_x = 1225;
       uint16_t cmd_y = 139;
+      uint16_t cmd_theta = 90;
 
       uint8_t lowByte_x = cmd_x & 0xFF;         // Octet de poids faible
       uint8_t highByte_x = (cmd_x >> 8) & 0xFF; // Octet de poids fort
 
-      uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
-      uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
+      uint8_t lowByte_y = cmd_y & 0xFF;                 // Octet de poids faible
+      uint8_t highByte_y = (cmd_y >> 8) & 0xFF;         // Octet de poids fort
+      uint8_t lowByte_theta = cmd_theta & 0xFF;         // Octet de poids faible
+      uint8_t highByte_theta = (cmd_theta >> 8) & 0xFF; // Octet de poids fort
 
       sendCANMessage(RECALAGE, 0, 0, 8, 0, 1, highByte_x, lowByte_x, 0, 0, 0, 0);
-
-      delay(20);
-
+      delay(40);
       sendCANMessage(RECALAGE, 0, 0, 8, 0, 2, highByte_y, lowByte_y, 0, 0, 0, 0);
+      delay(40);
+      sendCANMessage(RECALAGE, 0, 0, 8, 0, 3, highByte_theta, lowByte_theta, 0, 0, 0, 0);
     }
     if (commande == "p1")
     {
@@ -535,7 +539,11 @@ void receptionWIFI(char ch)
         delay(10);
       }
     }
+    if (commande == "s_j")
 
+    {
+      strategie_jaune_homologation();
+    }
     if ((commande == "RESTART") || (commande == "restart"))
     {
       TelnetStream.println();
@@ -702,5 +710,28 @@ void SerialWIFIActivites()
     justepouraffichage = 1;
 
     receptionWIFI(TelnetStream.read());
+  }
+}
+
+void strategie_jaune_homologation()
+{
+  nbr_ps = 4;
+  uint16_t x_homologation[nbr_ps] = {1225, 750, 750, 300};
+  uint16_t y_homologation[nbr_ps] = {750, 750, 1500, 1800};
+
+  for (int i = 0; i < nbr_ps; i++)
+  {
+    Serial.println("message");
+    uint16_t cmd_x = x_homologation[i];
+    uint16_t cmd_y = y_homologation[i];
+
+    uint8_t lowByte_x = cmd_x & 0xFF;         // Octet de poids faible
+    uint8_t highByte_x = (cmd_x >> 8) & 0xFF; // Octet de poids fort
+
+    uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
+    uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
+
+    sendCANMessage(POLAIRE, 0, 0, 8, i, highByte_x, lowByte_x, highByte_y, lowByte_y, nbr_ps, 0, 0);
+    delay(10);
   }
 }
