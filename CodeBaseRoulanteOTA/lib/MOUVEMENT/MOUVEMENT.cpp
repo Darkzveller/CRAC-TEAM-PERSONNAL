@@ -364,17 +364,16 @@ void gestion_freinage_et_point_de_passage(float distance_de_seuil_minimal_et_cha
         // Serial.printf(" Cote %d", convert_distance_mm_to_tick(distance_de_seuil_minimal_et_changement_point_passage__mm));
         if (erreur_distance <= convert_distance_mm_to_tick(distance_de_seuil_minimal_et_changement_point_passage__mm))
         {
+            // Serial.printf("Vrai 5");
+            // TelnetStream.printf("Vrai 5");
+
+            float facteur_deccel = erreur_distance / convert_distance_mm_to_tick(distance_de_seuil_minimal_et_changement_point_passage__mm);
+            consigne_dist_polaire_tick = consigne_dist_polaire_tick_max * facteur_deccel;
+            // Serial.printf(" fdecl %f", facteur_deccel);
+            // consigne_dist_polaire_tick =0;
+            // coeff_rot_polaire_tick = 0;
             if (liste.compteur_point_de_passage_polaire == liste.checksum_nbr_passage)
             {
-                // Serial.printf("Vrai 5");
-                // TelnetStream.printf("Vrai 5");
-
-                float facteur_deccel = erreur_distance / convert_distance_mm_to_tick(distance_de_seuil_minimal_et_changement_point_passage__mm);
-                consigne_dist_polaire_tick = consigne_dist_polaire_tick_max * facteur_deccel;
-                // Serial.printf(" fdecl %f", facteur_deccel);
-                // consigne_dist_polaire_tick =0;
-                // coeff_rot_polaire_tick = 0;
-
                 if (convert_distance_tick_to_mm(erreur_distance) <= seuil_minimal_autorise_permettant_de_quitter_asser_polaire_mm)
                 {
                     Serial.printf(" Vrai ");
@@ -395,25 +394,12 @@ void gestion_freinage_et_point_de_passage(float distance_de_seuil_minimal_et_cha
             }
             else
             {
-                if (convert_distance_tick_to_mm(erreur_distance) <= 20)
-                {
-
-                    Serial.printf(" Odo x %.1f ", odo_x);
-                    Serial.printf(" odo_y %.1f ", odo_y);
-                    Serial.printf(" teheta %.3f ", degrees(theta_robot));
-
-                    Serial.printf(" er_d %.3f ", convert_distance_tick_to_mm(erreur_distance));
-                    Serial.printf(" er_o %.3f ", convert_tick_to_angle_deg(erreur_orient));
-
-                    Serial.println();
-
-                    liste.compteur_point_de_passage_polaire += 1;
-                    Serial.printf(" Vrai 6");
-                    // TelnetStream.printf(" Vrai 6");
-                }
+                liste.compteur_point_de_passage_polaire += 1;
+                Serial.printf(" Vrai 6");
+                // TelnetStream.printf(" Vrai 6");
             }
         }
-    } /**/
+    }
     else if (convert_tick_to_angle_deg(fabs(erreur_orient)) <= convert_tick_to_angle_deg(seuil_minimal_permettant_de_quitter_rotation))
     {
         Serial.printf("Vrai 66");

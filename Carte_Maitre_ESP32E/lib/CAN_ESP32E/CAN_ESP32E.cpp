@@ -3,11 +3,12 @@
 #include "OTA.h"
 #include "ID_CAN.h"
 #include "CAN_ESP32E.h"
+#include "Variable.h"
 extern int data[10];
 extern int id;
 // Configuration des pins
-#define TWAI_TX_PIN GPIO_NUM_5 // Remplacez par le pin TX que vous utilisez
-#define TWAI_RX_PIN GPIO_NUM_4 // Remplacez par le pin RX que vous utilisez
+#define TWAI_TX_PIN GPIO_NUM_19 // Remplacez par le pin TX que vous utilisez
+#define TWAI_RX_PIN GPIO_NUM_18 // Remplacez par le pin RX que vous utilisez
 #define Tcan 5
 #define TYPE_DEPLACEMENT_IMMOBILE 1
 #define TYPE_DEPLACEMENT_LIGNE_DROITE 2
@@ -79,22 +80,22 @@ void setupCAN(int baudrate)
         Serial.println("Erreur lors du démarrage de TWAI.");
     }
 }
-void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, int data2, int data3, int data4, int data5, int data6,int data7)
+void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, int data2, int data3, int data4, int data5, int data6, int data7)
 {
     // Exemple : Envoi d'un message CAN
     twai_message_t message;
     message.identifier = id; // ID CAN
     message.extd = ext;
-    message.rtr = rtr;            // Active le mode identifiant étendu (29 bits)
+    message.rtr = rtr;                 // Active le mode identifiant étendu (29 bits)
     message.data_length_code = length; // DLC : Nombre d'octets dans le message
-    message.data[0] = data0;      // Données a envoyés
+    message.data[0] = data0;           // Données a envoyés
     message.data[1] = data1;
     message.data[2] = data2;
     message.data[3] = data3;
     message.data[4] = data4;
     message.data[5] = data5;
     message.data[6] = data6;
-      message.data[7] = data7;
+    message.data[7] = data7;
     // Envoi du message avec un délai d'attente de 1000 ms
     if (twai_transmit(&message, pdMS_TO_TICKS(10)) == ESP_OK)
     {
@@ -105,6 +106,69 @@ void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, 
         Serial.println("Erreur lors de l'envoi du message.");
     }
 }
+
+// void readCANMessage()
+// {
+//     // Exemple : Réception d'un message CAN
+//     twai_message_t rx_message;
+
+//     if (twai_receive(&rx_message, pdMS_TO_TICKS(Tcan)) == ESP_OK)
+//     { /*
+//          Serial.print("Message reçu : ID=");
+//          Serial.print(rx_message.identifier, HEX);
+//          Serial.print(" DLC=");
+//          Serial.print(rx_message.data_length_code);
+//          Serial.print(" Data=");
+//          for (int i = 0; i < rx_message.data_length_code; i++)
+//          {
+//              Serial.print(rx_message.data[i], HEX);
+//              Serial.print(" ");
+//          }
+//          Serial.println();
+//     */
+
+//         // Si l'ID est valide, traitement du message
+//         Serial.print(" Message reçu : ID=");
+//         Serial.print(rx_message.identifier, HEX); // Affiche l'ID du message en hexadécimal
+//         // Serial.print(" EXT=");
+//         // Serial.print(rx_message.extd); // Affiche le Data Length Code (DLC)
+//         // Serial.print(" RTR=");
+//         // Serial.print(rx_message.rtr); // Affiche le Data Length Code (DLC)
+
+//         // Serial.print(" DLC=");
+//         // Serial.print(rx_message.data_length_code); // Affiche le Data Length Code (DLC)
+//         Serial.print(" Data=");
+
+//         id = rx_message.identifier;
+//         // rxMsg.extd = rx_message.extd;
+//         // rxMsg.rtr = rx_message.rtr;
+//         // rxMsg.lenght = rx_message.data_length_code;
+//         // Affichage des données du message
+//         for (int i = 0; i < rx_message.data_length_code; i++)
+//         {
+//             data[i] = rx_message.data[i];
+//             Serial.print(data[i], HEX); // Affiche chaque octet de données en hexadécimal
+//             Serial.print(" ");
+//         }
+//      Serial.println();
+
+//        /* {
+
+//              else
+//              {
+//                  // Si l'ID n'est pas pris en compte, on l'ignore
+//                  Serial.print(" Message reçu avec ID non pris en compte : ");
+//                  Serial.print(rx_message.identifier, HEX);
+//              }
+//         } /*
+//          else
+//          {
+//              Serial.print(" Pas de message reçu.");
+//          }    Serial.println();
+//      */
+//     }
+// }
+
 void readCANMessage()
 {
     // Exemple : Réception d'un message CAN
@@ -124,47 +188,60 @@ void readCANMessage()
          }
          Serial.println();
     */
-
-        
-        // Si l'ID est valide, traitement du message
-        Serial.print(" Message reçu : ID=");
-        Serial.print(rx_message.identifier, HEX); // Affiche l'ID du message en hexadécimal
-        // Serial.print(" EXT=");
-        // Serial.print(rx_message.extd); // Affiche le Data Length Code (DLC)
-        // Serial.print(" RTR=");
-        // Serial.print(rx_message.rtr); // Affiche le Data Length Code (DLC)
-
-        // Serial.print(" DLC=");
-        // Serial.print(rx_message.data_length_code); // Affiche le Data Length Code (DLC)
-        Serial.print(" Data=");
-
-        id = rx_message.identifier;
-        // rxMsg.extd = rx_message.extd;
-        // rxMsg.rtr = rx_message.rtr;
-        // rxMsg.lenght = rx_message.data_length_code;
-        // Affichage des données du message
-        for (int i = 0; i < rx_message.data_length_code; i++)
+        if (messageCANForMe(rx_message.identifier))
         {
-            data[i] = rx_message.data[i];
-            Serial.print(data[i], HEX); // Affiche chaque octet de données en hexadécimal
-            Serial.print(" ");
-        }
-     Serial.println();
-
-       /* {
             
-             else
-             {
-                 // Si l'ID n'est pas pris en compte, on l'ignore
-                 Serial.print(" Message reçu avec ID non pris en compte : ");
-                 Serial.print(rx_message.identifier, HEX);
-             }
+            // Si l'ID est valide, traitement du message
+            Serial.print(" Message reçu : ID=");
+            Serial.print(rx_message.identifier, HEX); // Affiche l'ID du message en hexadécimal
+            Serial.print(" EXT=");
+            Serial.print(rx_message.extd); // Affiche le Data Length Code (DLC)
+            Serial.print(" RTR=");
+            Serial.print(rx_message.rtr); // Affiche le Data Length Code (DLC)
+
+            Serial.print(" DLC=");
+            Serial.print(rx_message.data_length_code); // Affiche le Data Length Code (DLC)
+            Serial.print(" Data=");
+
+            rxMsg.id = rx_message.identifier;
+            rxMsg.extd = rx_message.extd;
+            rxMsg.rtr = rx_message.rtr;
+            rxMsg.lenght = rx_message.data_length_code;
+            // Affichage des données du message
+            for (int i = 0; i < rx_message.data_length_code; i++)
+            {
+                rxMsg.data[i] = rx_message.data[i];
+                Serial.print(rxMsg.data[i], HEX); // Affiche chaque octet de données en hexadécimal
+                Serial.print(" ");
+                TelnetStream.print(rxMsg.data[i], HEX); // Affiche chaque octet de données en hexadécimal
+                TelnetStream.print(" ");
+            }
         } /*
-         else
-         {
-             Serial.print(" Pas de message reçu.");
-         }    Serial.println();
-     */
-    }
+     else
+     {
+         // Si l'ID n'est pas pris en compte, on l'ignore
+         Serial.print(" Message reçu avec ID non pris en compte : ");
+         Serial.print(rx_message.identifier, HEX);
+     }*/
+    } /*
+     else
+     {
+         Serial.print(" Pas de message reçu.");
+     }    Serial.println();
+ */
 }
 
+bool messageCANForMe(uint16_t ID)
+{
+    switch (ID)
+    {
+    case CARTE_MAITRE:
+        return true;
+        break;
+
+    default:
+        return false;
+        break;
+    }
+    return false;
+}

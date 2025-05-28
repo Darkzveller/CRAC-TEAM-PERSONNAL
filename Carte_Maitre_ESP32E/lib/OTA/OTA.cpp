@@ -715,9 +715,13 @@ void SerialWIFIActivites()
 
 void strategie_jaune_homologation()
 {
-  nbr_ps = 4;
-  uint16_t x_homologation[nbr_ps] = {1225, 750, 750, 300};
-  uint16_t y_homologation[nbr_ps] = {750, 750, 1500, 1800};
+  nbr_ps = 1;
+  // uint16_t x_homologation[nbr_ps] = {1225, 750, 750, 300};
+  // uint16_t y_homologation[nbr_ps] = {750, 750, 1500, 1800};
+
+  uint16_t x_homologation[nbr_ps] = {600};
+  uint16_t y_homologation[nbr_ps] = {1500};
+  // uint16_t t_homologation[nbr_ps] = {-45};
 
   for (int i = 0; i < nbr_ps; i++)
   {

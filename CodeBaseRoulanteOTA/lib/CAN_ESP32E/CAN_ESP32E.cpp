@@ -117,33 +117,33 @@ void readCANMessage()
          }
          Serial.println();
     */
-        if (messageCANForMe(rx_message.identifier))
-        {
-            /*
-            // Si l'ID est valide, traitement du message
-            Serial.print(" Message reçu : ID=");
-            Serial.print(rx_message.identifier, HEX); // Affiche l'ID du message en hexadécimal
-            Serial.print(" EXT=");
-            Serial.print(rx_message.extd); // Affiche le Data Length Code (DLC)
-            Serial.print(" RTR=");
-            Serial.print(rx_message.rtr); // Affiche le Data Length Code (DLC)
-
-            Serial.print(" DLC=");
-            Serial.print(rx_message.data_length_code); // Affiche le Data Length Code (DLC)
-            Serial.print(" Data=");
-*/
-            rxMsg.id = rx_message.identifier;
-            rxMsg.extd = rx_message.extd;
-            rxMsg.rtr = rx_message.rtr;
-            rxMsg.lenght = rx_message.data_length_code;
-            // Affichage des données du message
-            for (int i = 0; i < rx_message.data_length_code; i++)
+            if (messageCANForMe(rx_message.identifier))
             {
-                rxMsg.data[i] = rx_message.data[i];
-                // Serial.print(rxMsg.data[i], HEX); // Affiche chaque octet de données en hexadécimal
-                // Serial.print(" ");
-            }
-        } /*
+                /*
+                // Si l'ID est valide, traitement du message
+                Serial.print(" Message reçu : ID=");
+                Serial.print(rx_message.identifier, HEX); // Affiche l'ID du message en hexadécimal
+                Serial.print(" EXT=");
+                Serial.print(rx_message.extd); // Affiche le Data Length Code (DLC)
+                Serial.print(" RTR=");
+                Serial.print(rx_message.rtr); // Affiche le Data Length Code (DLC)
+
+                Serial.print(" DLC=");
+                Serial.print(rx_message.data_length_code); // Affiche le Data Length Code (DLC)
+                Serial.print(" Data=");
+    */
+                rxMsg.id = rx_message.identifier;
+                rxMsg.extd = rx_message.extd;
+                rxMsg.rtr = rx_message.rtr;
+                rxMsg.lenght = rx_message.data_length_code;
+                // Affichage des données du message
+                for (int i = 0; i < rx_message.data_length_code; i++)
+                {
+                    rxMsg.data[i] = rx_message.data[i];
+                    // Serial.print(rxMsg.data[i], HEX); // Affiche chaque octet de données en hexadécimal
+                    // Serial.print(" ");
+                }
+            } /*
          else
          {
              // Si l'ID n'est pas pris en compte, on l'ignore
@@ -157,6 +157,7 @@ void readCANMessage()
      }    Serial.println();
  */
 }
+
 
 bool messageCANForMe(uint16_t ID)
 {
@@ -207,6 +208,9 @@ bool messageCANForMe(uint16_t ID)
         return true;
         break;
     case INTERRUPTEUR_BATT3:
+        return true;
+        break;
+    case CARTE_MAITRE:
         return true;
         break;
 

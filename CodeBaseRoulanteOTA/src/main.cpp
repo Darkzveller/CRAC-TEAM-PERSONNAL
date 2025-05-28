@@ -86,7 +86,7 @@ void controle(void *parameters)
             }
             break;
         case TYPE_DEPLACEMENT_IMMOBILE:
-        enregistreur_odo();
+            enregistreur_odo();
             consigne_position_droite = consigne_odo_droite_prec;
             consigne_position_gauche = consigne_odo_gauche_prec;
             Serial.printf(" TYPE_DEPLACEMENT_IMMOBILE");
@@ -191,6 +191,17 @@ void bus_can(void *parameters)
 
         switch (rxMsg.id)
         {
+
+            
+        case CARTE_MAITRE:
+            Serial.println("CARTE_MAITRE");
+            // liste.general_purpose = TYPE_VIDE;
+            while (1)
+            {
+                stop_motors();
+            } // esp_restart();
+
+            break;
 
         case ESP32_RESTART:
             Serial.println("ESP32_RESTART");
@@ -498,9 +509,9 @@ void loop()
         {
             // Serial.printf(" PS_ASSER %d ", pause_asser_test);
 
-            Serial.printf(" Odo x %.3f ", odo_x);
-            Serial.printf(" odo_y %.3f ", odo_y);
-            Serial.printf(" teheta %.3f ", degrees(theta_robot));
+            // Serial.printf(" Odo x %.3f ", odo_x);
+            // Serial.printf(" odo_y %.3f ", odo_y);
+            // Serial.printf(" teheta %.3f ", degrees(theta_robot));
             // // Serial.printf("CPT_PS %d", liste.compteur_point_de_passage_polaire);
 
             // Serial.printf(" er_d %.3f ", convert_distance_tick_to_mm(erreur_distance));
@@ -527,7 +538,7 @@ void loop()
             // // Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
             // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
             // Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
-            Serial.println();
+            // Serial.println();
         }
         flag_controle = 0;
     }
