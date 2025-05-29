@@ -160,7 +160,7 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
     // Serial.printf(" angl_deg %.1f ", convert_tick_to_angle_deg(convert_angle_deg_to_tick(90)));
 
     // Serial.println();
-    TelnetStream.println();
+    // TelnetStream.println();
 }
 
 bool recalage(uint8_t direction, uint8_t type_modif, float nouvelle_valeur, uint16_t consigne_rotation)
@@ -202,7 +202,7 @@ bool recalage(uint8_t direction, uint8_t type_modif, float nouvelle_valeur, uint
             odo_y = nouvelle_valeur;
             flag_modif_fait = true;
 
-            Serial.printf("modif effec x");
+            Serial.printf("modif effec y");
             // delay( 2000);
         }
         if (type_modif == MODIF_THETA)
@@ -214,6 +214,7 @@ bool recalage(uint8_t direction, uint8_t type_modif, float nouvelle_valeur, uint
 
         break;
     case AVANT:
+        break;
     case ARRIERE:
 
         sens = (direction == AVANT) ? 1 : -1; // condition ? valeur_si_vrai : valeur_si_faux;

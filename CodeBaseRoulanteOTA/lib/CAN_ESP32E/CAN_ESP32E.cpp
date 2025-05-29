@@ -143,14 +143,16 @@ void readCANMessage()
                 // Serial.print(rxMsg.data[i], HEX); // Affiche chaque octet de données en hexadécimal
                 // Serial.print(" ");
             }
-        } /*
+        }
+        else rxMsg.id = 0; /*
      else
      {
          // Si l'ID n'est pas pris en compte, on l'ignore
          Serial.print(" Message reçu avec ID non pris en compte : ");
          Serial.print(rx_message.identifier, HEX);
      }*/
-    } /*
+    }
+    else rxMsg.id = 0; /*
      else
      {
          Serial.print(" Pas de message reçu.");
@@ -185,33 +187,34 @@ bool messageCANForMe(uint16_t ID)
     case RECALAGE:
         return true;
         break;
-    case BATT_MAIN:
-        return true;
-        break;
-    case BATT_1:
-        return true;
-        break;
-    case BATT_2:
-        return true;
-        break;
-    case BATT_3:
-        return true;
-        break;
-    case CELLULE_BAT:
-        return true;
-        break;
-    case INTERRUPTEUR_BATT1:
-        return true;
-        break;
-    case INTERRUPTEUR_BATT2:
-        return true;
-        break;
-    case INTERRUPTEUR_BATT3:
-        return true;
-        break;
+    // case BATT_MAIN:
+    //     return true;
+    //     break;
+    // case BATT_1:
+    //     return true;
+    //     break;
+    // case BATT_2:
+    //     return true;
+    //     break;
+    // case BATT_3:
+    //     return true;
+    //     break;
+    // case CELLULE_BAT:
+    //     return true;
+    //     break;
+    // case INTERRUPTEUR_BATT1:
+    //     return true;
+    //     break;
+    // case INTERRUPTEUR_BATT2:
+    //     return true;
+    //     break;
+    // case INTERRUPTEUR_BATT3:
+    //     return true;
+    //     break;
     case CARTE_MAITRE:
         return true;
         break;
+
     case LIDAR:
         return true;
         break;

@@ -11,6 +11,7 @@
 #include "USE_FUNCTION.h"
 
 float rectificateur_coeeff = 1;
+
 void controle(void *parameters)
 {
     TickType_t xLastWakeTime;
@@ -18,35 +19,35 @@ void controle(void *parameters)
     while (1)
     {
         read_x_y_theta();
-        static int pp = 1;
-        // Vérifie si plus de 500 ms se sont écoulées depuis la dernière exécution
+        // static int pp = 1;
+        // // Vérifie si plus de 500 ms se sont écoulées depuis la dernière exécution
 
-        if (pp == 0)
-        {
-            liste.nbr_passage = 0;
-            liste.x_polaire[0] = 0;
-            liste.y_polaire[0] = 0;
-            // liste.x_polaire[0] = 250;
-            // liste.y_polaire[0] = 500;
+        // if (pp == 0)
+        // {
+        //     liste.nbr_passage = 0;
+        //     liste.x_polaire[0] = 0;
+        //     liste.y_polaire[0] = 0;
+        //     // liste.x_polaire[0] = 250;
+        //     // liste.y_polaire[0] = 500;
 
-            // liste.x_polaire[1]=500;
-            // liste.y_polaire[1] = 250;
+        //     // liste.x_polaire[1]=500;
+        //     // liste.y_polaire[1] = 250;
 
-            // liste.nbr_passage = 0;
-            // liste.x_polaire[0] = 0;
-            // liste.y_polaire[0] = 0;
-            // // liste.x_polaire[1]=500;
-            // liste.y_polaire[1] = 250;
-            liste.rotation_polaire[0] = 90;
-            liste.checksum_nbr_passage = liste.nbr_passage;
+        //     // liste.nbr_passage = 0;
+        //     // liste.x_polaire[0] = 0;
+        //     // liste.y_polaire[0] = 0;
+        //     // // liste.x_polaire[1]=500;
+        //     // liste.y_polaire[1] = 250;
+        //     liste.rotation_polaire[0] = 90;
+        //     liste.checksum_nbr_passage = liste.nbr_passage;
 
-            liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
-            flag_fin_mvt = false;
-            rxMsg.id = 0;
-            liste.compteur_point_de_passage_polaire = 0;
+        //     liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
+        //     flag_fin_mvt = false;
+        //     rxMsg.id = 0;
+        //     liste.compteur_point_de_passage_polaire = 0;
 
-            pp = 1;
-        }
+        //     pp = 1;
+        // }
         if (detect_robot)
         {
             switch (liste.general_purpose)
@@ -98,7 +99,7 @@ void controle(void *parameters)
                 liste.general_purpose = TYPE_VIDE;
                 // sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
                 // Serial.printf("ACKNOWLEDGE_BASE_ROULANTE TYPE_DEPLACEMENT_IMMOBILE");
-                Serial.println();
+                // Serial.println();
 
                 // TelnetStream.println();
 
@@ -176,13 +177,15 @@ void controle(void *parameters)
 
 void bus_can(void *parameters)
 {
-
+    int prec_move = IMMOBILE;
+    bool flag_stop_lidar = false;
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
         readCANMessage();
         send_x_y_theta_regulierement(odo_x, odo_y, theta_robot, 10); // // Attendre la fin du mouvement avant de passer à l'ordre suivant
+        // (rxMsg.id != 0) ? Serial.println(rxMsg.id) : NONE;
         // if (flag_fin_mvt)
         // {
         //     FIFO_lecture = (FIFO_lecture + 1) % SIZE_FIFO;
@@ -199,19 +202,39 @@ void bus_can(void *parameters)
         case CARTE_MAITRE:
             Serial.println("CARTE_MAITRE");
             // liste.general_purpose = TYPE_VIDE;
-            while (1)
-            {
-                stop_motors();
-            } // esp_restart();
+            stop_motors();
 
             break;
         case LIDAR:
-            while (1)
-            {
-                Serial.printf("LIDAR DETECTION \n");
-                detect_robot = false;
-                stop_motors();
-            }
+
+            if (!rxMsg.data[0] && !rxMsg.data[1] && flag_stop_lidar){
+                Serial.println("On repart"),
+                    // Serial.println(prec_move == TYPE_DEPLACEMENT_X_Y_POLAIRE);
+                    flag_stop_lidar = false,
+                    liste.general_purpose = prec_move;
+                }
+
+            if (rxMsg.data[0] && !rxMsg.data[1] && !flag_stop_lidar && liste.general_purpose != IMMOBILE){
+                Serial.println("Detection avant"),
+                    // Serial.println(prec_move == TYPE_DEPLACEMENT_X_Y_POLAIRE),
+                    liste.general_purpose = IMMOBILE,
+                    // Serial.println(prec_move == TYPE_DEPLACEMENT_X_Y_POLAIRE),
+                    flag_stop_lidar = true;}
+
+            if (!rxMsg.data[0] && rxMsg.data[1] && !flag_stop_lidar && liste.general_purpose != IMMOBILE){
+                Serial.println("Detection arrière"),
+                    stop_moteur_droit(),
+                    stop_moteur_gauche(),
+                    liste.general_purpose = IMMOBILE;
+                    flag_stop_lidar = true;
+                }
+
+            if(flag_stop_lidar) liste.general_purpose = IMMOBILE;
+
+            // Serial.println(prec_move == POLAIRE);
+            // Serial.println(liste.general_purpose);
+            // Serial.printf("LIDAR DETECTION \n");
+            // detect_robot = false;
             break;
 
         case ESP32_RESTART:
@@ -226,6 +249,7 @@ void bus_can(void *parameters)
             // Pour se simplifier j'ai préférer décomposer les etapes quitte a prendre un peu plus de temps cpu
             enregistreur_odo();
             liste.general_purpose = TYPE_DEPLACEMENT_ROTATION;
+            prec_move = liste.general_purpose;
 
             // liste.angle = TIC_PER_TOUR * angle / 80.0;
 
@@ -251,6 +275,7 @@ void bus_can(void *parameters)
         case LIGNE_DROITE:
             enregistreur_odo();
             liste.general_purpose = TYPE_DEPLACEMENT_LIGNE_DROITE;
+            prec_move = liste.general_purpose;
             liste.distance = convert_distance_mm_to_tick(fusion_octet(rxMsg.data[0], rxMsg.data[1]));
             liste.vitesse_croisiere = rxMsg.data[2];
             lauch_flag_asser_roue(true);
@@ -271,6 +296,7 @@ void bus_can(void *parameters)
             liste.nbr_passage = rxMsg.data[0];
             liste.x_polaire[liste.nbr_passage] = fusion_octet(rxMsg.data[1], rxMsg.data[2]);
             liste.y_polaire[liste.nbr_passage] = fusion_octet(rxMsg.data[3], rxMsg.data[4]);
+            
 
             liste.checksum_nbr_passage = rxMsg.data[5] - 1;
             liste.rotation_polaire[liste.nbr_passage] = fusion_octet(rxMsg.data[6], rxMsg.data[7]);
@@ -280,6 +306,7 @@ void bus_can(void *parameters)
                 enregistreur_odo();
                 // Serial.printf("fâpkfakfa^pkfaêfpk^,ae^c,");
                 liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
+                prec_move = liste.general_purpose;
                 flag_fin_mvt = false;
                 rxMsg.id = 0;
                 liste.compteur_point_de_passage_polaire = 0;
@@ -313,6 +340,7 @@ void bus_can(void *parameters)
             enregistreur_odo();
 
             liste.general_purpose = TYPE_DEPLACEMENT_RECALAGE;
+            prec_move = liste.general_purpose;
             liste.direction_recalage = rxMsg.data[0];
             liste.type_modif_x_y_theta_recalge_rien = rxMsg.data[1];
             liste.nouvelle_valeur_x_y_theta_rien = fusion_octet(rxMsg.data[2], rxMsg.data[3]);
@@ -407,23 +435,23 @@ void bus_can(void *parameters)
 
         case INTERRUPTEUR_BATT1:
 
-            Serial.printf(" INTERRUPTEUR_BATT1 ");
-            Serial.println();
-            rxMsg.id = 0;
+            // Serial.printf(" INTERRUPTEUR_BATT1 ");
+            // Serial.println();
+            // rxMsg.id = 0;
 
             break;
         case INTERRUPTEUR_BATT2:
 
-            Serial.printf(" INTERRUPTEUR_BATT2 ");
-            Serial.println();
-            rxMsg.id = 0;
+            // Serial.printf(" INTERRUPTEUR_BATT2 ");
+            // Serial.println();
+            // rxMsg.id = 0;
 
             break;
         case INTERRUPTEUR_BATT3:
 
-            Serial.printf("  INTERRUPTEUR_BATT3 ");
-            Serial.println();
-            rxMsg.id = 0;
+            // Serial.printf("  INTERRUPTEUR_BATT3 ");
+            // Serial.println();
+            // rxMsg.id = 0;
 
             break;
 
@@ -506,7 +534,7 @@ void setup()
         "bus_can", // nom de la tache que nous venons de vréer
         10000,     // taille de la pile en octet
         NULL,      // parametre
-        9,         // tres haut niveau de priorite
+        11,        // tres haut niveau de priorite
         NULL       // descripteur
     );
 }
@@ -555,13 +583,13 @@ void loop()
     }
 }
 
-void serialEvent()
-{
-    while (Serial.available() > 0) // tant qu'il y a des caractères à lire
-    {
-        // reception(Serial.read());
-        char caractere = Serial.read();
-        receptionWIFI(caractere);
-        Serial.print(caractere);
-    }
-}
+// void serialEvent()
+// {
+//     while (Serial.available() > 0) // tant qu'il y a des caractères à lire
+//     {
+//         // reception(Serial.read());
+//         char caractere = Serial.read();
+//         receptionWIFI(caractere);
+//         Serial.print(caractere);
+//     }
+// }
