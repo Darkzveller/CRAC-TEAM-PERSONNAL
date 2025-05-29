@@ -127,14 +127,14 @@ void read_x_y_theta()
     delta_gauche = odo_dist_gauche - odo_last_g;
     odo_last_d = odo_dist_droit;
     odo_last_g = odo_dist_gauche;
-    bufferL[buf_index] = delta_gauche;
-    bufferR[buf_index] = delta_droit;
-    buf_index = (buf_index + 1) % FILTER_SIZE;
+    // bufferL[buf_index] = delta_gauche;
+    // bufferR[buf_index] = delta_droit;
+    // buf_index = (buf_index + 1) % FILTER_SIZE;
 
-    float valeur_moyenner_gauche = moyenneur(bufferL);
-    float valeur_moyenner_droite = moyenneur(bufferR);
+    // float valeur_moyenner_gauche = moyenneur(bufferL);
+    // float valeur_moyenner_droite = moyenneur(bufferR);
 
-    distance_parcourue = 0.5 * (valeur_moyenner_droite + valeur_moyenner_gauche);
+    distance_parcourue = 0.5 * (delta_droit + delta_gauche);
     vitesse_rob_roue_droite = delta_droit / Te;
     vitesse_rob_roue_gauche = delta_gauche / Te;
 
@@ -166,7 +166,7 @@ pour calculer ordo_x on ajoute à notre angle theta total notre nouvel angle afi
 pareil pour ordo_y
 
     */
-    theta_robot_prec = ((valeur_moyenner_droite - valeur_moyenner_gauche) * 0.5) / ENTRAXE;
+    theta_robot_prec = ((delta_droit - delta_gauche) * 0.5) / ENTRAXE;
     theta_robot += theta_robot_prec;
     // Mise à jour des coordonnées x et y
     odo_x += cos(theta_robot) * distance_parcourue;

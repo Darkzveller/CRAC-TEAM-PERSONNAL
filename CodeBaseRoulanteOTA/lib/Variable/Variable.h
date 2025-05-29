@@ -116,6 +116,9 @@ struct Ordre_deplacement
   uint8_t nbr_passage;
   uint8_t checksum_nbr_passage;
 
+  int distance_lidar;
+  int angle_lidar;
+
 };
 
 
@@ -255,10 +258,10 @@ extern double theta_deuxieme_rotation;
 extern float consigne_regulation_moyenne ;
 
 //************************Polaire en tick */
-#define TOLERANCE_ERREUR_DISTANCE_AUTORISER 5
+#define TOLERANCE_ERREUR_DISTANCE_AUTORISER 10
 #define SEUIL_ACTIVATION_DECELERATION_DISTANCE 85
 
-#define VALEUR_DEFAUT_COEFF_ROT_POLAIRE_TICK 0.5
+#define VALEUR_DEFAUT_COEFF_ROT_POLAIRE_TICK 0.5 /2
 #define VALEUR_DEFAUT_COEFF_DIST_POLAIRE_TICK 1
 #define VALEUR_ROTATION_SUR_PLACE_COEFF_ROT_POLAIRE_TICK 1.2
 #define VALEUR_ROTATION_SUR_PLACE_COEFF_DIST_POLAIRE_TICK 0
@@ -318,4 +321,13 @@ extern bool stop_start_robot_fin_match;
 extern float courant;
 extern float tension;
 extern float puissance;
+
+//***********Detect obstacle******************* */
+#define AVANT_LIDAR_DETECTER 1
+#define ARRIERE_LIDAR_DETECTER 1
+
+extern bool detect_robot ;
+
+
+
 #endif

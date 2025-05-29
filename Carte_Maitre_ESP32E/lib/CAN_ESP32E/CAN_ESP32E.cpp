@@ -239,6 +239,10 @@ bool messageCANForMe(uint16_t ID)
         return true;
         break;
 
+            case ACKNOWLEDGE_BASE_ROULANTE:
+        return true;
+        break;
+
     default:
         return false;
         break;

@@ -3,65 +3,46 @@
 #include "ID_CAN.h"
 #include "OTA.h" // Inclusion de la bibliothèque pour gérer l'OTA (Over-The-Air)
 #include "CAN_ESP32E.h"
-
-int etat = 0;
+#include "STRATEGIE.h"
+#include "Variable.h"
+static bool start_match = 0;
+int etat_match = 0;
 
 int data[10] = {0};
 int id = 0;
 int vitesse = 90;
-int x_low_byte, x_high_byte;
-int y_low_byte, y_high_byte;
-int t_low_byte, t_high_byte;
-
-uint16_t cmd_x = 1225;
-uint16_t cmd_y = 139;
-uint16_t cmd_theta = 90;
-
-uint8_t lowByte_x = cmd_x & 0xFF;         // Octet de poids faible
-uint8_t highByte_x = (cmd_x >> 8) & 0xFF; // Octet de poids fort
-
-uint8_t lowByte_y = cmd_y & 0xFF;                 // Octet de poids faible
-uint8_t highByte_y = (cmd_y >> 8) & 0xFF;         // Octet de poids fort
-uint8_t lowByte_theta = cmd_theta & 0xFF;         // Octet de poids faible
-uint8_t highByte_theta = (cmd_theta >> 8) & 0xFF; // Octet de poids fort
-
+#define PIN_CHOIX_COULEUR 32
+#define PIN_5V_FDC 25
+#define PIN_READ_FDC 33
+#define TIME_TO_SEND_DATA_CAN 20
+// #define HOMOLOGATION
+#define UN_SPOT
 void setup()
 {
   Serial.begin(115200);
   Serial.printf("CACA");
   setupCAN(1000E3);
   // setupOTA();
-  int i = 0;
   // Pour le finde course
-  pinMode(25, OUTPUT);
-  pinMode(33, INPUT_PULLDOWN);
-  digitalWrite(25, true);
+  pinMode(PIN_5V_FDC, OUTPUT);
+  pinMode(PIN_READ_FDC, INPUT_PULLDOWN);
+  digitalWrite(PIN_5V_FDC, true);
 
   // Pour choisir couleur de l'équipe
-  pinMode(32, INPUT_PULLDOWN);
-
-  // while (!TelnetStream.available())
-  // {
-  //   delay(500);                                             // Attente de 500 ms avant de vérifier à nouveau
-  //   Serial.println("Aucun client connecté, en attente..."); // Message indiquant qu'il n'y a pas de client connecté
-  //   i++;
-  //   // if (i == 22)
-  //   // {
-  //   //   esp_restart();
-  //   // }
-  // }
+  pinMode(PIN_CHOIX_COULEUR, INPUT_PULLDOWN);
   affichage_commande_wifi();
 }
-int etat_match = 0;
 void loop()
 {
   readCANMessage();
-  static bool start_match = 0;
-  start_match = digitalRead(33);
-Serial.printf("Val couleur %d ",digitalRead(32));
+  start_match = digitalRead(PIN_READ_FDC);
+  static bool choix_couleur_equipe = digitalRead(32);
+  // Serial.printf("Val couleur %d \n", choix_couleur_equipe);
+#ifdef HOMOLOGATION
   switch (etat_match)
   {
   case 0:
+
     if (start_match)
     {
       Serial.printf("Start match ");
@@ -71,48 +52,157 @@ Serial.printf("Val couleur %d ",digitalRead(32));
     }
     break;
   case 1:
+    Serial.printf("Esp restart ");
     sendCANMessage(ESP32_RESTART, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-
+    // Metttre les 5 secondes pour laisser le temps au robot de s'immobiliser
     delay(5000);
+    if (choix_couleur_equipe == 0)
+    {
+      Serial.printf("Strat jaune + recalage ");
 
-    sendCANMessage(RECALAGE, 0, 0, 8, 0, 1, highByte_x, lowByte_x, 0, 0, 0, 0);
-    delay(40);
-    sendCANMessage(RECALAGE, 0, 0, 8, 0, 2, highByte_y, lowByte_y, 0, 0, 0, 0);
-    delay(40);
-    sendCANMessage(RECALAGE, 0, 0, 8, 0, 3, highByte_theta, lowByte_theta, 0, 0, 0, 0);
-    delay(20);
+      strategie_jaune_homologation();
+    }
+    else
+    {
+      Serial.printf("Strat bleu + recalage ");
+      strategie_bleu_homologation();
+    }
+    Serial.printf("Start match ");
+
     sendCANMessage(START_ROBOT_MATCH, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0);
     delay(100);
+    Serial.printf("ON2 ");
+
     sendCANMessage(INTERRUPTEUR_BATT2, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0);
     delay(100);
-    strategie_jaune_homologation();
-
+    Serial.printf("Message envoyé et début de match \n");
     etat_match = 2;
     break;
 
   case 2:
-    Serial.printf("Message envoyé et début de match \n");
     break;
 
   default:
     break;
   }
 
-  // void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, int data2, int data3, int data4, int data5, int data6, int data7)
+#endif
 
-  // Serial.printf("Send command ON ALL Bat ");
-  // Serial.printf("Send command Rotation with cons");
-  // Serial.println();
+#ifdef UN_SPOT
+  switch (etat_match)
+  {
+  case 0:
 
-  // sendCANMessage(ROTATION, 0, 0, 4, 22, 22, 0x7B, 0, 0, 0, 0);
+    if (start_match)
+    {
+      Serial.printf("Start match ");
+      Serial.println(start_match);
 
-  // sendCANMessage(INTERRUPTEUR_BATT1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
-  // sendCANMessage(INTERRUPTEUR_BATT2, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
-  // sendCANMessage(INTERRUPTEUR_BATT3, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0);
+      etat_match = 1;
+    }
+    break;
+  case 1:
+    Serial.printf("Esp restart ");
+    sendCANMessage(ESP32_RESTART, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    // Metttre les 5 secondes pour laisser le temps au robot de s'immobiliser
+    delay(5000);
+    if (choix_couleur_equipe == 0)
+    {
+      Serial.printf("recalage jaune");
+      send_recalage(1225, 250, 90);
+    }
+    else
+    {
+      Serial.printf("recalage bleu");
+      send_recalage(1775, 250, 90);
+    }
+    Serial.printf("Start match ");
 
-  // Serial.println();
-  // delay(150);
-  // sendCANMessage(ROTATION, 0, 0, 4, 0, 0x5C, 0x1, 0x7B, 0, 0, 0);
+    sendCANMessage(START_ROBOT_MATCH, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0);
+    delay(TIME_TO_SEND_DATA_CAN);
+    Serial.printf("ON1 ");
+    sendCANMessage(INTERRUPTEUR_BATT1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0);
+    delay(TIME_TO_SEND_DATA_CAN);
+    Serial.printf("ON2 ");
+    sendCANMessage(INTERRUPTEUR_BATT2, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0);
+    delay(TIME_TO_SEND_DATA_CAN);
+    Serial.printf("ON3 ");
+    sendCANMessage(INTERRUPTEUR_BATT3, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0);
+    delay(TIME_TO_SEND_DATA_CAN);
+
+    sendCANMessage(CONSTRUIRE_AVANT_PREPARER, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0);
+    delay(TIME_TO_SEND_DATA_CAN);
+
+    etat_match = 2;
+    break;
+  case 2:
+    send_ligne_droite(150);
+    etat_match = 3;
+    break;
+  case 3:
+    if (rxMsg.id == ACKNOWLEDGE_BASE_ROULANTE)
+    {
+      rxMsg.id = 0;
+
+      delay(1000);
+
+      send_rotation(-45);
+
+      etat_match = 4;
+    }
+    break;
+  case 4:
+    if (rxMsg.id == ACKNOWLEDGE_BASE_ROULANTE)
+    {
+      rxMsg.id = 0;
+      delay(1000);
+      send_ligne_droite(175);
+      etat_match = 5;
+    }
+    break;
+  case 5:
+    if (rxMsg.id == ACKNOWLEDGE_BASE_ROULANTE)
+    {
+      rxMsg.id = 0;
+
+      delay(1000);
+      send_rotation(40);
+      etat_match = 6;
+    }
+
+  case 6:
+    if (rxMsg.id == ACKNOWLEDGE_BASE_ROULANTE)
+    {
+      rxMsg.id = 0;
+
+      delay(1000);
+      send_ligne_droite(600);
+      etat_match = 7;
+    }
+
+    break;
+
+  case 7:
+    if (rxMsg.id == ACKNOWLEDGE_BASE_ROULANTE)
+    {
+      rxMsg.id = 0;
+
+      send_x_y_theta(600, 1500, 0);
+      delay(200);
+      sendCANMessage(CONSTRUIRE_AVANT_2ETAGE, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0);
+
+      etat_match = 8;
+    }
+
+    break;
+  case 8:
+    break;
+
+  default:
+    break;
+  }
+
+#endif
 }
 
 void serialEvent()

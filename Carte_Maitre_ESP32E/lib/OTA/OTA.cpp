@@ -1,15 +1,14 @@
 #include "OTA.h" // Inclusion de la bibliothèque pour gérer l'OTA (Over-The-Air)
 #include "ID_CAN.h"
 #include "CAN_ESP32E.h"
-
+extern bool start_match;
 // Je laisse le routeur choisir l'adresse IP et
 // je fixe le nom de mon réseau Wi-Fi, ce qui simplifie les démarches, notamment lors des débogages
 //  Informations de connexion WiFi
-extern int x_low_byte, x_high_byte;
-extern int y_low_byte, y_high_byte;
-extern int t_low_byte, t_high_byte;
+int x_low_byte, x_high_byte;
+int y_low_byte, y_high_byte;
+int t_low_byte, t_high_byte;
 uint8_t nbr_ps = 20;
-uint8_t nbr_strat = 6;
 
 #define MON_TELEPHONE
 // #define MA_FREEBOX
@@ -409,141 +408,6 @@ void receptionWIFI(char ch)
       delay(40);
       sendCANMessage(RECALAGE, 0, 0, 8, 0, 3, highByte_theta, lowByte_theta, 0, 0, 0, 0);
     }
-    if (commande == "p1")
-    {
-      // uint16_t couille_x[nbr_ps] = {1224, 1255, 1277, 1290, 1296, 1295, 1289, 1278, 1263, 1245, 1225, 1204, 1183, 1162, 1143, 1126, 1112, 1103, 1098, 1100};
-      // uint16_t couille_y[nbr_ps] = {225 ,  260,  294,  325,  355,  383,  409,  434,  458,  482,  505,  527,  549,  572,  594,  617,  641,  666,  692,  761};
-      uint16_t couille_x[18] = {1224, 1255, 1277, 1290, 1296, 1295, 1289, 1278, 1263, 1245, 1225, 1204, 1183, 1162, 1143, 1126, 1112, 1098};
-      uint16_t couille_y[18] = {225, 260, 294, 325, 355, 383, 409, 434, 458, 482, 505, 527, 549, 572, 594, 617, 641, 720};
-
-      for (int i = 0; i < 18; i++)
-      {
-        Serial.println("message");
-        uint16_t cmd_x = couille_x[i];
-        uint16_t cmd_y = couille_y[i];
-
-        uint8_t lowByte_x = cmd_x & 0xFF;         // Octet de poids faible
-        uint8_t highByte_x = (cmd_x >> 8) & 0xFF; // Octet de poids fort
-
-        uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
-        uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
-
-        sendCANMessage(POLAIRE, 0, 0, 8, i, highByte_x, lowByte_x, highByte_y, lowByte_y, 18, 0, 0);
-        delay(300);
-      }
-    }
-    if (commande == "p2")
-    {
-      // uint16_t couille_x[nbr_ps - 1] = {1028, 1006, 982, 958, 934, 909, 886, 864, 843, 824, 807, 794, 783, 776, 773, 775 ,775   ,775    ,775};
-      // uint16_t couille_y[nbr_ps - 1] = {739 , 730 , 719, 707, 694, 680, 665, 648, 630, 612, 592, 571, 549, 526, 503, 439 ,440-60,440-120, 360};
-      uint16_t couille_x[nbr_ps - 5] = {1028, 958, 934, 909, 886, 864, 843, 824, 807, 794, 783, 776, 773, 800, 820};
-      uint16_t couille_y[nbr_ps - 5] = {700, 707, 694, 680, 665, 648, 630, 612, 592, 571, 549, 526, 503, 439, 390};
-
-      for (int i = 0; i < nbr_ps - 5; i++)
-      {
-        Serial.println("message");
-        uint16_t cmd_x = couille_x[i];
-        uint16_t cmd_y = couille_y[i];
-
-        uint8_t lowByte_x = cmd_x & 0xFF;         // Octet de poids faible
-        uint8_t highByte_x = (cmd_x >> 8) & 0xFF; // Octet de poids fort
-
-        uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
-        uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
-
-        sendCANMessage(POLAIRE, 0, 0, 8, i, highByte_x, lowByte_x, highByte_y, lowByte_y, nbr_ps - 5, 0, 0);
-        delay(300);
-      }
-    }
-    if (commande == "p3")
-    {
-      uint16_t couille_x[nbr_ps] = {775, 775, 775, 775, 775, 775, 775, 774, 775, 775, 775, 775, 775, 775, 774, 775, 774, 774, 775, 775};
-      uint16_t couille_y[nbr_ps] = {439, 492, 534, 566, 587, 600, 605, 603, 594, 580, 562, 541, 517, 491, 464, 438, 412, 388, 368, 269};
-
-      for (int i = 0; i < nbr_ps; i++)
-      {
-        Serial.println("message");
-        uint16_t cmd_x = couille_x[i];
-        uint16_t cmd_y = couille_y[i];
-
-        uint8_t lowByte_x = cmd_x & 0xFF;         // Octet de poids faible
-        uint8_t highByte_x = (cmd_x >> 8) & 0xFF; // Octet de poids fort
-
-        uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
-        uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
-
-        sendCANMessage(POLAIRE, 0, 0, 8, i, highByte_x, lowByte_x, highByte_y, lowByte_y, nbr_ps, 0, 0);
-        delay(10);
-      }
-    }
-    if (commande == "p4")
-    {
-      uint16_t couille_x[nbr_ps] = {774, 705, 671, 666, 685, 721, 769, 823, 877, 931, 986, 1040, 1094, 1148, 1202, 1244, 1248, 1233, 1218, 1225};
-      uint16_t couille_y[nbr_ps] = {269, 392, 480, 539, 575, 593, 599, 600, 599, 600, 599, 599, 600, 599, 599, 587, 537, 467, 398, 269};
-
-      for (int i = 0; i < nbr_ps; i++)
-      {
-        Serial.println("message");
-        uint16_t cmd_x = couille_x[i];
-        uint16_t cmd_y = couille_y[i];
-
-        uint8_t lowByte_x = cmd_x & 0xFF;         // Octet de poids faible
-        uint8_t highByte_x = (cmd_x >> 8) & 0xFF; // Octet de poids fort
-
-        uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
-        uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
-
-        sendCANMessage(POLAIRE, 0, 0, 8, i, highByte_x, lowByte_x, highByte_y, lowByte_y, nbr_ps, 0, 0);
-        delay(10);
-      }
-    }
-    if (commande == "p5")
-    {
-      uint16_t couille_x[nbr_ps] = {1225, 1311, 1337, 1319, 1269, 1203, 1132, 1061, 991, 920, 850, 779, 708, 638, 567, 499, 457, 430, 394, 264};
-      uint16_t couille_y[nbr_ps] = {269, 425, 523, 575, 596, 600, 599, 600, 599, 599, 600, 600, 599, 599, 599, 595, 543, 466, 404, 400};
-
-      for (int i = 0; i < nbr_ps; i++)
-      {
-        Serial.println("message");
-        uint16_t cmd_x = couille_x[i];
-        uint16_t cmd_y = couille_y[i];
-
-        uint8_t lowByte_x = cmd_x & 0xFF;         // Octet de poids faible
-        uint8_t highByte_x = (cmd_x >> 8) & 0xFF; // Octet de poids fort
-
-        uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
-        uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
-
-        sendCANMessage(POLAIRE, 0, 0, 8, i, highByte_x, lowByte_x, highByte_y, lowByte_y, nbr_ps, 0, 0);
-        delay(10);
-      }
-    }
-    if (commande == "p6")
-    {
-      uint16_t couille_x[nbr_ps] = {264, 373, 445, 486, 506, 511, 511, 512, 512, 511, 511, 512, 512, 511, 511, 511, 509, 462, 388, 264};
-      uint16_t couille_y[nbr_ps] = {399, 409, 438, 481, 534, 594, 656, 719, 782, 844, 907, 969, 1032, 1095, 1157, 1220, 1281, 1315, 1325, 1325};
-
-      for (int i = 0; i < nbr_ps; i++)
-      {
-        Serial.println("message");
-        uint16_t cmd_x = couille_x[i];
-        uint16_t cmd_y = couille_y[i];
-
-        uint8_t lowByte_x = cmd_x & 0xFF;         // Octet de poids faible
-        uint8_t highByte_x = (cmd_x >> 8) & 0xFF; // Octet de poids fort
-
-        uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
-        uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
-
-        sendCANMessage(POLAIRE, 0, 0, 8, i, highByte_x, lowByte_x, highByte_y, lowByte_y, nbr_ps, 0, 0);
-        delay(10);
-      }
-    }
-    if (commande == "s_j")
-
-    {
-      strategie_jaune_homologation();
-    }
     if ((commande == "RESTART") || (commande == "restart"))
     {
       TelnetStream.println();
@@ -710,32 +574,5 @@ void SerialWIFIActivites()
     justepouraffichage = 1;
 
     receptionWIFI(TelnetStream.read());
-  }
-}
-
-void strategie_jaune_homologation()
-{
-  nbr_ps = 1;
-  // uint16_t x_homologation[nbr_ps] = {1225, 750, 750, 300};
-  // uint16_t y_homologation[nbr_ps] = {750, 750, 1500, 1800};
-
-  uint16_t x_homologation[nbr_ps] = {600};
-  uint16_t y_homologation[nbr_ps] = {1500};
-  // uint16_t t_homologation[nbr_ps] = {-45};
-
-  for (int i = 0; i < nbr_ps; i++)
-  {
-    Serial.println("message");
-    uint16_t cmd_x = x_homologation[i];
-    uint16_t cmd_y = y_homologation[i];
-
-    uint8_t lowByte_x = cmd_x & 0xFF;         // Octet de poids faible
-    uint8_t highByte_x = (cmd_x >> 8) & 0xFF; // Octet de poids fort
-
-    uint8_t lowByte_y = cmd_y & 0xFF;         // Octet de poids faible
-    uint8_t highByte_y = (cmd_y >> 8) & 0xFF; // Octet de poids fort
-
-    sendCANMessage(POLAIRE, 0, 0, 8, i, highByte_x, lowByte_x, highByte_y, lowByte_y, nbr_ps, 0, 0);
-    delay(10);
   }
 }

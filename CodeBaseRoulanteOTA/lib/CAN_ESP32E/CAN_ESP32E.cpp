@@ -90,11 +90,11 @@ void sendCANMessage(int id, int ext, int rtr, int length, int data0, int data1, 
     // Envoi du message avec un délai d'attente de 1000 ms
     if (twai_transmit(&message, pdMS_TO_TICKS(10)) == ESP_OK)
     {
-        Serial.println("Message envoyé avec succès.");
+        // Serial.println("Message envoyé avec succès.");
     }
     else
     {
-        Serial.println("Erreur lors de l'envoi du message.");
+        // Serial.println("Erreur lors de l'envoi du message.");
     }
 }
 
@@ -117,39 +117,39 @@ void readCANMessage()
          }
          Serial.println();
     */
-            if (messageCANForMe(rx_message.identifier))
-            {
-                /*
-                // Si l'ID est valide, traitement du message
-                Serial.print(" Message reçu : ID=");
-                Serial.print(rx_message.identifier, HEX); // Affiche l'ID du message en hexadécimal
-                Serial.print(" EXT=");
-                Serial.print(rx_message.extd); // Affiche le Data Length Code (DLC)
-                Serial.print(" RTR=");
-                Serial.print(rx_message.rtr); // Affiche le Data Length Code (DLC)
+        if (messageCANForMe(rx_message.identifier))
+        {
+            /*
+            // Si l'ID est valide, traitement du message
+            Serial.print(" Message reçu : ID=");
+            Serial.print(rx_message.identifier, HEX); // Affiche l'ID du message en hexadécimal
+            Serial.print(" EXT=");
+            Serial.print(rx_message.extd); // Affiche le Data Length Code (DLC)
+            Serial.print(" RTR=");
+            Serial.print(rx_message.rtr); // Affiche le Data Length Code (DLC)
 
-                Serial.print(" DLC=");
-                Serial.print(rx_message.data_length_code); // Affiche le Data Length Code (DLC)
-                Serial.print(" Data=");
-    */
-                rxMsg.id = rx_message.identifier;
-                rxMsg.extd = rx_message.extd;
-                rxMsg.rtr = rx_message.rtr;
-                rxMsg.lenght = rx_message.data_length_code;
-                // Affichage des données du message
-                for (int i = 0; i < rx_message.data_length_code; i++)
-                {
-                    rxMsg.data[i] = rx_message.data[i];
-                    // Serial.print(rxMsg.data[i], HEX); // Affiche chaque octet de données en hexadécimal
-                    // Serial.print(" ");
-                }
-            } /*
-         else
-         {
-             // Si l'ID n'est pas pris en compte, on l'ignore
-             Serial.print(" Message reçu avec ID non pris en compte : ");
-             Serial.print(rx_message.identifier, HEX);
-         }*/
+            Serial.print(" DLC=");
+            Serial.print(rx_message.data_length_code); // Affiche le Data Length Code (DLC)
+            Serial.print(" Data=");
+*/
+            rxMsg.id = rx_message.identifier;
+            rxMsg.extd = rx_message.extd;
+            rxMsg.rtr = rx_message.rtr;
+            rxMsg.lenght = rx_message.data_length_code;
+            // Affichage des données du message
+            for (int i = 0; i < rx_message.data_length_code; i++)
+            {
+                rxMsg.data[i] = rx_message.data[i];
+                // Serial.print(rxMsg.data[i], HEX); // Affiche chaque octet de données en hexadécimal
+                // Serial.print(" ");
+            }
+        } /*
+     else
+     {
+         // Si l'ID n'est pas pris en compte, on l'ignore
+         Serial.print(" Message reçu avec ID non pris en compte : ");
+         Serial.print(rx_message.identifier, HEX);
+     }*/
     } /*
      else
      {
@@ -157,7 +157,6 @@ void readCANMessage()
      }    Serial.println();
  */
 }
-
 
 bool messageCANForMe(uint16_t ID)
 {
@@ -213,6 +212,9 @@ bool messageCANForMe(uint16_t ID)
     case CARTE_MAITRE:
         return true;
         break;
+    case LIDAR:
+        return true;
+        break;
 
     default:
         return false;
@@ -229,36 +231,41 @@ float conversion_4char_to_float(unsigned char *adresse_tableau)
     return nombre;
 }
 
-void send_x_y_regulierement(int x, int y, int time_to_repeat_send)
+void send_x_y_theta_regulierement(int x, int y, float theta_rad, int time_to_repeat_send)
 {
+    int16_t theta_deg = degrees(theta_rad);
 
-    uint8_t lowByte = x & 0xFF;         // Octet de poids faible
-    uint8_t highByte = (x >> 8) & 0xFF; // Octet de poids fort
+    uint8_t x_low_byte = x & 0xFF;         // Octet de poids faible
+    uint8_t x_high_byte = (x >> 8) & 0xFF; // Octet de poids fort
 
-    uint8_t x_low_byte = lowByte;
-    uint8_t x_high_byte = highByte;
+    uint8_t y_low_byte = y & 0xFF;         // Octet de poids faibl
+    uint8_t y_high_byte = (y >> 8) & 0xFF; // Octet de poids fort
 
-    lowByte = y & 0xFF;         // Octet de poids faibl
-    highByte = (y >> 8) & 0xFF; // Octet de poids fort
+    uint8_t t_low_byte = theta_deg & 0xFF;         // Octet de poids faibl
+    uint8_t t_high_byte = (theta_deg >> 8) & 0xFF; // Octet de poids fort
+
     static int intervalle = 0;
     if ((millis() - intervalle) > time_to_repeat_send)
     {
         // Affiche une trace série pour indiquer l'envoi du message
-        // Serial.printf("ODO_SEND_X_Y\n");
+        // Serial.printf("ODO_SEND_\n");
 
         // Envoie un message CAN avec les données ODO
-        /*  sendCANMessage(
-              ODO_SEND_X_Y,                    // ID du message
-              0,                               // Priorité ou type (selon ton implémentation)
-              0,                               // Flags ou identifiant secondaire
-              8,                               // Longueur du message (8 octets)
-              ((uint16_t)(odo_x) >> 8) & 0xFF, // Byte 0: partie haute de odo_x
-              (uint16_t)(odo_x) & 0xFF,        // Byte 1: partie basse de odo_x
-              ((uint16_t)(odo_y) >> 8) & 0xFF, // Byte 2: partie haute de odo_y
-              (uint16_t)(odo_y) & 0xFF,        // Byte 3: partie basse de odo_y
-              0, 0, 0, 0                       // Bytes 4 à 7: inutilisés ou réservés
-          );
-  */
+        sendCANMessage(
+            ODO_SEND, // ID du message
+            0,            // Priorité ou type (selon ton implémentation)
+            0,            // Flags ou identifiant secondaire
+            8,            // Longueur du message (8 octets)
+            x_high_byte,  // Byte 0: partie haute de odo_x
+            x_low_byte,   // Byte 1: partie basse de odo_x
+            y_high_byte,  // Byte 2: partie haute de odo_y
+            y_low_byte,   // Byte 3: partie basse de odo_y
+            t_high_byte, 
+            t_low_byte, 
+            0, 
+            0    
+        );
+
         // Met à jour l'intervalle pour le prochain envoi
         intervalle = millis();
     }

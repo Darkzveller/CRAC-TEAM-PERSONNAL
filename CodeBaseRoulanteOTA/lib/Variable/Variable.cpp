@@ -172,8 +172,8 @@ float somme_erreur_freinage_roue_folle_gauche = 0;
 float erreur_prec_freinage_roue_folle_gauche = 0;
 //************************Asser Correction d'angle */
 
-double coeff_P_angle = 2.5;
-double coeff_I_angle = 0.1;
+double coeff_P_angle = -3;
+double coeff_I_angle = 0;
 double coeff_D_angle = 0;
 double integral_limit_angle = 50.0;
 // Variables globales pour le PID
@@ -193,7 +193,7 @@ float consigne_regulation_moyenne = 0;
 
 float erreur_distance = 0;
 float erreur_orient = 0;
-float consigne_dist_polaire_tick_max = SPEED_ULTRA;
+float consigne_dist_polaire_tick_max = SPEED_TURBO;
 float coeff_rot_polaire_tick = VALEUR_DEFAUT_COEFF_ROT_POLAIRE_TICK;
 float coeff_dist_polaire_tick = VALEUR_DEFAUT_COEFF_DIST_POLAIRE_TICK;
 float consigne_rot_polaire_tick = 0;
@@ -225,3 +225,7 @@ bool stop_start_robot_fin_match = false;
 float courant = 0;
 float tension = 0;
 float puissance = 0;
+
+//***********Detect obstacle******************* */
+
+bool detect_robot = true;

@@ -13,6 +13,5 @@ void setupOTA();
 void receptionWIFI(char ch);
 void affichage_commande_wifi();
 void SerialWIFIActivites();
-void strategie_jaune_homologation();
 
 #endif

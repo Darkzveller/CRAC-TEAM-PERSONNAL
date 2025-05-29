@@ -127,7 +127,7 @@ void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons
     // TelnetStream.printf(" cs x %.1f ", coordonnee_x);
     // TelnetStream.printf(" cs_y %.1f ", coordonnee_y);
 
-    // // Serial.printf(" cpt %d ", compteur);
+    // Serial.printf(" cpt %d ", compteur);
     // Serial.printf(" S %d ", sens);
 
     // Serial.printf(" Odo x %.1f ", odo_x);
