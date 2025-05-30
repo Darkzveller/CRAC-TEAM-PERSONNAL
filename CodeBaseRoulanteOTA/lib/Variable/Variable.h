@@ -34,9 +34,9 @@ extern float tension_bat ;
 #define channel_2 1
 // Encodeur + Parametre physique du robot
 #ifdef PARAMETRE_BASE_OFFICIEL
-#define ENTRAXE 232.0
-#define LARGEUR_ROBOT_mm 232.0
-#define SIZE_WHEEL_DIAMETER_mm 52.0
+#define ENTRAXE 99.8
+#define LARGEUR_ROBOT_mm 200.0
+#define SIZE_WHEEL_DIAMETER_mm 45.0
 #endif
 #ifdef PARAMETRE_BASE_TEST
 #define ENTRAXE 110.0
