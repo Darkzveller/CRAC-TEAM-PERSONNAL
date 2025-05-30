@@ -326,7 +326,7 @@ extern float puissance;
 #define AVANT_LIDAR_DETECTER 1
 #define ARRIERE_LIDAR_DETECTER 1
 
-extern bool detect_robot ;
+extern bool flag_stop_lidar ;
 
 
 

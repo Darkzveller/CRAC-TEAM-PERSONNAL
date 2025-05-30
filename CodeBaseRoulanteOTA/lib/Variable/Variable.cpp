@@ -228,4 +228,4 @@ float puissance = 0;
 
 //***********Detect obstacle******************* */
 
-bool detect_robot = true;
+bool flag_stop_lidar = false;

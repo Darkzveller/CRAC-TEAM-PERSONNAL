@@ -48,7 +48,7 @@ void controle(void *parameters)
 
         //     pp = 1;
         // }
-        if (detect_robot)
+        if (!flag_stop_lidar)
         {
             switch (liste.general_purpose)
             {
@@ -178,8 +178,6 @@ void controle(void *parameters)
 
 void bus_can(void *parameters)
 {
-    int prec_move = IMMOBILE;
-    bool flag_stop_lidar = false;
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
     while (1)
@@ -208,34 +206,26 @@ void bus_can(void *parameters)
             break;
         case LIDAR:
 
-            if (!rxMsg.data[0] && !rxMsg.data[1] && flag_stop_lidar){
-                Serial.println("On repart"),
-                    // Serial.println(prec_move == TYPE_DEPLACEMENT_X_Y_POLAIRE);
-                    flag_stop_lidar = false,
-                    liste.general_purpose = prec_move;
-                }
+            if (!rxMsg.data[0] && !rxMsg.data[1] && flag_stop_lidar)
+            {
+                Serial.println("On repart");
+                flag_stop_lidar = false;
+            }
 
-            if (rxMsg.data[0] && !rxMsg.data[1] && !flag_stop_lidar && liste.general_purpose != IMMOBILE){
-                Serial.println("Detection avant"),
-                    // Serial.println(prec_move == TYPE_DEPLACEMENT_X_Y_POLAIRE),
-                    liste.general_purpose = IMMOBILE,
-                    // Serial.println(prec_move == TYPE_DEPLACEMENT_X_Y_POLAIRE),
-                    flag_stop_lidar = true;}
+            if (rxMsg.data[0] && !rxMsg.data[1] && !flag_stop_lidar && liste.general_purpose != IMMOBILE)
+            {
+                Serial.println("Detection avant");
+                flag_stop_lidar = true;
+            }
 
-            if (!rxMsg.data[0] && rxMsg.data[1] && !flag_stop_lidar && liste.general_purpose != IMMOBILE){
-                Serial.println("Detection arrière"),
-                    stop_moteur_droit(),
-                    stop_moteur_gauche(),
-                    liste.general_purpose = IMMOBILE;
-                    flag_stop_lidar = true;
-                }
+            if (!rxMsg.data[0] && rxMsg.data[1] && !flag_stop_lidar && liste.general_purpose != IMMOBILE)
+            {
+                Serial.println("Detection arrière");
+                stop_moteur_droit();
+                stop_moteur_gauche();
+                flag_stop_lidar = true;
+            }
 
-            if(flag_stop_lidar) liste.general_purpose = IMMOBILE;
-
-            // Serial.println(prec_move == POLAIRE);
-            // Serial.println(liste.general_purpose);
-            // Serial.printf("LIDAR DETECTION \n");
-            // detect_robot = false;
             break;
 
         case ESP32_RESTART:
@@ -250,7 +240,7 @@ void bus_can(void *parameters)
             // Pour se simplifier j'ai préférer décomposer les etapes quitte a prendre un peu plus de temps cpu
             enregistreur_odo();
             liste.general_purpose = TYPE_DEPLACEMENT_ROTATION;
-            prec_move = liste.general_purpose;
+            // prec_move = liste.general_purpose;
 
             // liste.angle = TIC_PER_TOUR * angle / 80.0;
 
@@ -276,7 +266,7 @@ void bus_can(void *parameters)
         case LIGNE_DROITE:
             enregistreur_odo();
             liste.general_purpose = TYPE_DEPLACEMENT_LIGNE_DROITE;
-            prec_move = liste.general_purpose;
+            // prec_move = liste.general_purpose;
             liste.distance = convert_distance_mm_to_tick(fusion_octet(rxMsg.data[0], rxMsg.data[1]));
             liste.vitesse_croisiere = rxMsg.data[2];
             lauch_flag_asser_roue(true);
@@ -297,7 +287,6 @@ void bus_can(void *parameters)
             liste.nbr_passage = rxMsg.data[0];
             liste.x_polaire[liste.nbr_passage] = fusion_octet(rxMsg.data[1], rxMsg.data[2]);
             liste.y_polaire[liste.nbr_passage] = fusion_octet(rxMsg.data[3], rxMsg.data[4]);
-            
 
             liste.checksum_nbr_passage = rxMsg.data[5] - 1;
             liste.rotation_polaire[liste.nbr_passage] = fusion_octet(rxMsg.data[6], rxMsg.data[7]);
@@ -307,7 +296,7 @@ void bus_can(void *parameters)
                 enregistreur_odo();
                 // Serial.printf("fâpkfakfa^pkfaêfpk^,ae^c,");
                 liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
-                prec_move = liste.general_purpose;
+                // prec_move = liste.general_purpose;
                 flag_fin_mvt = false;
                 rxMsg.id = 0;
                 liste.compteur_point_de_passage_polaire = 0;
@@ -341,7 +330,7 @@ void bus_can(void *parameters)
             enregistreur_odo();
 
             liste.general_purpose = TYPE_DEPLACEMENT_RECALAGE;
-            prec_move = liste.general_purpose;
+            // prec_move = liste.general_purpose;
             liste.direction_recalage = rxMsg.data[0];
             liste.type_modif_x_y_theta_recalge_rien = rxMsg.data[1];
             liste.nouvelle_valeur_x_y_theta_rien = fusion_octet(rxMsg.data[2], rxMsg.data[3]);
