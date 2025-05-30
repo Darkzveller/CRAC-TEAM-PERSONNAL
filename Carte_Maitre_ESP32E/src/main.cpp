@@ -16,7 +16,7 @@ int vitesse = 90;
 #define PIN_READ_FDC 33
 #define TIME_TO_SEND_DATA_CAN 20
 // #define HOMOLOGATION
-#define UN_SPOT
+// #define UN_SPOT
 void setup()
 {
   Serial.begin(115200);

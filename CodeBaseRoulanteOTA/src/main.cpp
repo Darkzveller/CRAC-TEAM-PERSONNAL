@@ -19,35 +19,27 @@ void controle(void *parameters)
     while (1)
     {
         read_x_y_theta();
-        // static int pp = 1;
+        static int pp = 0;
         // // Vérifie si plus de 500 ms se sont écoulées depuis la dernière exécution
 
-        // if (pp == 0)
-        // {
-        //     liste.nbr_passage = 0;
-        //     liste.x_polaire[0] = 0;
-        //     liste.y_polaire[0] = 0;
-        //     // liste.x_polaire[0] = 250;
-        //     // liste.y_polaire[0] = 500;
+        if (pp == 0)
+        {
+            // liste.distance = convert_distance_mm_to_tick(1000);
+            // liste.vitesse_croisiere = 100;
+            // lauch_flag_asser_roue(true);
+            // liste.general_purpose = TYPE_DEPLACEMENT_LIGNE_DROITE;
 
-        //     // liste.x_polaire[1]=500;
-        //     // liste.y_polaire[1] = 250;
+            liste.general_purpose = TYPE_DEPLACEMENT_ROTATION;
+            liste.angle = convert_angle_deg_to_tick(3600);
+            liste.vitesse_croisiere = 100;
 
-        //     // liste.nbr_passage = 0;
-        //     // liste.x_polaire[0] = 0;
-        //     // liste.y_polaire[0] = 0;
-        //     // // liste.x_polaire[1]=500;
-        //     // liste.y_polaire[1] = 250;
-        //     liste.rotation_polaire[0] = 90;
-        //     liste.checksum_nbr_passage = liste.nbr_passage;
+            lauch_flag_asser_roue(true);
+            rxMsg.id = 0;
 
-        //     liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
-        //     flag_fin_mvt = false;
-        //     rxMsg.id = 0;
-        //     liste.compteur_point_de_passage_polaire = 0;
+            rxMsg.id = 0;
 
-        //     pp = 1;
-        // }
+            pp = 1;
+        }
         if (!flag_stop_lidar)
         {
             switch (liste.general_purpose)
@@ -240,10 +232,6 @@ void bus_can(void *parameters)
             // Pour se simplifier j'ai préférer décomposer les etapes quitte a prendre un peu plus de temps cpu
             enregistreur_odo();
             liste.general_purpose = TYPE_DEPLACEMENT_ROTATION;
-            // prec_move = liste.general_purpose;
-
-            // liste.angle = TIC_PER_TOUR * angle / 80.0;
-
             liste.angle = convert_angle_deg_to_tick(fusion_octet(rxMsg.data[0], rxMsg.data[1]));
             liste.vitesse_croisiere = rxMsg.data[2];
 
@@ -538,9 +526,9 @@ void loop()
         {
             // Serial.printf(" PS_ASSER %d ", pause_asser_test);
 
-            // Serial.printf(" Odo x %.3f ", odo_x);
-            // Serial.printf(" odo_y %.3f ", odo_y);
-            // Serial.printf(" teheta %.3f ", degrees(theta_robot));
+            Serial.printf(" Odo x %.3f ", odo_x);
+            Serial.printf(" odo_y %.3f ", odo_y);
+            Serial.printf(" teheta %.3f ", degrees(theta_robot));
             // // Serial.printf("CPT_PS %d", liste.compteur_point_de_passage_polaire);
 
             // Serial.printf(" er_d %.3f ", convert_distance_tick_to_mm(erreur_distance));
@@ -567,7 +555,7 @@ void loop()
             // // Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
             // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
             // Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
-            // Serial.println();
+            Serial.println();
         }
         flag_controle = 0;
     }

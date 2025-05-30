@@ -4,6 +4,8 @@
 #include "ID_CAN.h"
 #include "CAN_ESP32E.h"
 #include "Variable.h"
+#include "USE_FUNCTION.h"
+
 extern int data[10];
 extern int id;
 // Configuration des pins
@@ -190,18 +192,18 @@ void readCANMessage()
     */
         if (messageCANForMe(rx_message.identifier))
         {
-            
-            // Si l'ID est valide, traitement du message
-            Serial.print(" Message reçu : ID=");
-            Serial.print(rx_message.identifier, HEX); // Affiche l'ID du message en hexadécimal
-            Serial.print(" EXT=");
-            Serial.print(rx_message.extd); // Affiche le Data Length Code (DLC)
-            Serial.print(" RTR=");
-            Serial.print(rx_message.rtr); // Affiche le Data Length Code (DLC)
 
-            Serial.print(" DLC=");
-            Serial.print(rx_message.data_length_code); // Affiche le Data Length Code (DLC)
-            Serial.print(" Data=");
+            // Si l'ID est valide, traitement du message
+            // Serial.print(" Message reçu : ID=");
+            // Serial.print(rx_message.identifier, HEX); // Affiche l'ID du message en hexadécimal
+            // Serial.print(" EXT=");
+            // Serial.print(rx_message.extd); // Affiche le Data Length Code (DLC)
+            // Serial.print(" RTR=");
+            // Serial.print(rx_message.rtr); // Affiche le Data Length Code (DLC)
+
+            // Serial.print(" DLC=");
+            // Serial.print(rx_message.data_length_code); // Affiche le Data Length Code (DLC)
+            // Serial.print(" Data=");
 
             rxMsg.id = rx_message.identifier;
             rxMsg.extd = rx_message.extd;
@@ -211,10 +213,10 @@ void readCANMessage()
             for (int i = 0; i < rx_message.data_length_code; i++)
             {
                 rxMsg.data[i] = rx_message.data[i];
-                Serial.print(rxMsg.data[i], HEX); // Affiche chaque octet de données en hexadécimal
-                Serial.print(" ");
-                TelnetStream.print(rxMsg.data[i], HEX); // Affiche chaque octet de données en hexadécimal
-                TelnetStream.print(" ");
+                // Serial.print(rxMsg.data[i], HEX); // Affiche chaque octet de données en hexadécimal
+                // Serial.print(" ");
+                // TelnetStream.print(rxMsg.data[i], HEX); // Affiche chaque octet de données en hexadécimal
+                // TelnetStream.print(" ");
             }
         } /*
      else
@@ -239,7 +241,15 @@ bool messageCANForMe(uint16_t ID)
         return true;
         break;
 
-            case ACKNOWLEDGE_BASE_ROULANTE:
+    case ACKNOWLEDGE_BASE_ROULANTE:
+        return true;
+        break;
+    case ODO_SEND:
+
+        // Serial.printf("X = %d ", fusion_octet(rxMsg.data[0], rxMsg.data[1]));
+        // Serial.printf("Y = %d ", fusion_octet(rxMsg.data[2], rxMsg.data[3]));
+        // Serial.printf("Theta = %d ", fusion_octet(rxMsg.data[4], rxMsg.data[5]));
+        // Serial.println();
         return true;
         break;
 
