@@ -248,8 +248,8 @@ bool messageCANForMe(uint16_t ID)
 
         // Serial.printf("X = %d ", fusion_octet(rxMsg.data[0], rxMsg.data[1]));
         // Serial.printf("Y = %d ", fusion_octet(rxMsg.data[2], rxMsg.data[3]));
-        // Serial.printf("Theta = %d ", fusion_octet(rxMsg.data[4], rxMsg.data[5]));
-        // Serial.println();
+        Serial.printf("Theta = %d ", fusion_octet(rxMsg.data[4], rxMsg.data[5]));
+        Serial.println();
         return true;
         break;
 

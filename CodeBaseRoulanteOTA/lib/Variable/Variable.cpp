@@ -45,7 +45,7 @@ Ordre_deplacement liste = {
 // Variable asservissement
 //************Asservissement ROUE FOLLE EN TICK */
 
-float coeff_P_roue_folle_tick_gauche = 10;
+float coeff_P_roue_folle_tick_gauche = 15;
 float coeff_D_roue_folle_tick_gauche = 250;
 float coeff_I_roue_folle_tick_gauche = 0.0;
 

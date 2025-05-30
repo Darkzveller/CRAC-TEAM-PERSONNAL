@@ -19,7 +19,7 @@ void controle(void *parameters)
     while (1)
     {
         read_x_y_theta();
-        static int pp = 0;
+        static int pp = 10;
         // // Vérifie si plus de 500 ms se sont écoulées depuis la dernière exécution
 
         if (pp == 0)
@@ -460,12 +460,10 @@ void setup()
 { // calcul coeff filtre
   // delay(10000);
   // Initialisation de la communication série à 115200 bauds
-    // odo_x = 1225;
-    // odo_y = 139.0;
     Serial.begin(115200);
     // Serial.println("Booting with OTA"); // Message indiquant le démarrage avec OTA
     // Appel à la fonction de configuration OTA (non définie dans ce code, mais probablement ailleurs)
-    // setupOTA();
+    setupOTA();
     // Initialisation des moteurs
     setup_motors();
     stop_motors();
@@ -526,9 +524,9 @@ void loop()
         {
             // Serial.printf(" PS_ASSER %d ", pause_asser_test);
 
-            Serial.printf(" Odo x %.3f ", odo_x);
-            Serial.printf(" odo_y %.3f ", odo_y);
-            Serial.printf(" teheta %.3f ", degrees(theta_robot));
+            // Serial.printf(" Odo x %.3f ", odo_x);
+            // Serial.printf(" odo_y %.3f ", odo_y);
+            // Serial.printf(" teheta %.3f ", degrees(theta_robot));
             // // Serial.printf("CPT_PS %d", liste.compteur_point_de_passage_polaire);
 
             // Serial.printf(" er_d %.3f ", convert_distance_tick_to_mm(erreur_distance));
@@ -555,19 +553,20 @@ void loop()
             // // Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
             // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
             // Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
-            Serial.println();
+            // Serial.println();
         }
         flag_controle = 0;
     }
 }
 
-// void serialEvent()
-// {
-//     while (Serial.available() > 0) // tant qu'il y a des caractères à lire
-//     {
-//         // reception(Serial.read());
-//         char caractere = Serial.read();
-//         receptionWIFI(caractere);
-//         Serial.print(caractere);
-//     }
-// }
+void serialEvent()
+{
+    while (Serial.available() > 0) // tant qu'il y a des caractères à lire
+    {
+        // reception(Serial.read());
+        char caractere = Serial.read();
+        receptionWIFI(caractere);
+        
+        Serial.print(caractere);
+    }
+}

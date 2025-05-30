@@ -9,11 +9,11 @@
 // je fixe le nom de mon réseau Wi-Fi, ce qui simplifie les démarches, notamment lors des débogages
 //  Informations de connexion WiFi
 
-// #define MON_TELEPHONE
+#define MON_TELEPHONE
 // #define MA_FREEBOX
 // #define MON_PC
 // #define MATTHIEU_PHONE
-#define ROUTEUR_CRAC_COUPE
+// #define ROUTEUR_CRAC_COUPE
 
 const char *name_card_elec = "baseroulante";
 // BESOIN DE ME SIMPLIFIER MA VIE
