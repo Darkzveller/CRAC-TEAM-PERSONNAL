@@ -69,6 +69,7 @@ void ligne_droite(int consigne, int vitesse)
     consigne_position_gauche += correction;
 }
 
+
 void asser_polaire_tick(float coordonnee_x, float coordonnee_y, float theta_cons, bool nbr_passage)
 {
 
@@ -214,7 +215,6 @@ bool recalage(uint8_t direction, uint8_t type_modif, float nouvelle_valeur, uint
 
         break;
     case AVANT:
-        break;
     case ARRIERE:
 
         sens = (direction == AVANT) ? 1 : -1; // condition ? valeur_si_vrai : valeur_si_faux;

@@ -53,6 +53,7 @@ void controle(void *parameters)
             switch (liste.general_purpose)
             {
             case TYPE_DEPLACEMENT_LIGNE_DROITE:
+                // Serial.println("aaaaaaaaaa");
                 liste.vitesse_croisiere = SPEED_NORMAL;
                 // Serial.printf("TYPE_DEPLACEMENT_LIGNE_DROITE ");
                 // TelnetStream.printf("TYPE_DEPLACEMENT_LIGNE_DROITE ");
@@ -61,7 +62,7 @@ void controle(void *parameters)
                 ligne_droite(liste.distance, liste.vitesse_croisiere);
                 if (return_flag_asser_roue())
                 {
-                    sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
+                    sendCANMessage(FIN_MOUV, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
                     Serial.printf("ACKNOWLEDGE_BASE_ROULANTE TYPE_DEPLACEMENT_LIGNE_DROITE");
                     Serial.println();
                     liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
@@ -82,7 +83,7 @@ void controle(void *parameters)
                 if (return_flag_asser_roue())
                 {
                     consigne_theta_prec = degrees(theta_robot);
-                    sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
+                    sendCANMessage(FIN_MOUV, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
                     Serial.printf("ACKNOWLEDGE_BASE_ROULANTE TYPE_DEPLACEMENT_ROTATION");
                     Serial.println();
 
@@ -118,7 +119,7 @@ void controle(void *parameters)
                 if (flag_fin_mvt)
                 {
                     reset_parametre_polaire();
-                    sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
+                    sendCANMessage(FIN_MOUV, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
                     // sendCANMessage(ODO_SEND_TETHA, 0, 0, 8, (((uint16_t)normaliser_angle_deg(degrees(theta_robot)) >> 8) & 0xFF), ((uint16_t)normaliser_angle_deg(degrees(theta_robot)) & 0xFF), 0, 0, 0, 0, 0, 0);
                     liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
                     Serial.printf("ACKNOWLEDGE_BASE_ROULANTE TYPE_DEPLACEMENT_X_Y_POLAIRE");
