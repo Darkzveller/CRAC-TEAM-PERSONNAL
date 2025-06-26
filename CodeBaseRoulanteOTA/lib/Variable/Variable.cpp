@@ -45,9 +45,13 @@ Ordre_deplacement liste = {
 // Variable asservissement
 //************Asservissement ROUE FOLLE EN TICK */
 
-float coeff_P_roue_folle_tick_gauche = 15;
-float coeff_D_roue_folle_tick_gauche = 250;
-float coeff_I_roue_folle_tick_gauche = 0.0;
+// float coeff_P_roue_folle_tick_gauche = 8;
+// float coeff_D_roue_folle_tick_gauche = 250;
+// float coeff_I_roue_folle_tick_gauche = 0.0;
+
+float coeff_P_roue_folle_tick_gauche = 10;
+float coeff_D_roue_folle_tick_gauche = 0.25;
+float coeff_I_roue_folle_tick_gauche = 0.4;
 
 float coeff_P_roue_folle_tick_droite = coeff_P_roue_folle_tick_gauche;
 float coeff_D_roue_folle_tick_droite = coeff_D_roue_folle_tick_gauche;
@@ -172,7 +176,7 @@ float somme_erreur_freinage_roue_folle_gauche = 0;
 float erreur_prec_freinage_roue_folle_gauche = 0;
 //************************Asser Correction d'angle */
 
-double coeff_P_angle = -3;
+double coeff_P_angle = -5;
 double coeff_I_angle = 0;
 double coeff_D_angle = 0;
 double integral_limit_angle = 50.0;
@@ -193,16 +197,12 @@ float consigne_regulation_moyenne = 0;
 
 float erreur_distance = 0;
 float erreur_orient = 0;
-float consigne_dist_polaire_tick_max = SPEED_TURBO;
+float consigne_dist_polaire_tick_max = SPEED_NORMAL;
 float coeff_rot_polaire_tick = VALEUR_DEFAUT_COEFF_ROT_POLAIRE_TICK;
 float coeff_dist_polaire_tick = VALEUR_DEFAUT_COEFF_DIST_POLAIRE_TICK;
 float consigne_rot_polaire_tick = 0;
 float consigne_dist_polaire_tick = 0;
 
-float coeff_decc_distance_polaire_tick = 15.25;
-float distance_decl_polaire_tick = 0;
-
-bool calcul_decl_polaire_tick = false;
 
 //***********Loop******************* */
 
@@ -218,7 +218,7 @@ signed char FIFO_occupation = 0;
 signed char FIFO_max_occupation = 0;
 bool flag_can_printf = false;
 //***********Ordre de déplacement******************* */
-bool flag_fin_mvt = true;
+bool flag_fin_mvt_x_y_theta = true;
 bool stop_start_robot_fin_match = false;
 
 //*********** Qu'est ce qu'on voit au borne de la batterie******************* */

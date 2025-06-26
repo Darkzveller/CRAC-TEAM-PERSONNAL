@@ -19,7 +19,7 @@ void controle(void *parameters)
     while (1)
     {
         read_x_y_theta();
-        static int pp = 10;
+        static int pp = 0;
         // // Vérifie si plus de 500 ms se sont écoulées depuis la dernière exécution
 
         if (pp == 0)
@@ -29,14 +29,20 @@ void controle(void *parameters)
             // lauch_flag_asser_roue(true);
             // liste.general_purpose = TYPE_DEPLACEMENT_LIGNE_DROITE;
 
-            liste.general_purpose = TYPE_DEPLACEMENT_ROTATION;
-            liste.angle = convert_angle_deg_to_tick(3600);
-            liste.vitesse_croisiere = 100;
+            // liste.general_purpose = TYPE_DEPLACEMENT_ROTATION;
+            // liste.angle = convert_angle_deg_to_tick(3600);
+            // liste.vitesse_croisiere = 100;
 
-            lauch_flag_asser_roue(true);
-            rxMsg.id = 0;
+            // lauch_flag_asser_roue(true);
+            // rxMsg.id = 0;
 
-            rxMsg.id = 0;
+            // rxMsg.id = 0;
+
+            liste.x = 200;
+            liste.y = 200;
+            liste.angle = 45;
+            liste.general_purpose = TYPE_DEPLACEMENT_X_Y_THETA;
+            flag_fin_mvt_x_y_theta = false;
 
             pp = 1;
         }
@@ -54,7 +60,7 @@ void controle(void *parameters)
                 ligne_droite(liste.distance, liste.vitesse_croisiere);
                 if (return_flag_asser_roue())
                 {
-                    sendCANMessage(FIN_MOUV, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
+                    sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE_LIGNE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
                     Serial.printf("ACKNOWLEDGE_BASE_ROULANTE TYPE_DEPLACEMENT_LIGNE_DROITE");
                     Serial.println();
                     liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
@@ -74,9 +80,9 @@ void controle(void *parameters)
 
                 if (return_flag_asser_roue())
                 {
-                    consigne_theta_prec = degrees(theta_robot);
-                    sendCANMessage(FIN_MOUV, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
-                    Serial.printf("ACKNOWLEDGE_BASE_ROULANTE TYPE_DEPLACEMENT_ROTATION");
+                    enregistreur_odo();
+                    sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE_ROTATION, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
+                    Serial.printf("ACKNOWLEDGE_BASE_ROULANTE_ROTATION ");
                     Serial.println();
 
                     liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
@@ -90,31 +96,24 @@ void controle(void *parameters)
                 // TelnetStream.printf(" TYPE_DEPLACEMENT_IMMOBILE");
 
                 liste.general_purpose = TYPE_VIDE;
-                // sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
-                // Serial.printf("ACKNOWLEDGE_BASE_ROULANTE TYPE_DEPLACEMENT_IMMOBILE");
-                // Serial.println();
+                sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE_IMMOBILE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
+                Serial.printf("ACKNOWLEDGE_BASE_ROULANTE_IMMOBILE");
+                Serial.println();
 
                 // TelnetStream.println();
 
                 break;
-            case TYPE_DEPLACEMENT_X_Y_POLAIRE:
-                // Serial.printf(" TYPE_DEPLACEMENT_X_Y_POLAIRE ");
-                // TelnetStream.printf(" TYPE_DEPLACEMENT_IMMOBILE");
-                // Serial.printf(" liste.x_polaire %f ", liste.x_polaire[liste.compteur_point_de_passage_polaire]);
-                // Serial.printf(" liste.y_polaire %f ", liste.y_polaire[liste.compteur_point_de_passage_polaire]);
-                // Serial.printf(" liste.cptps %d ", liste.compteur_point_de_passage_polaire);
-                // TelnetStream.printf(" liste.cptps %d ", liste.compteur_point_de_passage_polaire);
+            case TYPE_DEPLACEMENT_X_Y_THETA:
 
-                asser_polaire_tick(liste.x_polaire[liste.compteur_point_de_passage_polaire], liste.y_polaire[liste.compteur_point_de_passage_polaire], liste.rotation_polaire[liste.compteur_point_de_passage_polaire], liste.deceleration_polaire);
-                // TelnetStream.println();
+                asser_polaire_tick(liste.x, liste.y, liste.angle);
 
-                if (flag_fin_mvt)
+                if (flag_fin_mvt_x_y_theta)
                 {
                     reset_parametre_polaire();
-                    sendCANMessage(FIN_MOUV, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
-                    // sendCANMessage(ODO_SEND_TETHA, 0, 0, 8, (((uint16_t)normaliser_angle_deg(degrees(theta_robot)) >> 8) & 0xFF), ((uint16_t)normaliser_angle_deg(degrees(theta_robot)) & 0xFF), 0, 0, 0, 0, 0, 0);
+                    sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE_X_Y_THETA, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
+
                     liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
-                    Serial.printf("ACKNOWLEDGE_BASE_ROULANTE TYPE_DEPLACEMENT_X_Y_POLAIRE");
+                    Serial.printf("ACKNOWLEDGE_BASE_ROULANTE_X_Y_THETA");
                     Serial.println();
                 }
                 break;
@@ -126,10 +125,10 @@ void controle(void *parameters)
                 {
                     consigne_odo_droite_prec = odo_tick_droit;
                     consigne_odo_gauche_prec = odo_tick_gauche;
-                    sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
+                    sendCANMessage(ACKNOWLEDGE_BASE_ROULANTE_RECALAGE, 0, 0, 8, true, 0, 0, 0, 0, 0, 0, 0);
                     liste.general_purpose = TYPE_DEPLACEMENT_IMMOBILE;
-                    // Serial.printf("Don tACKNOWLEDGE_BASE_ROULANTE TYPE_DEPLACEMENT_X_Y_POLAIRE");
-                    // Serial.println();
+                    Serial.printf("Don ACKNOWLEDGE_BASE_ROULANTE_RECALAGE");
+                    Serial.println();
 
                     // Serial.printf(" Odo x %.3f ", odo_x);
                     // Serial.printf(" odo_y %.3f ", odo_y);
@@ -144,16 +143,9 @@ void controle(void *parameters)
 
                 break;
             case TYPE_VIDE:
-                // Serial.printf(" TYPE_VIDE ");
-                // Serial.printf(" Odo x %.3f ", odo_x);
-                // Serial.printf(" odo_y %.3f ", odo_y);
-                // Serial.printf(" teheta %.3f ", degrees(theta_robot));
-                // Serial.println();
-                break;
 
-            case TYPE_EVITEMENT:
+            break;
 
-                break;
 
             default:
                 break;
@@ -175,12 +167,12 @@ void bus_can(void *parameters)
     while (1)
     {
         readCANMessage();
-        send_x_y_theta_regulierement(odo_x, odo_y, theta_robot, 10); // // Attendre la fin du mouvement avant de passer à l'ordre suivant
+        // send_x_y_theta_regulierement(odo_x, odo_y, theta_robot, 10); // // Attendre la fin du mouvement avant de passer à l'ordre suivant
         // (rxMsg.id != 0) ? Serial.println(rxMsg.id) : NONE;
-        // if (flag_fin_mvt)
+        // if (flag_fin_mvt_x_y_theta)
         // {
         //     FIFO_lecture = (FIFO_lecture + 1) % SIZE_FIFO;
-        //     flag_fin_mvt = false; // Réinitialiser le flag pour le prochain ordre
+        //     flag_fin_mvt_x_y_theta = false; // Réinitialiser le flag pour le prochain ordre
 
         //     // vTaskDelay(pdMS_TO_TICKS(Tcan)); // Temporisation pour éviter une boucle trop rapide
         //     // continue;                        // Retourne au début de la boucle en attendant que flag_fin_mvt soit vrai
@@ -270,48 +262,14 @@ void bus_can(void *parameters)
 
             break;
 
-        case POLAIRE:
-
-            liste.nbr_passage = rxMsg.data[0];
-            liste.x_polaire[liste.nbr_passage] = fusion_octet(rxMsg.data[1], rxMsg.data[2]);
-            liste.y_polaire[liste.nbr_passage] = fusion_octet(rxMsg.data[3], rxMsg.data[4]);
-
-            liste.checksum_nbr_passage = rxMsg.data[5] - 1;
-            liste.rotation_polaire[liste.nbr_passage] = fusion_octet(rxMsg.data[6], rxMsg.data[7]);
-
-            if (liste.checksum_nbr_passage == liste.nbr_passage)
-            {
-                enregistreur_odo();
-                // Serial.printf("fâpkfakfa^pkfaêfpk^,ae^c,");
-                liste.general_purpose = TYPE_DEPLACEMENT_X_Y_POLAIRE;
-                // prec_move = liste.general_purpose;
-                flag_fin_mvt = false;
-                rxMsg.id = 0;
-                liste.compteur_point_de_passage_polaire = 0;
-            }
-
-            Serial.printf(" POLAIRE ");
-            Serial.printf(" liste.nbr_passage %d ", liste.nbr_passage);
-            Serial.printf(" liste.checksum_nbr_passage %d ", liste.checksum_nbr_passage);
-
-            Serial.printf(" liste.x_polaire %f ", liste.x_polaire[liste.nbr_passage]);
-            Serial.printf(" liste.y_polaire %f ", liste.y_polaire[liste.nbr_passage]);
-            Serial.printf(" liste.cptps %d ", liste.compteur_point_de_passage_polaire);
-
-            TelnetStream.printf(" POLAIRE ");
-            TelnetStream.printf(" liste.nbr_passage %d ", liste.nbr_passage);
-            TelnetStream.printf(" liste.checksum_nbr_passage %d ", liste.checksum_nbr_passage);
-            TelnetStream.printf(" liste.x_polaire %f ", liste.x_polaire[liste.nbr_passage]);
-            TelnetStream.printf(" liste.y_polaire %f ", liste.y_polaire[liste.nbr_passage]);
-            // TelnetStream.printf(" liste.cptps %d ", liste.compteur_point_de_passage_polaire);
-
-            // Serial.printf(" rxMsg.data[1] %d ", rxMsg.data[1]);
-            // Serial.printf(" rxMsg.data[2] %d ", rxMsg.data[2]);
-            // Serial.printf(" rxMsg.data[3] %d ", rxMsg.data[3]);
-            // Serial.printf(" rxMsg.data[4] %d ", rxMsg.data[4]);
-
-            Serial.println();
-            TelnetStream.println();
+        case XYTHETA:
+            enregistreur_odo();
+            liste.x = fusion_octet(rxMsg.data[0], rxMsg.data[1]);
+            liste.y = fusion_octet(rxMsg.data[2], rxMsg.data[3]);
+            liste.angle = fusion_octet(rxMsg.data[4], rxMsg.data[5]);
+            liste.general_purpose = TYPE_DEPLACEMENT_X_Y_THETA;
+            flag_fin_mvt_x_y_theta = false;
+            rxMsg.id = 0;
 
             break;
         case RECALAGE:
@@ -434,19 +392,8 @@ void bus_can(void *parameters)
             break;
 
         case 0:
-            // Serial.printf("Rien\n");
-            // {
-            //     int16_t odo_x_int = static_cast<int16_t>(odo_x * 10);
-            //     int16_t odo_y_int = static_cast<int16_t>(odo_y * 10);
 
-            //     uint8_t lowByte_x = odo_x_int & 0xFF;
-            //     uint8_t highByte_x = (odo_x_int >> 8) & 0xFF;
-            //     uint8_t lowByte_y = odo_y_int & 0xFF;
-            //     uint8_t highByte_y = (odo_y_int >> 8) & 0xFF;
-            //     // sendCANMessage(ODO_SEND_TETHA, 0, 0, 8, highByte_x, lowByte_x, highByte_y, lowByte_y, 0, 0, 0, 0);
-            // }
-
-            break;
+        break;
 
         default:
             break;
@@ -463,7 +410,7 @@ void setup()
     Serial.begin(115200);
     // Serial.println("Booting with OTA"); // Message indiquant le démarrage avec OTA
     // Appel à la fonction de configuration OTA (non définie dans ce code, mais probablement ailleurs)
-    setupOTA();
+    // setupOTA();
     // Initialisation des moteurs
     setup_motors();
     stop_motors();
@@ -520,41 +467,39 @@ void loop()
 {
     if (flag_controle)
     {
-        if (flag_fin_mvt == true)
-        {
-            // Serial.printf(" PS_ASSER %d ", pause_asser_test);
+        // Serial.printf(" PS_ASSER %d ", pause_asser_test);
 
-            // Serial.printf(" Odo x %.3f ", odo_x);
-            // Serial.printf(" odo_y %.3f ", odo_y);
-            // Serial.printf(" teheta %.3f ", degrees(theta_robot));
-            // // Serial.printf("CPT_PS %d", liste.compteur_point_de_passage_polaire);
+        // Serial.printf(" Odo x %.3f ", odo_x);
+        // Serial.printf(" odo_y %.3f ", odo_y);
+        // Serial.printf(" teheta %.3f ", degrees(theta_robot));
+        // // Serial.printf("CPT_PS %d", liste.compteur_point_de_passage_polaire);
 
-            // Serial.printf(" er_d %.3f ", convert_distance_tick_to_mm(erreur_distance));
-            // Serial.printf(" er_o %.3f ", convert_tick_to_angle_deg(erreur_orient));
-            // Serial.printf(" delta_droit %.0f ", delta_droit);
-            // Serial.printf("ROTATION ");
-            // Serial.printf(" angle %f ", (float)fusion_octet(rxMsg.data[0], rxMsg.data[1]));
-            // Serial.printf(" liste.dist %f", (float)liste.distance);
+        // Serial.printf(" er_d %.3f ", convert_distance_tick_to_mm(erreur_distance));
+        // Serial.printf(" er_o %.3f ", convert_tick_to_angle_deg(erreur_orient));
+        // Serial.printf(" delta_droit %.0f ", delta_droit);
+        // Serial.printf("ROTATION ");
+        // Serial.printf(" angle %f ", (float)fusion_octet(rxMsg.data[0], rxMsg.data[1]));
+        // Serial.printf(" liste.dist %f", (float)liste.distance);
 
-            // Serial.printf(" consigne_position_droite %.0f ", consigne_position_droite);
-            // Serial.printf(" consigne_position_gauche %.0f ", consigne_position_gauche);
+        // Serial.printf(" consigne_position_droite %.0f ", consigne_position_droite);
+        // Serial.printf(" consigne_position_gauche %.0f ", consigne_position_gauche);
 
-            // Serial.printf(" odo_tick_droit %.0f ", odo_tick_droit);
-            // Serial.printf(" odo_tick_gauche %.0f ", odo_tick_gauche);
+        // Serial.printf(" odo_tick_droit %.0f ", odo_tick_droit);
+        // Serial.printf(" odo_tick_gauche %.0f ", odo_tick_gauche);
 
-            // Serial.printf(" delta_tick_droit %.0f ", delta_odo_tick_droit);
-            // Serial.printf(" delta_tick_gauche %.0f ", delta_odo_tick_gauche);
+        // Serial.printf(" delta_tick_droit %.0f ", delta_odo_tick_droit);
+        // Serial.printf(" delta_tick_gauche %.0f ", delta_odo_tick_gauche);
 
-            // Serial.printf("cs_dist_mm %f", convert_distance_tick_to_mm(liste.distance));
-            // Serial.printf(" cs_dist_tic %d", (liste.distance));
+        // Serial.printf("cs_dist_mm %f", convert_distance_tick_to_mm(liste.distance));
+        // Serial.printf(" cs_dist_tic %d", (liste.distance));
 
-            // // // Serial.printf(" vitesse robo %f ", vitesse_rob);
+        // // // Serial.printf(" vitesse robo %f ", vitesse_rob);
 
-            // // Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
-            // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
-            // Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
-            // Serial.println();
-        }
+        // // Serial.printf(" etat_x_y_theta x %d ", etat_x_y_theta);
+        // Serial.print("Etat actuel : " + toStringG(etat_actuel_vit_roue_folle_gauche));
+        // Serial.print(" " + toStringD(etat_actuel_vit_roue_folle_droite));
+        // Serial.println();
+
         flag_controle = 0;
     }
 }
@@ -566,7 +511,7 @@ void serialEvent()
         // reception(Serial.read());
         char caractere = Serial.read();
         receptionWIFI(caractere);
-        
+
         Serial.print(caractere);
     }
 }

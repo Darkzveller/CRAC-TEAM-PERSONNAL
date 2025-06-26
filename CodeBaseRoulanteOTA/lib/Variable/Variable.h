@@ -3,8 +3,8 @@
 #ifndef Variable_H
 #define Variable_H
 
-// #define PARAMETRE_BASE_TEST 
-#define PARAMETRE_BASE_OFFICIEL
+#define PARAMETRE_BASE_TEST 
+// #define PARAMETRE_BASE_OFFICIEL
 
 extern float tension_bat ;
 // Parametre FreeRTOS
@@ -41,7 +41,7 @@ extern float tension_bat ;
 
 #endif
 #ifdef PARAMETRE_BASE_TEST
-#define ENTRAXE 110.0
+#define ENTRAXE 97.0
 #define LARGEUR_ROBOT_mm 250.0
 #define SIZE_WHEEL_DIAMETER_mm 50.0
 #endif
@@ -108,18 +108,12 @@ struct Ordre_deplacement
   uint8_t direction_recalage;
   float nouvelle_valeur_x_y_theta_rien;
   uint16_t consigne_rotation_recalge;
-  float x;
   bool deceleration_polaire;
   uint8_t compteur_point_de_passage_polaire;
   float vitesse_x_y_theta;
-  float x_polaire[255];
-  float y_polaire[255];
+  float x;
+  float y;
   float rotation_polaire[255];
-  uint8_t nbr_passage;
-  uint8_t checksum_nbr_passage;
-
-  int distance_lidar;
-  int angle_lidar;
 
 };
 
@@ -261,12 +255,10 @@ extern float consigne_regulation_moyenne ;
 
 //************************Polaire en tick */
 #define TOLERANCE_ERREUR_DISTANCE_AUTORISER 10
-#define SEUIL_ACTIVATION_DECELERATION_DISTANCE 85
+#define SEUIL_ACTIVATION_DECELERATION_DISTANCE 20
 
-#define VALEUR_DEFAUT_COEFF_ROT_POLAIRE_TICK 0.5 /2
-#define VALEUR_DEFAUT_COEFF_DIST_POLAIRE_TICK 1
-#define VALEUR_ROTATION_SUR_PLACE_COEFF_ROT_POLAIRE_TICK 1.2
-#define VALEUR_ROTATION_SUR_PLACE_COEFF_DIST_POLAIRE_TICK 0
+#define VALEUR_DEFAUT_COEFF_ROT_POLAIRE_TICK 0.15
+#define VALEUR_DEFAUT_COEFF_DIST_POLAIRE_TICK 1.2
 
 extern float erreur_distance ;
 extern float erreur_orient ;
@@ -275,11 +267,6 @@ extern float coeff_rot_polaire_tick ;
 extern float coeff_dist_polaire_tick ;
 extern float consigne_rot_polaire_tick ;
 extern float consigne_dist_polaire_tick;
-
-extern float coeff_decc_distance_polaire_tick ;
-extern float distance_decl_polaire_tick;
-
-extern bool calcul_decl_polaire_tick;
 
 
 //***********LOOP******************* */
@@ -316,7 +303,7 @@ extern bool flag_can_printf;
 #define TYPE_DEPLACEMENT_X_Y_POLAIRE 7 
 #define TYPE_EVITEMENT 8
 
-extern bool flag_fin_mvt;
+extern bool flag_fin_mvt_x_y_theta;
 
 extern bool stop_start_robot_fin_match;
 //*********** Qu'est ce qu'on voit au borne de la batterie******************* */

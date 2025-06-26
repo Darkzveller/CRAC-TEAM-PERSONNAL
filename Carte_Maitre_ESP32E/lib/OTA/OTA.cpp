@@ -542,6 +542,9 @@ void receptionWIFI(char ch)
       Serial.println();
 
       sendCANMessage(CONSTRUIRE_AVANT_PREPARER, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0);
+
+            // sendCANMessage(CMD_MPP_AVANT, 0, 0, 8, 100, 0, 0, 0, 1, 0, 0, 0);
+
     }
     if ((commande == "C"))
     {
@@ -553,6 +556,20 @@ void receptionWIFI(char ch)
       Serial.println();
 
       sendCANMessage(CONSTRUIRE_AVANT_2ETAGE, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0);
+    }
+    if ((commande == "relacher"))
+    {
+      TelnetStream.println();
+
+      TelnetStream.printf("On relache le pack ");
+      TelnetStream.println();
+      Serial.printf("On relache le pack");
+      Serial.println();
+      // #define HERKULEX_AVANT_AIMANT_COTE 0x501
+      // #define HERKULEX_AVANT_AIMANT_CENTRE 0x502
+
+      sendCANMessage(HERKULEX_AVANT_AIMANT_COTE, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0);
+      sendCANMessage(HERKULEX_AVANT_AIMANT_CENTRE, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
     chaine = "";

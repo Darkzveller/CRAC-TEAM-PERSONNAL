@@ -33,11 +33,10 @@ const char *password = "99xS,304";    // Mot de passe du réseau WiFi
 const char *ssid = "iPhone de Géraldine";        // SSID du réseau WiFi
 const char *password = "unmotdepassecompliquer"; // Mot de passe du réseau WiFi
 #endif
-#ifdef ROUTEUR_CRAC_COUPE                            // Nom d'hôte de la carte ESP32
-const char *ssid = "esp2.4hz";        // SSID du réseau WiFi
+#ifdef ROUTEUR_CRAC_COUPE           // Nom d'hôte de la carte ESP32
+const char *ssid = "esp2.4hz";      // SSID du réseau WiFi
 const char *password = "cracadmin"; // Mot de passe du réseau WiFi
 #endif
-
 
 // Fonction pour gérer les opérations OTA dans une tâche séparée
 void ota_handle(void *parameter)
@@ -239,6 +238,7 @@ void receptionWIFI(char ch)
       rxMsg.data[0] = highByte;
       rxMsg.data[1] = lowByte;
       rxMsg.data[2] = SPEED_NORMAL;
+      // enregistreur_odo();
     }
     if (commande == "LIGNE")
     {
@@ -279,6 +279,7 @@ void receptionWIFI(char ch)
       rxMsg.data[0] = highByte;
       rxMsg.data[1] = lowByte;
       rxMsg.data[2] = SPEED_NORMAL;
+      // enregistreur_odo();
     }
 
     if (commande == "xp")
@@ -316,13 +317,13 @@ void receptionWIFI(char ch)
       Serial.printf("Send command yp with cons");
       Serial.printf(" cmd %d", cmd);
       Serial.println();
-      rxMsg.id = POLAIRE;
+      // rxMsg.id = POLAIRE;
       rxMsg.data[1] = x_high_byte;
       rxMsg.data[2] = x_low_byte;
       rxMsg.data[3] = y_high_byte;
       rxMsg.data[4] = y_low_byte;
       // liste.nbr_passage = rxMsg.data[0];
-      liste.nbr_passage = 0;
+      // liste.nbr_passage = 0;
     }
 
     if (commande == "reset")
@@ -364,7 +365,7 @@ void receptionWIFI(char ch)
 
       consigne_theta_prec = degrees(theta_robot);
       pause_asser_test = true;
-     
+
       TelnetStream.println();
       TelnetStream.printf("start_asser ");
       TelnetStream.println();
@@ -372,7 +373,6 @@ void receptionWIFI(char ch)
       Serial.printf("start_asser");
       Serial.println();
       delay(1000);
-
     }
 
     if ((commande == "RESTART") || (commande == "restart"))

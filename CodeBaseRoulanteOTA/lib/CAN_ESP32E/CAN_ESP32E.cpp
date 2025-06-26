@@ -180,9 +180,6 @@ bool messageCANForMe(uint16_t ID)
     case XYTHETA:
         return true;
         break;
-    case POLAIRE:
-        return true;
-        break;
 
     case RECALAGE:
         return true;

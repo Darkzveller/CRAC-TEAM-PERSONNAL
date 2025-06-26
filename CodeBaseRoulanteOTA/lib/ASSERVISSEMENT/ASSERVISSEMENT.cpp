@@ -489,7 +489,7 @@ double asservissement_angle_correction(double consigne_angle, double observation
 
     static double somme_integral_angle = 0.0;
     double erreur = consigne_angle - observation_angle;
-
+Serial.printf("Errure aungle %f \n",erreur);
     double proportionnel = coeff_P_angle * erreur;
 
     // Terme dérivé
